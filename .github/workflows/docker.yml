@@ -76,7 +76,8 @@ jobs:
 
       - name: Verify image
         run: |
-          docker pull ${{ env.GHCR_REGISTRY }}/${{ github.repository }}:${{ github.sha }}
+          SHORT_SHA="${GITHUB_SHA::7}"
+          docker pull ${{ env.GHCR_REGISTRY }}/${{ github.repository }}:${SHORT_SHA}
           docker run --rm -e CLOUD_PILOT_SPECS_DYNAMIC=false \
-            ${{ env.GHCR_REGISTRY }}/${{ github.repository }}:${{ github.sha }} \
+            ${{ env.GHCR_REGISTRY }}/${{ github.repository }}:${SHORT_SHA} \
             node -e "console.log('Container runs OK')"
