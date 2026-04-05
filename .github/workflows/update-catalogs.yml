@@ -1,0 +1,40 @@
+name: Update bundled catalogs
+
+on:
+  schedule:
+    - cron: "0 6 1 * *" # 1st of every month at 06:00 UTC
+  workflow_dispatch: # allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  update-catalogs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - run: npm ci
+
+      - run: npm run build-catalogs
+
+      - name: Check for changes
+        id: diff
+        run: |
+          git diff --quiet data/ && echo "changed=false" >> "$GITHUB_OUTPUT" || echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/aws-catalog.json data/azure-catalog.json
+          git commit -m "chore: update bundled API catalogs
+
+          AWS services: $(node -e "console.log(require('./data/aws-catalog.json').length)")
+          Azure services: $(node -e "console.log(require('./data/azure-catalog.json').length)")"
+          git push
