@@ -33,5 +33,14 @@
   "engines": {
     "node": ">=20.0.0"
   },
+  "author": {
+    "name": "Vitale Mazo",
+    "url": "https://github.com/vitalemazo"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vitalemazo/cloud-pilot-mcp.git"
+  },
+  "homepage": "https://github.com/vitalemazo/cloud-pilot-mcp",
   "license": "MIT"
 }

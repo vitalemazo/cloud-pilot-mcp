@@ -552,6 +552,14 @@ test/
 | AWS ECS/Lambda | Streamable HTTP | IAM Role | Native AWS auth |
 | Kubernetes | Streamable HTTP | Vault / Workload Identity | Sidecar or standalone pod |
 
+## Author
+
+**Vitale Mazo** — [github.com/vitalemazo](https://github.com/vitalemazo)
+
+Sole author and copyright holder. All intellectual property rights, including the search-and-execute pattern for dynamic cloud API discovery via sandboxed execution, are retained by the author.
+
 ## License
 
-MIT
+MIT License. Copyright (c) 2026 Vitale Mazo. All rights reserved.
+
+See [LICENSE](LICENSE) for full terms. The MIT license grants permission to use, modify, and distribute this software, but does not transfer copyright or patent rights.

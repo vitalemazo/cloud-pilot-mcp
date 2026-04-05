@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Vitale Mazo. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root.
+
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import type { OperationSpec, ParamSpec } from "../../interfaces/cloud-provider.js";
 

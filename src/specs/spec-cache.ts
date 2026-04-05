@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Vitale Mazo. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root.
+
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import type { CatalogEntry, OperationIndexEntry, CacheManifest } from "./types.js";

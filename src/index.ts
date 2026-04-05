@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 
+
+
+// Copyright (c) 2026 Vitale Mazo. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root.
+
+
 import { createServer as createHttpServer } from "node:http";
 import { randomUUID } from "node:crypto";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";

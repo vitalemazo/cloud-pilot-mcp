@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Vitale Mazo. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root.
+
 import type { CloudProvider } from "../interfaces/cloud-provider.js";
 import type { AuditLogger } from "../interfaces/audit.js";
 
