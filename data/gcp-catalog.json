@@ -1,0 +1,1832 @@
+[
+  {
+    "service": "abusiveexperiencereport",
+    "version": "v1",
+    "path": "https://abusiveexperiencereport.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Abusive Experience Report API"
+  },
+  {
+    "service": "acceleratedmobilepageurl",
+    "version": "v1",
+    "path": "https://acceleratedmobilepageurl.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Accelerated Mobile Pages (AMP) URL API"
+  },
+  {
+    "service": "accessapproval",
+    "version": "v1",
+    "path": "https://accessapproval.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Access Approval API"
+  },
+  {
+    "service": "accesscontextmanager",
+    "version": "v1",
+    "path": "https://accesscontextmanager.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Access Context Manager API"
+  },
+  {
+    "service": "addressvalidation",
+    "version": "v1",
+    "path": "https://addressvalidation.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Address Validation API"
+  },
+  {
+    "service": "adexchangebuyer2",
+    "version": "v2beta1",
+    "path": "https://adexchangebuyer.googleapis.com/$discovery/rest?version=v2beta1",
+    "fullName": "Ad Exchange Buyer API II"
+  },
+  {
+    "service": "adexperiencereport",
+    "version": "v1",
+    "path": "https://adexperiencereport.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Ad Experience Report API"
+  },
+  {
+    "service": "admin",
+    "version": "reports_v1",
+    "path": "https://admin.googleapis.com/$discovery/rest?version=reports_v1",
+    "fullName": "Admin SDK API"
+  },
+  {
+    "service": "admob",
+    "version": "v1",
+    "path": "https://admob.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "AdMob API"
+  },
+  {
+    "service": "adsense",
+    "version": "v2",
+    "path": "https://adsense.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "AdSense Management API"
+  },
+  {
+    "service": "adsenseplatform",
+    "version": "v1",
+    "path": "https://adsenseplatform.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "AdSense Platform API"
+  },
+  {
+    "service": "advisorynotifications",
+    "version": "v1",
+    "path": "https://advisorynotifications.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Advisory Notifications API"
+  },
+  {
+    "service": "agentregistry",
+    "version": "v1alpha",
+    "path": "https://agentregistry.googleapis.com/$discovery/rest?version=v1alpha",
+    "fullName": "Agent Registry API"
+  },
+  {
+    "service": "aiplatform",
+    "version": "v1",
+    "path": "https://aiplatform.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Vertex AI API"
+  },
+  {
+    "service": "airquality",
+    "version": "v1",
+    "path": "https://airquality.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Air Quality API"
+  },
+  {
+    "service": "alertcenter",
+    "version": "v1beta1",
+    "path": "https://alertcenter.googleapis.com/$discovery/rest?version=v1beta1",
+    "fullName": "Google Workspace Alert Center API"
+  },
+  {
+    "service": "alloydb",
+    "version": "v1",
+    "path": "https://alloydb.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "AlloyDB API"
+  },
+  {
+    "service": "analytics",
+    "version": "v3",
+    "path": "https://analytics.googleapis.com/$discovery/rest?version=v3",
+    "fullName": "Google Analytics API"
+  },
+  {
+    "service": "analyticsadmin",
+    "version": "v1beta",
+    "path": "https://analyticsadmin.googleapis.com/$discovery/rest?version=v1beta",
+    "fullName": "Google Analytics Admin API"
+  },
+  {
+    "service": "analyticsdata",
+    "version": "v1beta",
+    "path": "https://analyticsdata.googleapis.com/$discovery/rest?version=v1beta",
+    "fullName": "Google Analytics Data API"
+  },
+  {
+    "service": "analyticshub",
+    "version": "v1",
+    "path": "https://analyticshub.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Analytics Hub API"
+  },
+  {
+    "service": "androiddeviceprovisioning",
+    "version": "v1",
+    "path": "https://androiddeviceprovisioning.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Android Device Provisioning Partner API"
+  },
+  {
+    "service": "androidenterprise",
+    "version": "v1",
+    "path": "https://androidenterprise.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Google Play EMM API"
+  },
+  {
+    "service": "androidmanagement",
+    "version": "v1",
+    "path": "https://androidmanagement.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Android Management API"
+  },
+  {
+    "service": "androidpublisher",
+    "version": "v3",
+    "path": "https://androidpublisher.googleapis.com/$discovery/rest?version=v3",
+    "fullName": "Google Play Android Developer API"
+  },
+  {
+    "service": "apigateway",
+    "version": "v1",
+    "path": "https://apigateway.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "API Gateway API"
+  },
+  {
+    "service": "apigee",
+    "version": "v1",
+    "path": "https://apigee.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Apigee API"
+  },
+  {
+    "service": "apigeeregistry",
+    "version": "v1",
+    "path": "https://apigeeregistry.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Apigee Registry API"
+  },
+  {
+    "service": "apihub",
+    "version": "v1",
+    "path": "https://apihub.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "API hub API"
+  },
+  {
+    "service": "apikeys",
+    "version": "v2",
+    "path": "https://apikeys.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "API Keys API"
+  },
+  {
+    "service": "apim",
+    "version": "v1alpha",
+    "path": "https://apim.googleapis.com/$discovery/rest?version=v1alpha",
+    "fullName": "API Management API"
+  },
+  {
+    "service": "appengine",
+    "version": "v1",
+    "path": "https://appengine.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "App Engine Admin API"
+  },
+  {
+    "service": "apphub",
+    "version": "v1",
+    "path": "https://apphub.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "App Hub API"
+  },
+  {
+    "service": "appsmarket",
+    "version": "v2",
+    "path": "https://appsmarket.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Google Workspace Marketplace API"
+  },
+  {
+    "service": "area120tables",
+    "version": "v1alpha1",
+    "path": "https://area120tables.googleapis.com/$discovery/rest?version=v1alpha1",
+    "fullName": "Area120 Tables API"
+  },
+  {
+    "service": "areainsights",
+    "version": "v1",
+    "path": "https://areainsights.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Places Aggregate API"
+  },
+  {
+    "service": "artifactregistry",
+    "version": "v1",
+    "path": "https://artifactregistry.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Artifact Registry API"
+  },
+  {
+    "service": "assuredworkloads",
+    "version": "v1",
+    "path": "https://assuredworkloads.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Assured Workloads API"
+  },
+  {
+    "service": "authorizedbuyersmarketplace",
+    "version": "v1",
+    "path": "https://authorizedbuyersmarketplace.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Authorized Buyers Marketplace API"
+  },
+  {
+    "service": "backupdr",
+    "version": "v1",
+    "path": "https://backupdr.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Backup and DR Service API"
+  },
+  {
+    "service": "baremetalsolution",
+    "version": "v2",
+    "path": "https://baremetalsolution.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Bare Metal Solution API"
+  },
+  {
+    "service": "batch",
+    "version": "v1",
+    "path": "https://batch.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Batch API"
+  },
+  {
+    "service": "beyondcorp",
+    "version": "v1",
+    "path": "https://beyondcorp.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "BeyondCorp API"
+  },
+  {
+    "service": "biglake",
+    "version": "v1",
+    "path": "https://biglake.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "BigLake API"
+  },
+  {
+    "service": "bigquery",
+    "version": "v2",
+    "path": "https://bigquery.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "BigQuery API"
+  },
+  {
+    "service": "bigqueryconnection",
+    "version": "v1",
+    "path": "https://bigqueryconnection.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "BigQuery Connection API"
+  },
+  {
+    "service": "bigquerydatapolicy",
+    "version": "v2",
+    "path": "https://bigquerydatapolicy.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "BigQuery Data Policy API"
+  },
+  {
+    "service": "bigquerydatatransfer",
+    "version": "v1",
+    "path": "https://bigquerydatatransfer.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "BigQuery Data Transfer API"
+  },
+  {
+    "service": "bigqueryreservation",
+    "version": "v1",
+    "path": "https://bigqueryreservation.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "BigQuery Reservation API"
+  },
+  {
+    "service": "bigtableadmin",
+    "version": "v2",
+    "path": "https://bigtableadmin.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Cloud Bigtable Admin API"
+  },
+  {
+    "service": "billingbudgets",
+    "version": "v1",
+    "path": "https://billingbudgets.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Billing Budget API"
+  },
+  {
+    "service": "binaryauthorization",
+    "version": "v1",
+    "path": "https://binaryauthorization.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Binary Authorization API"
+  },
+  {
+    "service": "blockchainnodeengine",
+    "version": "v1",
+    "path": "https://blockchainnodeengine.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Blockchain Node Engine API"
+  },
+  {
+    "service": "blogger",
+    "version": "v3",
+    "path": "https://blogger.googleapis.com/$discovery/rest?version=v3",
+    "fullName": "Blogger API"
+  },
+  {
+    "service": "books",
+    "version": "v1",
+    "path": "https://books.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Books API"
+  },
+  {
+    "service": "businessprofileperformance",
+    "version": "v1",
+    "path": "https://businessprofileperformance.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Business Profile Performance API"
+  },
+  {
+    "service": "calendar",
+    "version": "v3",
+    "path": "https://calendar-json.googleapis.com/$discovery/rest?version=v3",
+    "fullName": "Google Calendar API"
+  },
+  {
+    "service": "certificatemanager",
+    "version": "v1",
+    "path": "https://certificatemanager.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Certificate Manager API"
+  },
+  {
+    "service": "ces",
+    "version": "v1",
+    "path": "https://ces.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Gemini Enterprise for Customer Experience API"
+  },
+  {
+    "service": "chat",
+    "version": "v1",
+    "path": "https://chat.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Google Chat API"
+  },
+  {
+    "service": "checks",
+    "version": "v1alpha",
+    "path": "https://checks.googleapis.com/$discovery/rest?version=v1alpha",
+    "fullName": "Checks API"
+  },
+  {
+    "service": "chromemanagement",
+    "version": "v1",
+    "path": "https://chromemanagement.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Chrome Management API"
+  },
+  {
+    "service": "chromepolicy",
+    "version": "v1",
+    "path": "https://chromepolicy.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Chrome Policy API"
+  },
+  {
+    "service": "chromeuxreport",
+    "version": "v1",
+    "path": "https://chromeuxreport.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Chrome UX Report API"
+  },
+  {
+    "service": "chromewebstore",
+    "version": "v2",
+    "path": "https://chromewebstore.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Chrome Web Store API"
+  },
+  {
+    "service": "civicinfo",
+    "version": "v2",
+    "path": "https://civicinfo.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Google Civic Information API"
+  },
+  {
+    "service": "classroom",
+    "version": "v1",
+    "path": "https://classroom.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Google Classroom API"
+  },
+  {
+    "service": "cloudasset",
+    "version": "v1",
+    "path": "https://cloudasset.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Asset API"
+  },
+  {
+    "service": "cloudbilling",
+    "version": "v1",
+    "path": "https://cloudbilling.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Billing API"
+  },
+  {
+    "service": "cloudbuild",
+    "version": "v2",
+    "path": "https://cloudbuild.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Cloud Build API"
+  },
+  {
+    "service": "cloudchannel",
+    "version": "v1",
+    "path": "https://cloudchannel.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Channel API"
+  },
+  {
+    "service": "cloudcommerceprocurement",
+    "version": "v1",
+    "path": "https://cloudcommerceprocurement.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Commerce Partner Procurement API"
+  },
+  {
+    "service": "cloudcontrolspartner",
+    "version": "v1",
+    "path": "https://cloudcontrolspartner.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Controls Partner API"
+  },
+  {
+    "service": "clouddeploy",
+    "version": "v1",
+    "path": "https://clouddeploy.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Deploy API"
+  },
+  {
+    "service": "clouderrorreporting",
+    "version": "v1beta1",
+    "path": "https://clouderrorreporting.googleapis.com/$discovery/rest?version=v1beta1",
+    "fullName": "Error Reporting API"
+  },
+  {
+    "service": "cloudfunctions",
+    "version": "v2",
+    "path": "https://cloudfunctions.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Cloud Functions API"
+  },
+  {
+    "service": "cloudidentity",
+    "version": "v1",
+    "path": "https://cloudidentity.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Identity API"
+  },
+  {
+    "service": "cloudkms",
+    "version": "v1",
+    "path": "https://cloudkms.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Key Management Service (KMS) API"
+  },
+  {
+    "service": "cloudlocationfinder",
+    "version": "v1",
+    "path": "https://cloudlocationfinder.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Location Finder API"
+  },
+  {
+    "service": "cloudprofiler",
+    "version": "v2",
+    "path": "https://cloudprofiler.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Cloud Profiler API"
+  },
+  {
+    "service": "cloudresourcemanager",
+    "version": "v3",
+    "path": "https://cloudresourcemanager.googleapis.com/$discovery/rest?version=v3",
+    "fullName": "Cloud Resource Manager API"
+  },
+  {
+    "service": "cloudscheduler",
+    "version": "v1",
+    "path": "https://cloudscheduler.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Scheduler API"
+  },
+  {
+    "service": "cloudsearch",
+    "version": "v1",
+    "path": "https://cloudsearch.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Search API"
+  },
+  {
+    "service": "cloudshell",
+    "version": "v1",
+    "path": "https://cloudshell.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Shell API"
+  },
+  {
+    "service": "cloudsupport",
+    "version": "v2",
+    "path": "https://cloudsupport.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Google Cloud Support API"
+  },
+  {
+    "service": "cloudtasks",
+    "version": "v2",
+    "path": "https://cloudtasks.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Cloud Tasks API"
+  },
+  {
+    "service": "cloudtrace",
+    "version": "v2",
+    "path": "https://cloudtrace.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Cloud Trace API"
+  },
+  {
+    "service": "composer",
+    "version": "v1",
+    "path": "https://composer.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Composer API"
+  },
+  {
+    "service": "compute",
+    "version": "v1",
+    "path": "https://www.googleapis.com/discovery/v1/apis/compute/v1/rest",
+    "fullName": "Compute Engine API"
+  },
+  {
+    "service": "config",
+    "version": "v1",
+    "path": "https://config.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Infrastructure Manager API"
+  },
+  {
+    "service": "connectors",
+    "version": "v2",
+    "path": "https://connectors.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Connectors API"
+  },
+  {
+    "service": "contactcenteraiplatform",
+    "version": "v1alpha1",
+    "path": "https://contactcenteraiplatform.googleapis.com/$discovery/rest?version=v1alpha1",
+    "fullName": "Contact Center AI Platform API"
+  },
+  {
+    "service": "contactcenterinsights",
+    "version": "v1",
+    "path": "https://contactcenterinsights.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Contact Center AI Insights API"
+  },
+  {
+    "service": "container",
+    "version": "v1",
+    "path": "https://container.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Kubernetes Engine API"
+  },
+  {
+    "service": "containeranalysis",
+    "version": "v1",
+    "path": "https://containeranalysis.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Container Analysis API"
+  },
+  {
+    "service": "content",
+    "version": "v2.1",
+    "path": "https://shoppingcontent.googleapis.com/$discovery/rest?version=v2.1",
+    "fullName": "Content API for Shopping"
+  },
+  {
+    "service": "contentwarehouse",
+    "version": "v1",
+    "path": "https://contentwarehouse.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Document AI Warehouse API"
+  },
+  {
+    "service": "css",
+    "version": "v1",
+    "path": "https://css.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "CSS API"
+  },
+  {
+    "service": "customsearch",
+    "version": "v1",
+    "path": "https://customsearch.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Custom Search API"
+  },
+  {
+    "service": "datacatalog",
+    "version": "v1",
+    "path": "https://datacatalog.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Google Cloud Data Catalog API"
+  },
+  {
+    "service": "dataflow",
+    "version": "v1b3",
+    "path": "https://dataflow.googleapis.com/$discovery/rest?version=v1b3",
+    "fullName": "Dataflow API"
+  },
+  {
+    "service": "dataform",
+    "version": "v1",
+    "path": "https://dataform.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Dataform API"
+  },
+  {
+    "service": "datafusion",
+    "version": "v1",
+    "path": "https://datafusion.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Data Fusion API"
+  },
+  {
+    "service": "datalabeling",
+    "version": "v1beta1",
+    "path": "https://datalabeling.googleapis.com/$discovery/rest?version=v1beta1",
+    "fullName": "Data Labeling API"
+  },
+  {
+    "service": "datalineage",
+    "version": "v1",
+    "path": "https://datalineage.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Data Lineage API"
+  },
+  {
+    "service": "datamanager",
+    "version": "v1",
+    "path": "https://datamanager.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Data Manager API"
+  },
+  {
+    "service": "datamigration",
+    "version": "v1",
+    "path": "https://datamigration.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Database Migration API"
+  },
+  {
+    "service": "datapipelines",
+    "version": "v1",
+    "path": "https://datapipelines.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Data pipelines API"
+  },
+  {
+    "service": "dataplex",
+    "version": "v1",
+    "path": "https://dataplex.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Dataplex API"
+  },
+  {
+    "service": "dataportability",
+    "version": "v1",
+    "path": "https://dataportability.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Data Portability API"
+  },
+  {
+    "service": "dataproc",
+    "version": "v1",
+    "path": "https://dataproc.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Dataproc API"
+  },
+  {
+    "service": "datastore",
+    "version": "v1",
+    "path": "https://datastore.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Datastore API"
+  },
+  {
+    "service": "datastream",
+    "version": "v1",
+    "path": "https://datastream.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Datastream API"
+  },
+  {
+    "service": "deploymentmanager",
+    "version": "v2",
+    "path": "https://deploymentmanager.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Cloud Deployment Manager V2 API"
+  },
+  {
+    "service": "developerconnect",
+    "version": "v1",
+    "path": "https://developerconnect.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Developer Connect API"
+  },
+  {
+    "service": "developerknowledge",
+    "version": "v1alpha",
+    "path": "https://developerknowledge.googleapis.com/$discovery/rest?version=v1alpha",
+    "fullName": "Developer Knowledge API"
+  },
+  {
+    "service": "dfareporting",
+    "version": "v5",
+    "path": "https://dfareporting.googleapis.com/$discovery/rest?version=v5",
+    "fullName": "Campaign Manager 360 API"
+  },
+  {
+    "service": "dialogflow",
+    "version": "v3",
+    "path": "https://dialogflow.googleapis.com/$discovery/rest?version=v3",
+    "fullName": "Dialogflow API"
+  },
+  {
+    "service": "digitalassetlinks",
+    "version": "v1",
+    "path": "https://digitalassetlinks.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Digital Asset Links API"
+  },
+  {
+    "service": "discovery",
+    "version": "v1",
+    "path": "https://discovery.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "API Discovery Service"
+  },
+  {
+    "service": "discoveryengine",
+    "version": "v1",
+    "path": "https://discoveryengine.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Discovery Engine API"
+  },
+  {
+    "service": "displayvideo",
+    "version": "v4",
+    "path": "https://displayvideo.googleapis.com/$discovery/rest?version=v4",
+    "fullName": "Display & Video 360 API"
+  },
+  {
+    "service": "dlp",
+    "version": "v2",
+    "path": "https://dlp.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Sensitive Data Protection (DLP)"
+  },
+  {
+    "service": "dns",
+    "version": "v1",
+    "path": "https://dns.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud DNS API"
+  },
+  {
+    "service": "docs",
+    "version": "v1",
+    "path": "https://docs.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Google Docs API"
+  },
+  {
+    "service": "documentai",
+    "version": "v1",
+    "path": "https://documentai.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Document AI API"
+  },
+  {
+    "service": "domains",
+    "version": "v1",
+    "path": "https://domains.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Domains API"
+  },
+  {
+    "service": "doubleclickbidmanager",
+    "version": "v2",
+    "path": "https://doubleclickbidmanager.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "DoubleClick Bid Manager API"
+  },
+  {
+    "service": "doubleclicksearch",
+    "version": "v2",
+    "path": "https://doubleclicksearch.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Search Ads 360 API"
+  },
+  {
+    "service": "drive",
+    "version": "v3",
+    "path": "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest",
+    "fullName": "Drive API"
+  },
+  {
+    "service": "driveactivity",
+    "version": "v2",
+    "path": "https://driveactivity.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Drive Activity API"
+  },
+  {
+    "service": "drivelabels",
+    "version": "v2",
+    "path": "https://drivelabels.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Drive Labels API"
+  },
+  {
+    "service": "essentialcontacts",
+    "version": "v1",
+    "path": "https://essentialcontacts.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Essential Contacts API"
+  },
+  {
+    "service": "eventarc",
+    "version": "v1",
+    "path": "https://eventarc.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Eventarc API"
+  },
+  {
+    "service": "factchecktools",
+    "version": "v1alpha1",
+    "path": "https://factchecktools.googleapis.com/$discovery/rest?version=v1alpha1",
+    "fullName": "Fact Check Tools API"
+  },
+  {
+    "service": "fcm",
+    "version": "v1",
+    "path": "https://fcm.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Firebase Cloud Messaging API"
+  },
+  {
+    "service": "fcmdata",
+    "version": "v1beta1",
+    "path": "https://fcmdata.googleapis.com/$discovery/rest?version=v1beta1",
+    "fullName": "Firebase Cloud Messaging Data API"
+  },
+  {
+    "service": "file",
+    "version": "v1",
+    "path": "https://file.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Filestore API"
+  },
+  {
+    "service": "firebase",
+    "version": "v1beta1",
+    "path": "https://firebase.googleapis.com/$discovery/rest?version=v1beta1",
+    "fullName": "Firebase Management API"
+  },
+  {
+    "service": "firebaseappcheck",
+    "version": "v1",
+    "path": "https://firebaseappcheck.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Firebase App Check API"
+  },
+  {
+    "service": "firebaseappdistribution",
+    "version": "v1",
+    "path": "https://firebaseappdistribution.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Firebase App Distribution API"
+  },
+  {
+    "service": "firebaseapphosting",
+    "version": "v1",
+    "path": "https://firebaseapphosting.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Firebase App Hosting API"
+  },
+  {
+    "service": "firebasedatabase",
+    "version": "v1beta",
+    "path": "https://firebasedatabase.googleapis.com/$discovery/rest?version=v1beta",
+    "fullName": "Firebase Realtime Database Management API"
+  },
+  {
+    "service": "firebasedataconnect",
+    "version": "v1",
+    "path": "https://firebasedataconnect.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Firebase Data Connect API"
+  },
+  {
+    "service": "firebasedynamiclinks",
+    "version": "v1",
+    "path": "https://firebasedynamiclinks.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Firebase Dynamic Links API"
+  },
+  {
+    "service": "firebasehosting",
+    "version": "v1",
+    "path": "https://firebasehosting.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Firebase Hosting API"
+  },
+  {
+    "service": "firebaseml",
+    "version": "v1",
+    "path": "https://firebaseml.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Firebase ML API"
+  },
+  {
+    "service": "firebaserules",
+    "version": "v1",
+    "path": "https://firebaserules.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Firebase Rules API"
+  },
+  {
+    "service": "firebasestorage",
+    "version": "v1beta",
+    "path": "https://firebasestorage.googleapis.com/$discovery/rest?version=v1beta",
+    "fullName": "Cloud Storage for Firebase API"
+  },
+  {
+    "service": "firestore",
+    "version": "v1",
+    "path": "https://firestore.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Firestore API"
+  },
+  {
+    "service": "fitness",
+    "version": "v1",
+    "path": "https://fitness.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Fitness API"
+  },
+  {
+    "service": "forms",
+    "version": "v1",
+    "path": "https://forms.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Google Forms API"
+  },
+  {
+    "service": "games",
+    "version": "v1",
+    "path": "https://games.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Google Play Games Services API"
+  },
+  {
+    "service": "gamesConfiguration",
+    "version": "v1configuration",
+    "path": "https://gamesconfiguration.googleapis.com/$discovery/rest?version=v1configuration",
+    "fullName": "Google Play Games Services Publishing API"
+  },
+  {
+    "service": "gamesManagement",
+    "version": "v1management",
+    "path": "https://gamesmanagement.googleapis.com/$discovery/rest?version=v1management",
+    "fullName": "Google Play Games Services Management API"
+  },
+  {
+    "service": "gkebackup",
+    "version": "v1",
+    "path": "https://gkebackup.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Backup for GKE API"
+  },
+  {
+    "service": "gkehub",
+    "version": "v2",
+    "path": "https://gkehub.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "GKE Hub API"
+  },
+  {
+    "service": "gkeonprem",
+    "version": "v1",
+    "path": "https://gkeonprem.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "GKE On-Prem API"
+  },
+  {
+    "service": "gmail",
+    "version": "v1",
+    "path": "https://gmail.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Gmail API"
+  },
+  {
+    "service": "gmailpostmastertools",
+    "version": "v2",
+    "path": "https://gmailpostmastertools.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Gmail Postmaster Tools API"
+  },
+  {
+    "service": "groupsmigration",
+    "version": "v1",
+    "path": "https://groupsmigration.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Groups Migration API"
+  },
+  {
+    "service": "groupssettings",
+    "version": "v1",
+    "path": "https://groupssettings.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Groups Settings API"
+  },
+  {
+    "service": "health",
+    "version": "v4",
+    "path": "https://health.googleapis.com/$discovery/rest?version=v4",
+    "fullName": "Google Health API"
+  },
+  {
+    "service": "healthcare",
+    "version": "v1",
+    "path": "https://healthcare.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Healthcare API"
+  },
+  {
+    "service": "homegraph",
+    "version": "v1",
+    "path": "https://homegraph.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "HomeGraph API"
+  },
+  {
+    "service": "hypercomputecluster",
+    "version": "v1",
+    "path": "https://hypercomputecluster.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cluster Director API"
+  },
+  {
+    "service": "iam",
+    "version": "v2",
+    "path": "https://iam.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Identity and Access Management (IAM) API"
+  },
+  {
+    "service": "iamcredentials",
+    "version": "v1",
+    "path": "https://iamcredentials.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "IAM Service Account Credentials API"
+  },
+  {
+    "service": "iap",
+    "version": "v1",
+    "path": "https://iap.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Identity-Aware Proxy API"
+  },
+  {
+    "service": "identitytoolkit",
+    "version": "v3",
+    "path": "https://identitytoolkit.googleapis.com/$discovery/rest?version=v3",
+    "fullName": "Identity Toolkit API"
+  },
+  {
+    "service": "ids",
+    "version": "v1",
+    "path": "https://ids.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud IDS API"
+  },
+  {
+    "service": "indexing",
+    "version": "v3",
+    "path": "https://indexing.googleapis.com/$discovery/rest?version=v3",
+    "fullName": "Web Search Indexing API"
+  },
+  {
+    "service": "integrations",
+    "version": "v1",
+    "path": "https://integrations.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Application Integration API"
+  },
+  {
+    "service": "jobs",
+    "version": "v4",
+    "path": "https://jobs.googleapis.com/$discovery/rest?version=v4",
+    "fullName": "Cloud Talent Solution API"
+  },
+  {
+    "service": "keep",
+    "version": "v1",
+    "path": "https://keep.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Google Keep API"
+  },
+  {
+    "service": "kgsearch",
+    "version": "v1",
+    "path": "https://kgsearch.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Knowledge Graph Search API"
+  },
+  {
+    "service": "kmsinventory",
+    "version": "v1",
+    "path": "https://kmsinventory.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "KMS Inventory API"
+  },
+  {
+    "service": "language",
+    "version": "v2",
+    "path": "https://language.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Cloud Natural Language API"
+  },
+  {
+    "service": "libraryagent",
+    "version": "v1",
+    "path": "https://libraryagent.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Library Agent API"
+  },
+  {
+    "service": "licensing",
+    "version": "v1",
+    "path": "https://licensing.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Enterprise License Manager API"
+  },
+  {
+    "service": "localservices",
+    "version": "v1",
+    "path": "https://localservices.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Local Services API"
+  },
+  {
+    "service": "logging",
+    "version": "v2",
+    "path": "https://logging.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Cloud Logging API"
+  },
+  {
+    "service": "looker",
+    "version": "v1",
+    "path": "https://looker.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Looker (Google Cloud core) API"
+  },
+  {
+    "service": "managedidentities",
+    "version": "v1",
+    "path": "https://managedidentities.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Managed Service for Microsoft Active Directory API"
+  },
+  {
+    "service": "managedkafka",
+    "version": "v1",
+    "path": "https://managedkafka.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Managed Service for Apache Kafka API"
+  },
+  {
+    "service": "manufacturers",
+    "version": "v1",
+    "path": "https://manufacturers.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Manufacturer Center API"
+  },
+  {
+    "service": "marketingplatformadmin",
+    "version": "v1alpha",
+    "path": "https://marketingplatformadmin.googleapis.com/$discovery/rest?version=v1alpha",
+    "fullName": "Google Marketing Platform Admin API"
+  },
+  {
+    "service": "meet",
+    "version": "v2",
+    "path": "https://meet.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Google Meet API"
+  },
+  {
+    "service": "memcache",
+    "version": "v1",
+    "path": "https://memcache.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Memorystore for Memcached API"
+  },
+  {
+    "service": "merchantapi",
+    "version": "reviews_v1beta",
+    "path": "https://merchantapi.googleapis.com/$discovery/rest?version=reviews_v1beta",
+    "fullName": "Merchant API"
+  },
+  {
+    "service": "metastore",
+    "version": "v1",
+    "path": "https://metastore.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Dataproc Metastore API"
+  },
+  {
+    "service": "migrationcenter",
+    "version": "v1",
+    "path": "https://migrationcenter.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Migration Center API"
+  },
+  {
+    "service": "ml",
+    "version": "v1",
+    "path": "https://ml.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "AI Platform Training & Prediction API"
+  },
+  {
+    "service": "monitoring",
+    "version": "v3",
+    "path": "https://monitoring.googleapis.com/$discovery/rest?version=v3",
+    "fullName": "Cloud Monitoring API"
+  },
+  {
+    "service": "mybusinessaccountmanagement",
+    "version": "v1",
+    "path": "https://mybusinessaccountmanagement.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "My Business Account Management API"
+  },
+  {
+    "service": "mybusinessbusinessinformation",
+    "version": "v1",
+    "path": "https://mybusinessbusinessinformation.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "My Business Business Information API"
+  },
+  {
+    "service": "mybusinesslodging",
+    "version": "v1",
+    "path": "https://mybusinesslodging.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "My Business Lodging API"
+  },
+  {
+    "service": "mybusinessnotifications",
+    "version": "v1",
+    "path": "https://mybusinessnotifications.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "My Business Notifications API"
+  },
+  {
+    "service": "mybusinessplaceactions",
+    "version": "v1",
+    "path": "https://mybusinessplaceactions.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "My Business Place Actions API"
+  },
+  {
+    "service": "mybusinessqanda",
+    "version": "v1",
+    "path": "https://mybusinessqanda.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "My Business Q&A API"
+  },
+  {
+    "service": "mybusinessverifications",
+    "version": "v1",
+    "path": "https://mybusinessverifications.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "My Business Verifications API"
+  },
+  {
+    "service": "netapp",
+    "version": "v1",
+    "path": "https://netapp.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "NetApp API"
+  },
+  {
+    "service": "networkconnectivity",
+    "version": "v1",
+    "path": "https://networkconnectivity.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Network Connectivity API"
+  },
+  {
+    "service": "networkmanagement",
+    "version": "v1",
+    "path": "https://networkmanagement.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Network Management API"
+  },
+  {
+    "service": "networksecurity",
+    "version": "v1",
+    "path": "https://networksecurity.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Network Security API"
+  },
+  {
+    "service": "networkservices",
+    "version": "v1",
+    "path": "https://networkservices.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Network Services API"
+  },
+  {
+    "service": "notebooks",
+    "version": "v2",
+    "path": "https://notebooks.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Notebooks API"
+  },
+  {
+    "service": "oauth2",
+    "version": "v2",
+    "path": "https://www.googleapis.com/discovery/v1/apis/oauth2/v2/rest",
+    "fullName": "Google OAuth2 API"
+  },
+  {
+    "service": "observability",
+    "version": "v1",
+    "path": "https://observability.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Observability API"
+  },
+  {
+    "service": "ondemandscanning",
+    "version": "v1",
+    "path": "https://ondemandscanning.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "On-Demand Scanning API"
+  },
+  {
+    "service": "oracledatabase",
+    "version": "v1",
+    "path": "https://oracledatabase.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Oracle Database@Google Cloud API"
+  },
+  {
+    "service": "orgpolicy",
+    "version": "v2",
+    "path": "https://orgpolicy.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Organization Policy API"
+  },
+  {
+    "service": "osconfig",
+    "version": "v2",
+    "path": "https://osconfig.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "OS Config API"
+  },
+  {
+    "service": "oslogin",
+    "version": "v1",
+    "path": "https://oslogin.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud OS Login API"
+  },
+  {
+    "service": "pagespeedonline",
+    "version": "v5",
+    "path": "https://pagespeedonline.googleapis.com/$discovery/rest?version=v5",
+    "fullName": "PageSpeed Insights API"
+  },
+  {
+    "service": "parallelstore",
+    "version": "v1",
+    "path": "https://parallelstore.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Parallelstore API"
+  },
+  {
+    "service": "parametermanager",
+    "version": "v1",
+    "path": "https://parametermanager.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Parameter Manager API"
+  },
+  {
+    "service": "paymentsresellersubscription",
+    "version": "v1",
+    "path": "https://paymentsresellersubscription.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Payments Reseller Subscription API"
+  },
+  {
+    "service": "people",
+    "version": "v1",
+    "path": "https://people.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "People API"
+  },
+  {
+    "service": "places",
+    "version": "v1",
+    "path": "https://places.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Places API (New)"
+  },
+  {
+    "service": "playcustomapp",
+    "version": "v1",
+    "path": "https://playcustomapp.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Google Play Custom App Publishing API"
+  },
+  {
+    "service": "playdeveloperreporting",
+    "version": "v1beta1",
+    "path": "https://playdeveloperreporting.googleapis.com/$discovery/rest?version=v1beta1",
+    "fullName": "Google Play Developer Reporting API"
+  },
+  {
+    "service": "playgrouping",
+    "version": "v1alpha1",
+    "path": "https://playgrouping.googleapis.com/$discovery/rest?version=v1alpha1",
+    "fullName": "Google Play Grouping API"
+  },
+  {
+    "service": "playintegrity",
+    "version": "v1",
+    "path": "https://playintegrity.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Google Play Integrity API"
+  },
+  {
+    "service": "policyanalyzer",
+    "version": "v1",
+    "path": "https://policyanalyzer.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Policy Analyzer API"
+  },
+  {
+    "service": "policysimulator",
+    "version": "v1",
+    "path": "https://policysimulator.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Policy Simulator API"
+  },
+  {
+    "service": "policytroubleshooter",
+    "version": "v3",
+    "path": "https://policytroubleshooter.googleapis.com/$discovery/rest?version=v3",
+    "fullName": "Policy Troubleshooter API"
+  },
+  {
+    "service": "pollen",
+    "version": "v1",
+    "path": "https://pollen.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Pollen API"
+  },
+  {
+    "service": "poly",
+    "version": "v1",
+    "path": "https://poly.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Poly API"
+  },
+  {
+    "service": "privateca",
+    "version": "v1",
+    "path": "https://privateca.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Certificate Authority API"
+  },
+  {
+    "service": "prod_tt_sasportal",
+    "version": "v1alpha1",
+    "path": "https://prod-tt-sasportal.googleapis.com/$discovery/rest?version=v1alpha1",
+    "fullName": "SAS Portal API (Testing)"
+  },
+  {
+    "service": "publicca",
+    "version": "v1",
+    "path": "https://publicca.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Public Certificate Authority API"
+  },
+  {
+    "service": "pubsub",
+    "version": "v1",
+    "path": "https://pubsub.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Pub/Sub API"
+  },
+  {
+    "service": "pubsublite",
+    "version": "v1",
+    "path": "https://pubsublite.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Pub/Sub Lite API"
+  },
+  {
+    "service": "rapidmigrationassessment",
+    "version": "v1",
+    "path": "https://rapidmigrationassessment.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Rapid Migration Assessment API"
+  },
+  {
+    "service": "readerrevenuesubscriptionlinking",
+    "version": "v1",
+    "path": "https://readerrevenuesubscriptionlinking.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Reader Revenue Subscription Linking API"
+  },
+  {
+    "service": "realtimebidding",
+    "version": "v1",
+    "path": "https://realtimebidding.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Real-time Bidding API"
+  },
+  {
+    "service": "recaptchaenterprise",
+    "version": "v1",
+    "path": "https://recaptchaenterprise.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "reCAPTCHA Enterprise API"
+  },
+  {
+    "service": "recommendationengine",
+    "version": "v1beta1",
+    "path": "https://recommendationengine.googleapis.com/$discovery/rest?version=v1beta1",
+    "fullName": "Recommendations AI (Beta)"
+  },
+  {
+    "service": "recommender",
+    "version": "v1",
+    "path": "https://recommender.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Recommender API"
+  },
+  {
+    "service": "redis",
+    "version": "v1",
+    "path": "https://redis.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Google Cloud Memorystore for Redis API"
+  },
+  {
+    "service": "reseller",
+    "version": "v1",
+    "path": "https://reseller.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Google Workspace Reseller API"
+  },
+  {
+    "service": "retail",
+    "version": "v2",
+    "path": "https://retail.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Vertex AI Search for commerce API"
+  },
+  {
+    "service": "run",
+    "version": "v2",
+    "path": "https://run.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Cloud Run Admin API"
+  },
+  {
+    "service": "runtimeconfig",
+    "version": "v1",
+    "path": "https://runtimeconfig.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Runtime Configuration API"
+  },
+  {
+    "service": "saasservicemgmt",
+    "version": "v1",
+    "path": "https://saasservicemgmt.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "App Lifecycle Manager API"
+  },
+  {
+    "service": "safebrowsing",
+    "version": "v5",
+    "path": "https://safebrowsing.googleapis.com/$discovery/rest?version=v5",
+    "fullName": "Safe Browsing API"
+  },
+  {
+    "service": "sasportal",
+    "version": "v1alpha1",
+    "path": "https://sasportal.googleapis.com/$discovery/rest?version=v1alpha1",
+    "fullName": "SAS Portal API"
+  },
+  {
+    "service": "script",
+    "version": "v1",
+    "path": "https://script.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Apps Script API"
+  },
+  {
+    "service": "searchads360",
+    "version": "v0",
+    "path": "https://searchads360.googleapis.com/$discovery/rest?version=v0",
+    "fullName": "Search Ads 360 Reporting API"
+  },
+  {
+    "service": "searchconsole",
+    "version": "v1",
+    "path": "https://searchconsole.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Google Search Console API"
+  },
+  {
+    "service": "secretmanager",
+    "version": "v1",
+    "path": "https://secretmanager.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Secret Manager API"
+  },
+  {
+    "service": "securesourcemanager",
+    "version": "v1",
+    "path": "https://securesourcemanager.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Secure Source Manager API"
+  },
+  {
+    "service": "securitycenter",
+    "version": "v1",
+    "path": "https://securitycenter.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Security Command Center API"
+  },
+  {
+    "service": "securityposture",
+    "version": "v1",
+    "path": "https://securityposture.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Security Posture API"
+  },
+  {
+    "service": "serviceconsumermanagement",
+    "version": "v1",
+    "path": "https://serviceconsumermanagement.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Service Consumer Management API"
+  },
+  {
+    "service": "servicecontrol",
+    "version": "v2",
+    "path": "https://servicecontrol.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Service Control API"
+  },
+  {
+    "service": "servicedirectory",
+    "version": "v1",
+    "path": "https://servicedirectory.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Service Directory API"
+  },
+  {
+    "service": "servicemanagement",
+    "version": "v1",
+    "path": "https://servicemanagement.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Service Management API"
+  },
+  {
+    "service": "servicenetworking",
+    "version": "v1",
+    "path": "https://servicenetworking.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Service Networking API"
+  },
+  {
+    "service": "serviceusage",
+    "version": "v1",
+    "path": "https://serviceusage.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Service Usage API"
+  },
+  {
+    "service": "sheets",
+    "version": "v4",
+    "path": "https://sheets.googleapis.com/$discovery/rest?version=v4",
+    "fullName": "Google Sheets API"
+  },
+  {
+    "service": "siteVerification",
+    "version": "v1",
+    "path": "https://siteverification.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Site Verification API"
+  },
+  {
+    "service": "slides",
+    "version": "v1",
+    "path": "https://slides.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Google Slides API"
+  },
+  {
+    "service": "smartdevicemanagement",
+    "version": "v1",
+    "path": "https://smartdevicemanagement.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Smart Device Management API"
+  },
+  {
+    "service": "solar",
+    "version": "v1",
+    "path": "https://solar.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Solar API"
+  },
+  {
+    "service": "spanner",
+    "version": "v1",
+    "path": "https://spanner.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Spanner API"
+  },
+  {
+    "service": "speech",
+    "version": "v1",
+    "path": "https://speech.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Speech-to-Text API"
+  },
+  {
+    "service": "sqladmin",
+    "version": "v1",
+    "path": "https://sqladmin.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud SQL Admin API"
+  },
+  {
+    "service": "storage",
+    "version": "v1",
+    "path": "https://storage.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Storage API"
+  },
+  {
+    "service": "storagebatchoperations",
+    "version": "v1",
+    "path": "https://storagebatchoperations.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Storage Batch Operations API"
+  },
+  {
+    "service": "storagetransfer",
+    "version": "v1",
+    "path": "https://storagetransfer.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Storage Transfer API"
+  },
+  {
+    "service": "streetviewpublish",
+    "version": "v1",
+    "path": "https://streetviewpublish.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Street View Publish API"
+  },
+  {
+    "service": "sts",
+    "version": "v1",
+    "path": "https://sts.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Security Token Service API"
+  },
+  {
+    "service": "tagmanager",
+    "version": "v2",
+    "path": "https://tagmanager.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Tag Manager API"
+  },
+  {
+    "service": "tasks",
+    "version": "v1",
+    "path": "https://tasks.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Google Tasks API"
+  },
+  {
+    "service": "testing",
+    "version": "v1",
+    "path": "https://testing.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Testing API"
+  },
+  {
+    "service": "texttospeech",
+    "version": "v1",
+    "path": "https://texttospeech.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Text-to-Speech API"
+  },
+  {
+    "service": "threatintelligence",
+    "version": "v1beta",
+    "path": "https://threatintelligence.googleapis.com/$discovery/rest?version=v1beta",
+    "fullName": "Threat Intelligence API"
+  },
+  {
+    "service": "toolresults",
+    "version": "v1beta3",
+    "path": "https://toolresults.googleapis.com/$discovery/rest?version=v1beta3",
+    "fullName": "Cloud Tool Results API"
+  },
+  {
+    "service": "tpu",
+    "version": "v2",
+    "path": "https://tpu.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Cloud TPU API"
+  },
+  {
+    "service": "trafficdirector",
+    "version": "v3",
+    "path": "https://trafficdirector.googleapis.com/$discovery/rest?version=v3",
+    "fullName": "Traffic Director API"
+  },
+  {
+    "service": "transcoder",
+    "version": "v1",
+    "path": "https://transcoder.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Transcoder API"
+  },
+  {
+    "service": "translate",
+    "version": "v3",
+    "path": "https://translation.googleapis.com/$discovery/rest?version=v3",
+    "fullName": "Cloud Translation API"
+  },
+  {
+    "service": "travelimpactmodel",
+    "version": "v1",
+    "path": "https://travelimpactmodel.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Travel Impact Model API"
+  },
+  {
+    "service": "vault",
+    "version": "v1",
+    "path": "https://vault.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Google Vault API"
+  },
+  {
+    "service": "verifiedaccess",
+    "version": "v2",
+    "path": "https://verifiedaccess.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "Chrome Verified Access API"
+  },
+  {
+    "service": "versionhistory",
+    "version": "v1",
+    "path": "https://versionhistory.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "versionhistory.googleapis.com API"
+  },
+  {
+    "service": "videointelligence",
+    "version": "v1",
+    "path": "https://videointelligence.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Video Intelligence API"
+  },
+  {
+    "service": "vision",
+    "version": "v1",
+    "path": "https://vision.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Vision API"
+  },
+  {
+    "service": "vmmigration",
+    "version": "v1",
+    "path": "https://vmmigration.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "VM Migration API"
+  },
+  {
+    "service": "vmwareengine",
+    "version": "v1",
+    "path": "https://vmwareengine.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "VMware Engine API"
+  },
+  {
+    "service": "vpcaccess",
+    "version": "v1",
+    "path": "https://vpcaccess.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Serverless VPC Access API"
+  },
+  {
+    "service": "walletobjects",
+    "version": "v1",
+    "path": "https://walletobjects.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Google Wallet API"
+  },
+  {
+    "service": "webfonts",
+    "version": "v1",
+    "path": "https://webfonts.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Web Fonts Developer API"
+  },
+  {
+    "service": "webrisk",
+    "version": "v1",
+    "path": "https://webrisk.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Web Risk API"
+  },
+  {
+    "service": "websecurityscanner",
+    "version": "v1",
+    "path": "https://websecurityscanner.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Web Security Scanner API"
+  },
+  {
+    "service": "workflowexecutions",
+    "version": "v1",
+    "path": "https://workflowexecutions.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Workflow Executions API"
+  },
+  {
+    "service": "workflows",
+    "version": "v1",
+    "path": "https://workflows.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Workflows API"
+  },
+  {
+    "service": "workloadmanager",
+    "version": "v1",
+    "path": "https://workloadmanager.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Workload Manager API"
+  },
+  {
+    "service": "workspaceevents",
+    "version": "v1",
+    "path": "https://workspaceevents.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Google Workspace Events API"
+  },
+  {
+    "service": "workstations",
+    "version": "v1",
+    "path": "https://workstations.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "Cloud Workstations API"
+  },
+  {
+    "service": "youtube",
+    "version": "v3",
+    "path": "https://youtube.googleapis.com/$discovery/rest?version=v3",
+    "fullName": "YouTube Data API v3"
+  },
+  {
+    "service": "youtubeAnalytics",
+    "version": "v2",
+    "path": "https://youtubeanalytics.googleapis.com/$discovery/rest?version=v2",
+    "fullName": "YouTube Analytics API"
+  },
+  {
+    "service": "youtubereporting",
+    "version": "v1",
+    "path": "https://youtubereporting.googleapis.com/$discovery/rest?version=v1",
+    "fullName": "YouTube Reporting API"
+  }
+]

@@ -28,6 +28,13 @@ async function main() {
   writeFileSync(azurePath, JSON.stringify(azureCatalog, null, 2));
   console.log(`  Azure: ${azureCatalog.length} services -> ${azurePath}`);
 
+  // GCP
+  console.log("Fetching GCP catalog from Google Discovery API...");
+  const gcpCatalog = await fetcher.fetchGcpCatalog();
+  const gcpPath = resolve(dataDir, "gcp-catalog.json");
+  writeFileSync(gcpPath, JSON.stringify(gcpCatalog, null, 2));
+  console.log(`  GCP: ${gcpCatalog.length} services -> ${gcpPath}`);
+
   console.log("\nDone.");
 }
 
