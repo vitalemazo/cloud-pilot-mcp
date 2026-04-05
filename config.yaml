@@ -1,0 +1,29 @@
+transport: stdio
+
+http:
+  port: 8400
+  host: "127.0.0.1"
+
+auth:
+  type: env
+
+providers:
+  - type: aws
+    region: us-east-1
+    mode: read-only
+    allowedServices:
+      - ec2
+      - s3
+      - iam
+      - rds
+      - lambda
+      - ecs
+      - cloudwatch
+
+sandbox:
+  memoryLimitMB: 128
+  timeoutMs: 30000
+
+audit:
+  type: file
+  path: ./audit.json
