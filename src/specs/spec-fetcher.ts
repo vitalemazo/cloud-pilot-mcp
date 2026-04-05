@@ -173,40 +173,37 @@ export class SpecFetcher {
     product: string,
     version: string,
   ): Promise<unknown> {
-    const url = `https://api.aliyun.com/api/product/apiDir?product=${encodeURIComponent(product)}&version=${encodeURIComponent(version)}`;
-    const raw = (await this.fetchJson(url)) as {
-      code: number;
-      data: Array<{
-        node_title?: string;
-        title?: string;
-        children?: Array<{
-          name?: string;
-          title?: string;
-          summary?: string;
-          method?: string;
-          deprecated?: number;
+    // Primary: full api-docs.json with parameter schemas
+    const docsUrl = `https://api.aliyun.com/meta/v1/products/${encodeURIComponent(product)}/versions/${encodeURIComponent(version)}/api-docs.json?language=en_US`;
+    try {
+      return await this.fetchJson(docsUrl);
+    } catch {
+      // Fallback: apiDir endpoint (lighter, operation names only)
+      const dirUrl = `https://api.aliyun.com/api/product/apiDir?product=${encodeURIComponent(product)}&version=${encodeURIComponent(version)}`;
+      const raw = (await this.fetchJson(dirUrl)) as {
+        data: Array<{
+          children?: Array<{
+            name?: string;
+            title?: string;
+            method?: string;
+            deprecated?: number;
+          }>;
         }>;
-      }>;
-    };
-
-    // Flatten the directory tree into an apis array
-    const apis: Array<{
-      name: string;
-      title: string;
-      method: string;
-    }> = [];
-    for (const dir of raw.data ?? []) {
-      for (const child of dir.children ?? []) {
-        if (child.name && !child.deprecated) {
-          apis.push({
-            name: child.name,
-            title: child.title ?? child.summary ?? "",
-            method: (child.method ?? "POST").split("|")[0],
-          });
+      };
+      const apis: Array<{ name: string; title: string; method: string }> = [];
+      for (const dir of raw.data ?? []) {
+        for (const child of dir.children ?? []) {
+          if (child.name && !child.deprecated) {
+            apis.push({
+              name: child.name,
+              title: child.title ?? "",
+              method: (child.method ?? "POST").split("|")[0],
+            });
+          }
         }
       }
+      return { apis };
     }
-    return { apis };
   }
 
   // ── Internals ─────────────────────────────────────────────────────

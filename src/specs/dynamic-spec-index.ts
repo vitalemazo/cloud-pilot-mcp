@@ -470,34 +470,64 @@ export class DynamicSpecIndex {
     operation: string,
     spec: unknown,
   ): OperationSpec | null {
-    // Alibaba overview API returns minimal info — return what we have
     const typedSpec = spec as {
-      apis?: Array<{
-        name?: string;
-        title?: string;
-        summary?: string;
-        method?: string;
-      }>;
+      apis?: Record<
+        string,
+        {
+          methods?: string[];
+          summary?: string;
+          title?: string;
+          parameters?: Array<{
+            name: string;
+            in: string;
+            schema?: { type?: string; required?: boolean; description?: string };
+          }>;
+          responses?: Record<string, { schema?: { properties?: Record<string, { type?: string; description?: string }> } }>;
+        }
+      > | Array<{ name?: string; title?: string; method?: string }>;
     };
-    if (typedSpec.apis) {
-      const api = typedSpec.apis.find((a) => a.name === operation);
-      if (api) {
-        return {
-          service,
-          operation: api.name ?? operation,
-          httpMethod: (api.method ?? "POST").toUpperCase(),
-          description: api.title ?? api.summary ?? "",
-          inputParams: [],
-          outputFields: [],
-        };
-      }
+
+    if (!typedSpec.apis) {
+      return { service, operation, httpMethod: "POST", description: "", inputParams: [], outputFields: [] };
     }
-    // Fallback: return stub from operation name
+
+    // api-docs.json format (object keyed by action name)
+    if (!Array.isArray(typedSpec.apis)) {
+      const api = typedSpec.apis[operation];
+      if (!api) return null;
+
+      const inputParams = (api.parameters ?? []).map((p) => ({
+        name: p.name,
+        type: p.schema?.type ?? "string",
+        required: p.schema?.required ?? false,
+        description: p.schema?.description,
+      }));
+
+      const outputFields: OperationSpec["outputFields"] = [];
+      const resp = api.responses?.["200"]?.schema?.properties;
+      if (resp) {
+        for (const [name, prop] of Object.entries(resp)) {
+          outputFields.push({ name, type: prop.type ?? "object", required: false, description: prop.description });
+        }
+      }
+
+      return {
+        service,
+        operation,
+        httpMethod: (api.methods?.[0] ?? "POST").toUpperCase(),
+        description: api.summary ?? api.title ?? "",
+        inputParams,
+        outputFields,
+      };
+    }
+
+    // Fallback: array format from apiDir
+    const api = typedSpec.apis.find((a) => a.name === operation);
     return {
       service,
       operation,
-      httpMethod: "POST",
-      description: "",
+      httpMethod: (api?.method ?? "POST").toUpperCase(),
+      description: api?.title ?? "",
       inputParams: [],
       outputFields: [],
     };

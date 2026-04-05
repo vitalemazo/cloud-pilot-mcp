@@ -145,49 +145,51 @@ export class OperationIndex {
   static extractFromAlibabaSpec(
     service: string,
     spec: {
-      apis?: Array<{
+      // api-docs.json format: keyed by action name
+      apis?: Record<
+        string,
+        {
+          methods?: string[];
+          summary?: string;
+          title?: string;
+          deprecated?: boolean;
+        }
+      > | Array<{
         name?: string;
         title?: string;
         summary?: string;
         method?: string;
       }>;
-      apiDoc?: {
-        hasDoc?: string[];
-        noDoc?: string[];
-      };
     },
   ): OperationIndexEntry[] {
     const entries: OperationIndexEntry[] = [];
+    if (!spec.apis) return entries;
 
-    // Format 1: overview response with apis array
-    if (spec.apis) {
-      for (const api of spec.apis) {
-        if (api.name) {
-          entries.push({
-            service,
-            operation: api.name,
-            method: (api.method ?? "POST").toUpperCase(),
-            description: (api.title ?? api.summary ?? "").slice(0, 120),
-          });
-        }
+    // Format 1: api-docs.json — apis is an object keyed by action name
+    if (!Array.isArray(spec.apis)) {
+      for (const [actionName, api] of Object.entries(spec.apis)) {
+        if (api.deprecated) continue;
+        entries.push({
+          service,
+          operation: actionName,
+          method: (api.methods?.[0] ?? "POST").toUpperCase(),
+          description: (api.summary ?? api.title ?? "").slice(0, 120),
+        });
       }
       return entries;
     }
 
-    // Format 2: apiDoc with hasDoc/noDoc arrays (operation names only)
-    const opNames = [
-      ...(spec.apiDoc?.hasDoc ?? []),
-      ...(spec.apiDoc?.noDoc ?? []),
-    ];
-    for (const name of opNames) {
-      entries.push({
-        service,
-        operation: name,
-        method: "POST",
-        description: "",
-      });
+    // Format 2: apiDir fallback — apis is an array
+    for (const api of spec.apis) {
+      if (api.name) {
+        entries.push({
+          service,
+          operation: api.name,
+          method: (api.method ?? "POST").toUpperCase(),
+          description: (api.title ?? api.summary ?? "").slice(0, 120),
+        });
+      }
     }
-
     return entries;
   }
 }
