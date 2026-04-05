@@ -15,7 +15,6 @@ COPY --from=builder /app/node_modules node_modules/
 COPY package.json ./
 COPY config.yaml ./
 COPY data/ data/
-COPY specs/ specs/
 
 ENV NODE_ENV=production
 ENV TRANSPORT=http
