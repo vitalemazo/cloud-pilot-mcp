@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  typecheck-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+
+      - name: Smoke test (server starts)
+        run: |
+          node -e "
+            const { spawn } = require('child_process');
+            const p = spawn('node', ['dist/index.js'], {
+              stdio: ['pipe','pipe','pipe'],
+              env: { ...process.env, CLOUD_PILOT_SPECS_DYNAMIC: 'false' }
+            });
+            let stderr = '';
+            p.stderr.on('data', d => stderr += d);
+            setTimeout(() => {
+              p.kill();
+              if (stderr.includes('Server started')) {
+                console.log('Server started successfully');
+                process.exit(0);
+              } else {
+                console.error('Server failed to start:', stderr);
+                process.exit(1);
+              }
+            }, 3000);
+          "
