@@ -207,7 +207,11 @@ AZURE_SUBSCRIPTION_ID=...
 
 ### Connect to Your MCP Client
 
-Add to your MCP client configuration:
+The server speaks standard MCP protocol and works with any compatible client. Below are integration examples for major platforms.
+
+#### Claude Code (stdio)
+
+Add to `~/.claude/mcp.json` or `.mcp.json` in your project root:
 
 ```json
 {
@@ -219,6 +223,248 @@ Add to your MCP client configuration:
     }
   }
 }
+```
+
+Once connected, the `search` and `execute` tools appear automatically. You interact naturally:
+
+```
+You:   "What EC2 operations exist for Transit Gateways?"
+Agent: → calls search("transit gateway", provider: "aws")
+       ← Returns 15 operations with full parameter schemas
+
+You:   "Create a Transit Gateway with ASN 64512"
+Agent: → calls execute(provider: "aws", code: "const tgw = await sdk.request({...})")
+       ← Returns the created Transit Gateway details
+```
+
+#### Claude Code (Streamable HTTP — remote server)
+
+When cloud-pilot-mcp runs as a persistent service (e.g., Docker on a server):
+
+```json
+{
+  "mcpServers": {
+    "cloud-pilot": {
+      "type": "http",
+      "url": "http://your-server:8400/mcp"
+    }
+  }
+}
+```
+
+Or behind Cloudflare Access / auth proxy:
+
+```json
+{
+  "mcpServers": {
+    "cloud-pilot": {
+      "type": "url",
+      "url": "https://cloudpilot.example.com/mcp",
+      "headers": {
+        "CF-Access-Client-Id": "...",
+        "CF-Access-Client-Secret": "..."
+      }
+    }
+  }
+}
+```
+
+#### OpenAI Agents SDK (Python)
+
+The OpenAI Agents SDK has native MCP support. Connect via stdio or Streamable HTTP:
+
+```python
+from agents import Agent
+from agents.mcp import MCPServerStdio, MCPServerStreamableHttp
+
+# Option 1: stdio (agent spawns the server)
+cloud_pilot = MCPServerStdio(
+    command="node",
+    args=["dist/index.js"],
+    cwd="/path/to/cloud-pilot-mcp"
+)
+
+# Option 2: Streamable HTTP (connect to running server)
+cloud_pilot = MCPServerStreamableHttp(
+    url="http://your-server:8400/mcp"
+)
+
+agent = Agent(
+    name="cloud-ops",
+    instructions="You manage AWS and Azure infrastructure using cloud-pilot tools.",
+    mcp_servers=[cloud_pilot]
+)
+
+# The agent now has access to search() and execute() tools.
+# When it receives a message like "List all stopped EC2 instances",
+# it will call search to discover DescribeInstances, then execute
+# to call the AWS API and filter the results.
+```
+
+The SDK converts MCP tool schemas to OpenAI function-calling format automatically. The agent sees `search` and `execute` as callable functions just like any native OpenAI tool.
+
+#### Cursor / Windsurf / Cline
+
+All three IDE-based AI coding tools use the same MCP configuration format:
+
+**Cursor** — `~/.cursor/mcp.json`:
+```json
+{
+  "mcpServers": {
+    "cloud-pilot": {
+      "command": "node",
+      "args": ["dist/index.js"],
+      "cwd": "/path/to/cloud-pilot-mcp"
+    }
+  }
+}
+```
+
+**Windsurf** — `~/.codeium/windsurf/mcp_config.json` — same format.
+
+**Cline** — configured through VS Code settings UI or `cline_mcp_settings.json` — same format with optional `"disabled"` and `"alwaysAllow"` fields.
+
+Once configured, you can ask these coding assistants to manage cloud infrastructure directly while you code:
+
+```
+You: "The API gateway is throwing 503s. Check the Lambda function's configuration
+      and recent CloudWatch errors, then fix the timeout setting."
+
+Agent: → search("describe function configuration", provider: "aws")
+       → execute(code to call Lambda:GetFunctionConfiguration)
+       → search("cloudwatch get log events", provider: "aws")  
+       → execute(code to query CloudWatch Logs)
+       → search("update function configuration", provider: "aws")
+       → execute(code to update the Lambda timeout)  [if mode: read-write]
+```
+
+#### LangChain / LangGraph
+
+Use the `langchain-mcp-adapters` package to bring cloud-pilot tools into any LangChain agent:
+
+```python
+from langchain_mcp_adapters.client import MultiServerMCPClient
+from langgraph.prebuilt import create_react_agent
+from langchain_openai import ChatOpenAI
+
+async with MultiServerMCPClient({
+    "cloud-pilot": {
+        "transport": "streamable_http",
+        "url": "http://your-server:8400/mcp"
+    }
+}) as client:
+    tools = client.get_tools()  # search + execute as LangChain BaseTool objects
+    llm = ChatOpenAI(model="gpt-4o")
+    agent = create_react_agent(llm, tools)
+
+    result = await agent.ainvoke({
+        "messages": [{"role": "user", "content": "List all Azure VMs that are deallocated"}]
+    })
+```
+
+This works with any LangChain-compatible LLM — OpenAI, Anthropic, local models, etc.
+
+#### Custom Agent (TypeScript)
+
+Use the official MCP TypeScript SDK to build your own agent:
+
+```typescript
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+
+const transport = new StreamableHTTPClientTransport(
+  new URL("http://your-server:8400/mcp")
+);
+const client = new Client({ name: "my-agent", version: "1.0.0" });
+await client.connect(transport);
+
+// Discover available tools
+const { tools } = await client.listTools();
+// → [{ name: "search", description: "...", inputSchema: {...} },
+//    { name: "execute", description: "...", inputSchema: {...} }]
+
+// Search for operations
+const searchResult = await client.callTool({
+  name: "search",
+  arguments: { provider: "aws", query: "create vpc" }
+});
+
+// Execute an API call
+const execResult = await client.callTool({
+  name: "execute",
+  arguments: {
+    provider: "aws",
+    code: `
+      const vpc = await sdk.request({
+        service: "ec2",
+        action: "CreateVpc",
+        params: { CidrBlock: "10.0.0.0/16" }
+      });
+      console.log(vpc);
+    `
+  }
+});
+```
+
+#### Custom Agent (Python)
+
+```python
+from mcp.client.streamable_http import streamablehttp_client
+from mcp import ClientSession
+
+async with streamablehttp_client(url="http://your-server:8400/mcp") as (r, w, _):
+    async with ClientSession(r, w) as session:
+        await session.initialize()
+
+        # Discover tools
+        tools = await session.list_tools()
+
+        # Search for Azure Kubernetes operations
+        result = await session.call_tool(
+            "search",
+            {"provider": "azure", "query": "managed cluster create"}
+        )
+
+        # Execute: list all AKS clusters
+        result = await session.call_tool(
+            "execute",
+            {
+                "provider": "azure",
+                "code": """
+                    const clusters = await sdk.request({
+                        service: "containerservice",
+                        action: "GET /subscriptions/{subscriptionId}/providers/Microsoft.ContainerService/managedClusters",
+                        params: {}
+                    });
+                    console.log(clusters);
+                """
+            }
+        )
+```
+
+### Why One Server Serves All Platforms
+
+cloud-pilot-mcp speaks the Model Context Protocol — an open standard. Every platform listed above connects using the same wire protocol (JSON-RPC 2.0 over stdio or HTTP). The server doesn't need platform-specific adapters. Deploy it once, connect from everywhere:
+
+```
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│  Claude Code │  │  OpenAI SDK  │  │   Cursor     │
+│  (stdio)     │  │  (HTTP)      │  │   (stdio)    │
+└──────┬───────┘  └──────┬───────┘  └──────┬───────┘
+       │                 │                 │
+       └─────────────────┼─────────────────┘
+                         │
+               ┌─────────▼──────────┐
+               │  cloud-pilot-mcp   │
+               │  (one instance)    │
+               └─────────┬──────────┘
+                         │
+              ┌──────────┼──────────┐
+              │          │          │
+         ┌────▼───┐ ┌───▼────┐ ┌──▼───┐
+         │  AWS   │ │ Azure  │ │ GCP? │
+         │421 svcs│ │240 svcs│ │      │
+         └────────┘ └────────┘ └──────┘
 ```
 
 The server starts, loads the service catalog (~50KB), and is ready to serve searches and executions.
