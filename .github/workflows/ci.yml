@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  typecheck-and-build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,24 +28,19 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Smoke test (server starts)
+      - name: Unit tests
+        run: npx vitest run
+
+      - name: Smoke test (server starts and responds)
         run: |
-          node -e "
-            const { spawn } = require('child_process');
-            const p = spawn('node', ['dist/index.js'], {
-              stdio: ['pipe','pipe','pipe'],
-              env: { ...process.env, CLOUD_PILOT_SPECS_DYNAMIC: 'false' }
-            });
-            let stderr = '';
-            p.stderr.on('data', d => stderr += d);
-            setTimeout(() => {
-              p.kill();
-              if (stderr.includes('Server started')) {
-                console.log('Server started successfully');
-                process.exit(0);
-              } else {
-                console.error('Server failed to start:', stderr);
-                process.exit(1);
-              }
-            }, 3000);
-          "
+          CLOUD_PILOT_SPECS_DYNAMIC=false TRANSPORT=http HTTP_HOST=127.0.0.1 HTTP_PORT=8400 \
+            node dist/index.js &
+          sleep 3
+          STATUS=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8400/health)
+          kill %1 2>/dev/null
+          if [ "$STATUS" = "200" ]; then
+            echo "Health check passed (HTTP 200)"
+          else
+            echo "Health check failed (HTTP $STATUS)"
+            exit 1
+          fi
