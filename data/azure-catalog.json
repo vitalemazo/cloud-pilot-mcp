@@ -1,0 +1,1202 @@
+[
+  {
+    "service": "adhybridhealthservice/ADHybridHealthService",
+    "version": "2014-01-01",
+    "path": "specification/adhybridhealthservice/resource-manager/Microsoft.ADHybridHealthService/ADHybridHealthService/stable/2014-01-01/ADHybridHealthService.json"
+  },
+  {
+    "service": "advisor/advisor",
+    "version": "2025-01-01",
+    "path": "specification/advisor/resource-manager/Microsoft.Advisor/Advisor/stable/2025-01-01/advisor.json"
+  },
+  {
+    "service": "alertsmanagement/PrometheusRuleGroups",
+    "version": "2023-03-01",
+    "path": "specification/alertsmanagement/resource-manager/Microsoft.AlertsManagement/PrometheusRuleGroups/stable/2023-03-01/PrometheusRuleGroups.json"
+  },
+  {
+    "service": "analysisservices/analysisservices",
+    "version": "2017-08-01",
+    "path": "specification/analysisservices/resource-manager/Microsoft.AnalysisServices/AnalysisServices/stable/2017-08-01/analysisservices.json"
+  },
+  {
+    "service": "apicenter/apicenter",
+    "version": "2024-03-01",
+    "path": "specification/apicenter/resource-manager/Microsoft.ApiCenter/stable/2024-03-01/apicenter.json"
+  },
+  {
+    "service": "apimanagement/apigateway",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apigateway.json"
+  },
+  {
+    "service": "apimanagement/apimallpolicies",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimallpolicies.json"
+  },
+  {
+    "service": "apimanagement/apimanagement",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimanagement.json"
+  },
+  {
+    "service": "apimanagement/apimapis",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimapis.json"
+  },
+  {
+    "service": "apimanagement/apimapisByTags",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimapisByTags.json"
+  },
+  {
+    "service": "apimanagement/apimapiversionsets",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimapiversionsets.json"
+  },
+  {
+    "service": "apimanagement/apimauthorizationproviders",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimauthorizationproviders.json"
+  },
+  {
+    "service": "apimanagement/apimauthorizationservers",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimauthorizationservers.json"
+  },
+  {
+    "service": "apimanagement/apimbackends",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimbackends.json"
+  },
+  {
+    "service": "apimanagement/apimcaches",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimcaches.json"
+  },
+  {
+    "service": "apimanagement/apimcertificates",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimcertificates.json"
+  },
+  {
+    "service": "apimanagement/apimconnectivitycheck",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimconnectivitycheck.json"
+  },
+  {
+    "service": "apimanagement/apimcontenttypes",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimcontenttypes.json"
+  },
+  {
+    "service": "apimanagement/apimdeletedservices",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimdeletedservices.json"
+  },
+  {
+    "service": "apimanagement/apimdeployment",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimdeployment.json"
+  },
+  {
+    "service": "apimanagement/apimdiagnostics",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimdiagnostics.json"
+  },
+  {
+    "service": "apimanagement/apimdocumentations",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimdocumentations.json"
+  },
+  {
+    "service": "apimanagement/apimemailtemplates",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimemailtemplates.json"
+  },
+  {
+    "service": "apimanagement/apimgatewayConfigConnections",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimgatewayConfigConnections.json"
+  },
+  {
+    "service": "apimanagement/apimgateways",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimgateways.json"
+  },
+  {
+    "service": "apimanagement/apimgroups",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimgroups.json"
+  },
+  {
+    "service": "apimanagement/apimidentityprovider",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimidentityprovider.json"
+  },
+  {
+    "service": "apimanagement/apimissues",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimissues.json"
+  },
+  {
+    "service": "apimanagement/apimloggers",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimloggers.json"
+  },
+  {
+    "service": "apimanagement/apimnamedvalues",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimnamedvalues.json"
+  },
+  {
+    "service": "apimanagement/apimnetworkstatus",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimnetworkstatus.json"
+  },
+  {
+    "service": "apimanagement/apimnotifications",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimnotifications.json"
+  },
+  {
+    "service": "apimanagement/apimopenidconnectproviders",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimopenidconnectproviders.json"
+  },
+  {
+    "service": "apimanagement/apimoutbounddependency",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimoutbounddependency.json"
+  },
+  {
+    "service": "apimanagement/apimpolicies",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimpolicies.json"
+  },
+  {
+    "service": "apimanagement/apimpolicydescriptions",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimpolicydescriptions.json"
+  },
+  {
+    "service": "apimanagement/apimpolicyfragments",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimpolicyfragments.json"
+  },
+  {
+    "service": "apimanagement/apimpolicyrestrictions",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimpolicyrestrictions.json"
+  },
+  {
+    "service": "apimanagement/apimpolicyrestrictionsvalidation",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimpolicyrestrictionsvalidation.json"
+  },
+  {
+    "service": "apimanagement/apimportalconfigs",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimportalconfigs.json"
+  },
+  {
+    "service": "apimanagement/apimportalrevisions",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimportalrevisions.json"
+  },
+  {
+    "service": "apimanagement/apimportalsettings",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimportalsettings.json"
+  },
+  {
+    "service": "apimanagement/apimprivatelink",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimprivatelink.json"
+  },
+  {
+    "service": "apimanagement/apimproducts",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimproducts.json"
+  },
+  {
+    "service": "apimanagement/apimproductsByTags",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimproductsByTags.json"
+  },
+  {
+    "service": "apimanagement/apimquotas",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimquotas.json"
+  },
+  {
+    "service": "apimanagement/apimregions",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimregions.json"
+  },
+  {
+    "service": "apimanagement/apimreports",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimreports.json"
+  },
+  {
+    "service": "apimanagement/apimschema",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimschema.json"
+  },
+  {
+    "service": "apimanagement/apimsettings",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimsettings.json"
+  },
+  {
+    "service": "apimanagement/apimskus",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimskus.json"
+  },
+  {
+    "service": "apimanagement/apimsubscriptions",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimsubscriptions.json"
+  },
+  {
+    "service": "apimanagement/apimtagresources",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimtagresources.json"
+  },
+  {
+    "service": "apimanagement/apimtags",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimtags.json"
+  },
+  {
+    "service": "apimanagement/apimtenant",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimtenant.json"
+  },
+  {
+    "service": "apimanagement/apimusers",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimusers.json"
+  },
+  {
+    "service": "apimanagement/apimworkspacebackends",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimworkspacebackends.json"
+  },
+  {
+    "service": "apimanagement/apimworkspacecertificates",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimworkspacecertificates.json"
+  },
+  {
+    "service": "apimanagement/apimworkspacediagnostics",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimworkspacediagnostics.json"
+  },
+  {
+    "service": "apimanagement/apimworkspacelinks",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimworkspacelinks.json"
+  },
+  {
+    "service": "apimanagement/apimworkspaceloggers",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimworkspaceloggers.json"
+  },
+  {
+    "service": "apimanagement/apimworkspaces",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/apimworkspaces.json"
+  },
+  {
+    "service": "apimanagement/definitions",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/definitions.json"
+  },
+  {
+    "service": "apimanagement/operationStatuses",
+    "version": "2024-05-01",
+    "path": "specification/apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement/stable/2024-05-01/operationStatuses.json"
+  },
+  {
+    "service": "app/AuthConfigs",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/AuthConfigs.json"
+  },
+  {
+    "service": "app/AvailableWorkloadProfiles",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/AvailableWorkloadProfiles.json"
+  },
+  {
+    "service": "app/BillingMeters",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/BillingMeters.json"
+  },
+  {
+    "service": "app/CommonDefinitions",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/CommonDefinitions.json"
+  },
+  {
+    "service": "app/ConnectedEnvironments",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/ConnectedEnvironments.json"
+  },
+  {
+    "service": "app/ConnectedEnvironmentsCertificates",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/ConnectedEnvironmentsCertificates.json"
+  },
+  {
+    "service": "app/ConnectedEnvironmentsDaprComponents",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/ConnectedEnvironmentsDaprComponents.json"
+  },
+  {
+    "service": "app/ConnectedEnvironmentsStorages",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/ConnectedEnvironmentsStorages.json"
+  },
+  {
+    "service": "app/ContainerApps",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/ContainerApps.json"
+  },
+  {
+    "service": "app/ContainerAppsRevisions",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/ContainerAppsRevisions.json"
+  },
+  {
+    "service": "app/Diagnostics",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/Diagnostics.json"
+  },
+  {
+    "service": "app/Global",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/Global.json"
+  },
+  {
+    "service": "app/JavaComponents",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/JavaComponents.json"
+  },
+  {
+    "service": "app/Jobs",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/Jobs.json"
+  },
+  {
+    "service": "app/LogicAppsExtension",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/LogicAppsExtension.json"
+  },
+  {
+    "service": "app/ManagedEnvironments",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/ManagedEnvironments.json"
+  },
+  {
+    "service": "app/ManagedEnvironmentsDaprComponents",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/ManagedEnvironmentsDaprComponents.json"
+  },
+  {
+    "service": "app/ManagedEnvironmentsHttpRouteConfig",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/ManagedEnvironmentsHttpRouteConfig.json"
+  },
+  {
+    "service": "app/ManagedEnvironmentsMaintenanceConfigurations",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/ManagedEnvironmentsMaintenanceConfigurations.json"
+  },
+  {
+    "service": "app/ManagedEnvironmentsStorages",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/ManagedEnvironmentsStorages.json"
+  },
+  {
+    "service": "app/SessionPools",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/SessionPools.json"
+  },
+  {
+    "service": "app/SourceControls",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/SourceControls.json"
+  },
+  {
+    "service": "app/Subscriptions",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/Subscriptions.json"
+  },
+  {
+    "service": "app/Usages",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/ContainerApps/stable/2026-01-01/Usages.json"
+  },
+  {
+    "service": "app/sreagent",
+    "version": "2026-01-01",
+    "path": "specification/app/resource-manager/Microsoft.App/SreAgent/stable/2026-01-01/sreagent.json"
+  },
+  {
+    "service": "appcomplianceautomation/appcomplianceautomation",
+    "version": "2024-06-27",
+    "path": "specification/appcomplianceautomation/resource-manager/Microsoft.AppComplianceAutomation/stable/2024-06-27/appcomplianceautomation.json"
+  },
+  {
+    "service": "appconfiguration/appconfiguration",
+    "version": "2024-06-01",
+    "path": "specification/appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration/stable/2024-06-01/appconfiguration.json"
+  },
+  {
+    "service": "applicationinsights/workbooks_API",
+    "version": "2023-06-01",
+    "path": "specification/applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights/stable/2023-06-01/workbooks_API.json"
+  },
+  {
+    "service": "appplatform/appplatform",
+    "version": "2023-12-01",
+    "path": "specification/appplatform/resource-manager/Microsoft.AppPlatform/stable/2023-12-01/appplatform.json"
+  },
+  {
+    "service": "attestation/attestation",
+    "version": "2021-06-01",
+    "path": "specification/attestation/resource-manager/Microsoft.Attestation/Attestation/stable/2021-06-01/attestation.json"
+  },
+  {
+    "service": "authorization/authorization-DenyAssignmentCalls",
+    "version": "2022-04-01",
+    "path": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/stable/2022-04-01/authorization-DenyAssignmentCalls.json"
+  },
+  {
+    "service": "authorization/authorization-ProviderOperationsCalls",
+    "version": "2022-04-01",
+    "path": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/stable/2022-04-01/authorization-ProviderOperationsCalls.json"
+  },
+  {
+    "service": "authorization/authorization-RoleAssignmentsCalls",
+    "version": "2022-04-01",
+    "path": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/stable/2022-04-01/authorization-RoleAssignmentsCalls.json"
+  },
+  {
+    "service": "authorization/authorization-RoleDefinitionsCalls",
+    "version": "2022-04-01",
+    "path": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/stable/2022-04-01/authorization-RoleDefinitionsCalls.json"
+  },
+  {
+    "service": "authorization/common-types",
+    "version": "2022-04-01",
+    "path": "specification/authorization/resource-manager/Microsoft.Authorization/Authorization/stable/2022-04-01/common-types.json"
+  },
+  {
+    "service": "automanage/automanage",
+    "version": "2022-05-04",
+    "path": "specification/automanage/resource-manager/Microsoft.Automanage/stable/2022-05-04/automanage.json"
+  },
+  {
+    "service": "automation/openapi",
+    "version": "2024-10-23",
+    "path": "specification/automation/resource-manager/Microsoft.Automation/stable/2024-10-23/openapi.json"
+  },
+  {
+    "service": "awsconnector/accessAnalyzerAnalyzer",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/accessAnalyzerAnalyzer.json"
+  },
+  {
+    "service": "awsconnector/acmCertificateSummary",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/acmCertificateSummary.json"
+  },
+  {
+    "service": "awsconnector/apiGatewayRestApi",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/apiGatewayRestApi.json"
+  },
+  {
+    "service": "awsconnector/apiGatewayStage",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/apiGatewayStage.json"
+  },
+  {
+    "service": "awsconnector/appSyncGraphqlApi",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/appSyncGraphqlApi.json"
+  },
+  {
+    "service": "awsconnector/autoScalingAutoScalingGroup",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/autoScalingAutoScalingGroup.json"
+  },
+  {
+    "service": "awsconnector/cloudFormationStack",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/cloudFormationStack.json"
+  },
+  {
+    "service": "awsconnector/cloudFormationStackSet",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/cloudFormationStackSet.json"
+  },
+  {
+    "service": "awsconnector/cloudFrontDistribution",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/cloudFrontDistribution.json"
+  },
+  {
+    "service": "awsconnector/cloudTrailTrail",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/cloudTrailTrail.json"
+  },
+  {
+    "service": "awsconnector/cloudWatchAlarm",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/cloudWatchAlarm.json"
+  },
+  {
+    "service": "awsconnector/codeBuildProject",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/codeBuildProject.json"
+  },
+  {
+    "service": "awsconnector/codeBuildSourceCredentialsInfo",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/codeBuildSourceCredentialsInfo.json"
+  },
+  {
+    "service": "awsconnector/configServiceConfigurationRecorder",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/configServiceConfigurationRecorder.json"
+  },
+  {
+    "service": "awsconnector/configServiceConfigurationRecorderStatus",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/configServiceConfigurationRecorderStatus.json"
+  },
+  {
+    "service": "awsconnector/configServiceDeliveryChannel",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/configServiceDeliveryChannel.json"
+  },
+  {
+    "service": "awsconnector/databaseMigrationServiceReplicationInstance",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/databaseMigrationServiceReplicationInstance.json"
+  },
+  {
+    "service": "awsconnector/daxCluster",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/daxCluster.json"
+  },
+  {
+    "service": "awsconnector/dynamoDBContinuousBackupsDescription",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/dynamoDBContinuousBackupsDescription.json"
+  },
+  {
+    "service": "awsconnector/dynamoDBTable",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/dynamoDBTable.json"
+  },
+  {
+    "service": "awsconnector/ec2AccountAttribute",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ec2AccountAttribute.json"
+  },
+  {
+    "service": "awsconnector/ec2Address",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ec2Address.json"
+  },
+  {
+    "service": "awsconnector/ec2FlowLog",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ec2FlowLog.json"
+  },
+  {
+    "service": "awsconnector/ec2Image",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ec2Image.json"
+  },
+  {
+    "service": "awsconnector/ec2Instance",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ec2Instance.json"
+  },
+  {
+    "service": "awsconnector/ec2InstanceStatus",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ec2InstanceStatus.json"
+  },
+  {
+    "service": "awsconnector/ec2Ipam",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ec2Ipam.json"
+  },
+  {
+    "service": "awsconnector/ec2KeyPair",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ec2KeyPair.json"
+  },
+  {
+    "service": "awsconnector/ec2NetworkAcl",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ec2NetworkAcl.json"
+  },
+  {
+    "service": "awsconnector/ec2NetworkInterface",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ec2NetworkInterface.json"
+  },
+  {
+    "service": "awsconnector/ec2RouteTable",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ec2RouteTable.json"
+  },
+  {
+    "service": "awsconnector/ec2SecurityGroup",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ec2SecurityGroup.json"
+  },
+  {
+    "service": "awsconnector/ec2Snapshot",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ec2Snapshot.json"
+  },
+  {
+    "service": "awsconnector/ec2Subnet",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ec2Subnet.json"
+  },
+  {
+    "service": "awsconnector/ec2VPCEndpoint",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ec2VPCEndpoint.json"
+  },
+  {
+    "service": "awsconnector/ec2VPCPeeringConnection",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ec2VPCPeeringConnection.json"
+  },
+  {
+    "service": "awsconnector/ec2Volume",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ec2Volume.json"
+  },
+  {
+    "service": "awsconnector/ec2Vpc",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ec2Vpc.json"
+  },
+  {
+    "service": "awsconnector/ecrImageDetail",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ecrImageDetail.json"
+  },
+  {
+    "service": "awsconnector/ecrRepository",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ecrRepository.json"
+  },
+  {
+    "service": "awsconnector/ecsCluster",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ecsCluster.json"
+  },
+  {
+    "service": "awsconnector/ecsService",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ecsService.json"
+  },
+  {
+    "service": "awsconnector/ecsTaskDefinition",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ecsTaskDefinition.json"
+  },
+  {
+    "service": "awsconnector/efsFileSystem",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/efsFileSystem.json"
+  },
+  {
+    "service": "awsconnector/efsMountTarget",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/efsMountTarget.json"
+  },
+  {
+    "service": "awsconnector/eksCluster",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/eksCluster.json"
+  },
+  {
+    "service": "awsconnector/eksNodegroup",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/eksNodegroup.json"
+  },
+  {
+    "service": "awsconnector/elasticBeanstalkApplication",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/elasticBeanstalkApplication.json"
+  },
+  {
+    "service": "awsconnector/elasticBeanstalkConfigurationTemplate",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/elasticBeanstalkConfigurationTemplate.json"
+  },
+  {
+    "service": "awsconnector/elasticBeanstalkEnvironment",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/elasticBeanstalkEnvironment.json"
+  },
+  {
+    "service": "awsconnector/elasticLoadBalancingV2Listener",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/elasticLoadBalancingV2Listener.json"
+  },
+  {
+    "service": "awsconnector/elasticLoadBalancingV2LoadBalancer",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/elasticLoadBalancingV2LoadBalancer.json"
+  },
+  {
+    "service": "awsconnector/elasticLoadBalancingV2TargetGroup",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/elasticLoadBalancingV2TargetGroup.json"
+  },
+  {
+    "service": "awsconnector/elasticLoadBalancingV2TargetHealthDescription",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/elasticLoadBalancingV2TargetHealthDescription.json"
+  },
+  {
+    "service": "awsconnector/emrCluster",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/emrCluster.json"
+  },
+  {
+    "service": "awsconnector/guardDutyDetector",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/guardDutyDetector.json"
+  },
+  {
+    "service": "awsconnector/iamAccessKeyLastUsed",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/iamAccessKeyLastUsed.json"
+  },
+  {
+    "service": "awsconnector/iamAccessKeyMetadata",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/iamAccessKeyMetadata.json"
+  },
+  {
+    "service": "awsconnector/iamGroup",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/iamGroup.json"
+  },
+  {
+    "service": "awsconnector/iamInstanceProfile",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/iamInstanceProfile.json"
+  },
+  {
+    "service": "awsconnector/iamMFADevice",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/iamMFADevice.json"
+  },
+  {
+    "service": "awsconnector/iamPasswordPolicy",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/iamPasswordPolicy.json"
+  },
+  {
+    "service": "awsconnector/iamPolicyVersion",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/iamPolicyVersion.json"
+  },
+  {
+    "service": "awsconnector/iamRole",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/iamRole.json"
+  },
+  {
+    "service": "awsconnector/iamServerCertificate",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/iamServerCertificate.json"
+  },
+  {
+    "service": "awsconnector/iamVirtualMFADevice",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/iamVirtualMFADevice.json"
+  },
+  {
+    "service": "awsconnector/kmsAlias",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/kmsAlias.json"
+  },
+  {
+    "service": "awsconnector/kmsKey",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/kmsKey.json"
+  },
+  {
+    "service": "awsconnector/lambdaFunction",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/lambdaFunction.json"
+  },
+  {
+    "service": "awsconnector/lambdaFunctionCodeLocation",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/lambdaFunctionCodeLocation.json"
+  },
+  {
+    "service": "awsconnector/lightsailBucket",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/lightsailBucket.json"
+  },
+  {
+    "service": "awsconnector/lightsailInstance",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/lightsailInstance.json"
+  },
+  {
+    "service": "awsconnector/logsLogGroup",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/logsLogGroup.json"
+  },
+  {
+    "service": "awsconnector/logsLogStream",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/logsLogStream.json"
+  },
+  {
+    "service": "awsconnector/logsMetricFilter",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/logsMetricFilter.json"
+  },
+  {
+    "service": "awsconnector/logsSubscriptionFilter",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/logsSubscriptionFilter.json"
+  },
+  {
+    "service": "awsconnector/macie2JobSummary",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/macie2JobSummary.json"
+  },
+  {
+    "service": "awsconnector/macieAllowList",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/macieAllowList.json"
+  },
+  {
+    "service": "awsconnector/networkFirewallFirewall",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/networkFirewallFirewall.json"
+  },
+  {
+    "service": "awsconnector/networkFirewallFirewallPolicy",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/networkFirewallFirewallPolicy.json"
+  },
+  {
+    "service": "awsconnector/networkFirewallRuleGroup",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/networkFirewallRuleGroup.json"
+  },
+  {
+    "service": "awsconnector/openSearchDomainStatus",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/openSearchDomainStatus.json"
+  },
+  {
+    "service": "awsconnector/operations",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/operations.json"
+  },
+  {
+    "service": "awsconnector/organizationsAccount",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/organizationsAccount.json"
+  },
+  {
+    "service": "awsconnector/organizationsOrganization",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/organizationsOrganization.json"
+  },
+  {
+    "service": "awsconnector/rdsDBCluster",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/rdsDBCluster.json"
+  },
+  {
+    "service": "awsconnector/rdsDBInstance",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/rdsDBInstance.json"
+  },
+  {
+    "service": "awsconnector/rdsDBSnapshot",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/rdsDBSnapshot.json"
+  },
+  {
+    "service": "awsconnector/rdsDBSnapshotAttributesResult",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/rdsDBSnapshotAttributesResult.json"
+  },
+  {
+    "service": "awsconnector/rdsEventSubscription",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/rdsEventSubscription.json"
+  },
+  {
+    "service": "awsconnector/rdsExportTask",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/rdsExportTask.json"
+  },
+  {
+    "service": "awsconnector/redshiftCluster",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/redshiftCluster.json"
+  },
+  {
+    "service": "awsconnector/redshiftClusterParameterGroup",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/redshiftClusterParameterGroup.json"
+  },
+  {
+    "service": "awsconnector/route53DomainsDomainSummary",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/route53DomainsDomainSummary.json"
+  },
+  {
+    "service": "awsconnector/route53HostedZone",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/route53HostedZone.json"
+  },
+  {
+    "service": "awsconnector/route53ResourceRecordSet",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/route53ResourceRecordSet.json"
+  },
+  {
+    "service": "awsconnector/s3AccessControlPolicy",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/s3AccessControlPolicy.json"
+  },
+  {
+    "service": "awsconnector/s3AccessPoint",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/s3AccessPoint.json"
+  },
+  {
+    "service": "awsconnector/s3Bucket",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/s3Bucket.json"
+  },
+  {
+    "service": "awsconnector/s3BucketPolicy",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/s3BucketPolicy.json"
+  },
+  {
+    "service": "awsconnector/s3ControlMultiRegionAccessPointPolicyDocument",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/s3ControlMultiRegionAccessPointPolicyDocument.json"
+  },
+  {
+    "service": "awsconnector/sageMakerApp",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/sageMakerApp.json"
+  },
+  {
+    "service": "awsconnector/sageMakerNotebookInstanceSummary",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/sageMakerNotebookInstanceSummary.json"
+  },
+  {
+    "service": "awsconnector/secretsManagerResourcePolicy",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/secretsManagerResourcePolicy.json"
+  },
+  {
+    "service": "awsconnector/secretsManagerSecret",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/secretsManagerSecret.json"
+  },
+  {
+    "service": "awsconnector/snsSubscription",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/snsSubscription.json"
+  },
+  {
+    "service": "awsconnector/snsTopic",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/snsTopic.json"
+  },
+  {
+    "service": "awsconnector/sqsQueue",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/sqsQueue.json"
+  },
+  {
+    "service": "awsconnector/ssmInstanceInformation",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ssmInstanceInformation.json"
+  },
+  {
+    "service": "awsconnector/ssmParameter",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ssmParameter.json"
+  },
+  {
+    "service": "awsconnector/ssmResourceComplianceSummaryItem",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/ssmResourceComplianceSummaryItem.json"
+  },
+  {
+    "service": "awsconnector/wafWebACLSummary",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/wafWebACLSummary.json"
+  },
+  {
+    "service": "awsconnector/wafv2LoggingConfiguration",
+    "version": "2024-12-01",
+    "path": "specification/awsconnector/resource-manager/Microsoft.AwsConnector/stable/2024-12-01/wafv2LoggingConfiguration.json"
+  },
+  {
+    "service": "azsadmin/FabricLocation",
+    "version": "2022-03-01",
+    "path": "specification/azsadmin/resource-manager/fabric/Microsoft.Fabric.Admin/stable/2022-03-01/FabricLocation.json"
+  },
+  {
+    "service": "azure-kusto/kusto",
+    "version": "2025-02-14",
+    "path": "specification/azure-kusto/resource-manager/Microsoft.Kusto/Kusto/stable/2025-02-14/kusto.json"
+  },
+  {
+    "service": "azureactivedirectory/privateEndpointConnections",
+    "version": "2020-03-01",
+    "path": "specification/azureactivedirectory/resource-manager/Microsoft.Aadiam/AzureActiveDirectory/stable/2020-03-01/privateEndpointConnections.json"
+  },
+  {
+    "service": "azureactivedirectory/privateLinkForAzureAD",
+    "version": "2020-03-01",
+    "path": "specification/azureactivedirectory/resource-manager/Microsoft.Aadiam/AzureActiveDirectory/stable/2020-03-01/privateLinkForAzureAD.json"
+  },
+  {
+    "service": "azureactivedirectory/privateLinkResources",
+    "version": "2020-03-01",
+    "path": "specification/azureactivedirectory/resource-manager/Microsoft.Aadiam/AzureActiveDirectory/stable/2020-03-01/privateLinkResources.json"
+  },
+  {
+    "service": "azurearcdata/activeDirectoryConnectors",
+    "version": "2026-01-01",
+    "path": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/stable/2026-01-01/activeDirectoryConnectors.json"
+  },
+  {
+    "service": "azurearcdata/azurearcdata",
+    "version": "2026-01-01",
+    "path": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/stable/2026-01-01/azurearcdata.json"
+  },
+  {
+    "service": "azurearcdata/common",
+    "version": "2026-01-01",
+    "path": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/stable/2026-01-01/common.json"
+  },
+  {
+    "service": "azurearcdata/dataControllers",
+    "version": "2026-01-01",
+    "path": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/stable/2026-01-01/dataControllers.json"
+  },
+  {
+    "service": "azurearcdata/failoverGroups",
+    "version": "2026-01-01",
+    "path": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/stable/2026-01-01/failoverGroups.json"
+  },
+  {
+    "service": "azurearcdata/operations",
+    "version": "2026-01-01",
+    "path": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/stable/2026-01-01/operations.json"
+  },
+  {
+    "service": "azurearcdata/postgresInstances",
+    "version": "2026-01-01",
+    "path": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/stable/2026-01-01/postgresInstances.json"
+  },
+  {
+    "service": "azurearcdata/sqlManagedInstances",
+    "version": "2026-01-01",
+    "path": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/stable/2026-01-01/sqlManagedInstances.json"
+  },
+  {
+    "service": "azurearcdata/sqlServerAvailabilityGroups",
+    "version": "2026-01-01",
+    "path": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/stable/2026-01-01/sqlServerAvailabilityGroups.json"
+  },
+  {
+    "service": "azurearcdata/sqlServerDatabases",
+    "version": "2026-01-01",
+    "path": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/stable/2026-01-01/sqlServerDatabases.json"
+  },
+  {
+    "service": "azurearcdata/sqlServerEsuLicenses",
+    "version": "2026-01-01",
+    "path": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/stable/2026-01-01/sqlServerEsuLicenses.json"
+  },
+  {
+    "service": "azurearcdata/sqlServerInstances",
+    "version": "2026-01-01",
+    "path": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/stable/2026-01-01/sqlServerInstances.json"
+  },
+  {
+    "service": "azurearcdata/sqlServerLicenses",
+    "version": "2026-01-01",
+    "path": "specification/azurearcdata/resource-manager/Microsoft.AzureArcData/stable/2026-01-01/sqlServerLicenses.json"
+  },
+  {
+    "service": "azuredatatransfer/azuredatatransfer",
+    "version": "2025-05-21",
+    "path": "specification/azuredatatransfer/resource-manager/Microsoft.AzureDataTransfer/stable/2025-05-21/azuredatatransfer.json"
+  },
+  {
+    "service": "azurefleet/azurefleet",
+    "version": "2024-11-01",
+    "path": "specification/azurefleet/resource-manager/Microsoft.AzureFleet/AzureFleet/stable/2024-11-01/azurefleet.json"
+  },
+  {
+    "service": "azurelargeinstance/azurelargeinstance",
+    "version": "2024-04-10",
+    "path": "specification/azurelargeinstance/resource-manager/Microsoft.AzureLargeInstance/AzureLargeInstance/stable/2024-04-10/azurelargeinstance.json"
+  },
+  {
+    "service": "azurestack/AzureStack",
+    "version": "2022-06-01",
+    "path": "specification/azurestack/resource-manager/Microsoft.AzureStack/AzureStack/stable/2022-06-01/AzureStack.json"
+  },
+  {
+    "service": "azurestack/CustomerSubscription",
+    "version": "2022-06-01",
+    "path": "specification/azurestack/resource-manager/Microsoft.AzureStack/AzureStack/stable/2022-06-01/CustomerSubscription.json"
+  },
+  {
+    "service": "azurestack/Product",
+    "version": "2022-06-01",
+    "path": "specification/azurestack/resource-manager/Microsoft.AzureStack/AzureStack/stable/2022-06-01/Product.json"
+  },
+  {
+    "service": "azurestack/Registration",
+    "version": "2022-06-01",
+    "path": "specification/azurestack/resource-manager/Microsoft.AzureStack/AzureStack/stable/2022-06-01/Registration.json"
+  },
+  {
+    "service": "azurestackhci/hci",
+    "version": "2026-02-01",
+    "path": "specification/azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI/stable/2026-02-01/hci.json"
+  }
+]

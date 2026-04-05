@@ -33,6 +33,14 @@ providers:
       - monitor
       - containerservice
 
+specs:
+  dynamic: true
+  cacheDir: "~/.cloud-pilot/cache"
+  catalogTtlDays: 7
+  specTtlDays: 30
+  maxMemorySpecs: 10
+  offline: false
+
 sandbox:
   memoryLimitMB: 128
   timeoutMs: 30000

@@ -5,7 +5,11 @@ import type {
 } from "../../interfaces/cloud-provider.js";
 import type { AuthProvider } from "../../interfaces/auth.js";
 import type { ProviderConfig } from "../../config.js";
-import { AzureSpecIndex } from "./specs.js";
+
+export interface SpecIndex {
+  search(query: string, service?: string): Promise<OperationSpec[]> | OperationSpec[];
+  listServices(): string[];
+}
 
 const MUTATING_METHODS = ["PUT", "POST", "DELETE", "PATCH"];
 
@@ -25,19 +29,18 @@ export class AzureProvider implements CloudProvider {
   name = "azure" as const;
   private config: ProviderConfig;
   private auth: AuthProvider;
-  private specIndex: AzureSpecIndex;
+  private specIndex: SpecIndex;
   private subscriptionId: string;
 
   constructor(
     config: ProviderConfig,
     auth: AuthProvider,
-    specsDir: string,
+    specIndex: SpecIndex,
     subscriptionId?: string,
   ) {
     this.config = config;
     this.auth = auth;
-    this.specIndex = new AzureSpecIndex(specsDir);
-    this.specIndex.loadAll();
+    this.specIndex = specIndex;
     this.subscriptionId =
       subscriptionId ?? process.env.AZURE_SUBSCRIPTION_ID ?? "";
   }

@@ -47,6 +47,16 @@ const ConfigSchema = z.object({
       timeoutMs: z.number().default(30000),
     })
     .default({}),
+  specs: z
+    .object({
+      dynamic: z.boolean().default(true),
+      cacheDir: z.string().default("~/.cloud-pilot/cache"),
+      catalogTtlDays: z.number().default(7),
+      specTtlDays: z.number().default(30),
+      maxMemorySpecs: z.number().default(10),
+      offline: z.boolean().default(false),
+    })
+    .default({}),
   audit: z
     .object({
       type: z.enum(["file", "console", "cloudwatch", "azure-monitor"]).default("file"),
@@ -94,6 +104,18 @@ function applyEnvOverrides(raw: Record<string, unknown>): Record<string, unknown
   }
   if (process.env.AUTH_TYPE) {
     raw.auth = { ...(raw.auth as object), type: process.env.AUTH_TYPE };
+  }
+  if (process.env.CLOUD_PILOT_SPECS_DYNAMIC !== undefined) {
+    raw.specs = {
+      ...(raw.specs as object),
+      dynamic: process.env.CLOUD_PILOT_SPECS_DYNAMIC === "true",
+    };
+  }
+  if (process.env.CLOUD_PILOT_SPECS_OFFLINE !== undefined) {
+    raw.specs = {
+      ...(raw.specs as object),
+      offline: process.env.CLOUD_PILOT_SPECS_OFFLINE === "true",
+    };
   }
   return raw;
 }

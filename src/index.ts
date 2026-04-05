@@ -9,6 +9,11 @@ import { AzureADAuthProvider } from "./auth/azure-ad.js";
 import { FileAuditLogger } from "./audit/file.js";
 import { AwsProvider } from "./providers/aws/provider.js";
 import { AzureProvider } from "./providers/azure/provider.js";
+import { AwsSpecIndex } from "./providers/aws/specs.js";
+import { AzureSpecIndex } from "./providers/azure/specs.js";
+import { DynamicSpecIndex } from "./specs/dynamic-spec-index.js";
+import { SpecCache } from "./specs/spec-cache.js";
+import { SpecFetcher } from "./specs/spec-fetcher.js";
 import type { AuthProvider } from "./interfaces/auth.js";
 import type { AuditLogger } from "./interfaces/audit.js";
 import type { CloudProvider } from "./interfaces/cloud-provider.js";
@@ -20,15 +25,11 @@ async function main() {
 
   const auth = buildAuth(config);
   const audit = buildAudit(config);
-  const { providers, providerConfigs } = buildProviders(config, auth);
+  const { providers, providerConfigs } = await buildProviders(config, auth);
 
   const server = createServer({ providers, providerConfigs, audit, config });
 
   if (config.transport === "http") {
-    const { StreamableHTTPServerTransport } = await import(
-      "@modelcontextprotocol/sdk/server/streamableHttp.js"
-    );
-    // Streamable HTTP transport will be wired here once we add the HTTP layer
     console.error(
       `[cloud-pilot] Streamable HTTP transport on ${config.http.host}:${config.http.port} — not yet implemented, falling back to stdio`,
     );
@@ -42,6 +43,9 @@ async function main() {
   console.error(`[cloud-pilot] Server started (transport: ${config.transport})`);
   console.error(
     `[cloud-pilot] Providers: ${Array.from(providers.keys()).join(", ") || "none"}`,
+  );
+  console.error(
+    `[cloud-pilot] Dynamic specs: ${config.specs.dynamic ? "enabled" : "disabled"}`,
   );
 }
 
@@ -97,33 +101,81 @@ function buildAudit(config: Config): AuditLogger {
   }
 }
 
-function buildProviders(
+async function buildProviders(
   config: Config,
   auth: AuthProvider,
-): {
+): Promise<{
   providers: Map<string, CloudProvider>;
   providerConfigs: Map<string, Config["providers"][number]>;
-} {
+}> {
   const providers = new Map<string, CloudProvider>();
   const providerConfigs = new Map<string, Config["providers"][number]>();
 
+  // Shared infrastructure for dynamic spec loading
+  const cache = new SpecCache(config.specs.cacheDir);
+  const fetcher = new SpecFetcher();
+
   for (const pc of config.providers) {
     switch (pc.type) {
-      case "aws":
-        providers.set("aws", new AwsProvider(pc, auth, resolve("specs/aws")));
+      case "aws": {
+        const localDir = resolve("specs/aws");
+        const specIndex = config.specs.dynamic
+          ? await buildDynamicIndex("aws", localDir, config, cache, fetcher)
+          : buildStaticAwsIndex(localDir);
+
+        providers.set("aws", new AwsProvider(pc, auth, specIndex));
         providerConfigs.set("aws", pc);
         break;
-      case "azure":
+      }
+      case "azure": {
+        const localDir = resolve("specs/azure");
+        const specIndex = config.specs.dynamic
+          ? await buildDynamicIndex("azure", localDir, config, cache, fetcher)
+          : buildStaticAzureIndex(localDir);
+
         providers.set(
           "azure",
-          new AzureProvider(pc, auth, resolve("specs/azure"), pc.subscriptionId),
+          new AzureProvider(pc, auth, specIndex, pc.subscriptionId),
         );
         providerConfigs.set("azure", pc);
         break;
+      }
     }
   }
 
   return { providers, providerConfigs };
+}
+
+async function buildDynamicIndex(
+  provider: "aws" | "azure",
+  localSpecsDir: string,
+  config: Config,
+  cache: SpecCache,
+  fetcher: SpecFetcher,
+): Promise<DynamicSpecIndex> {
+  const bundledPath = resolve(`data/${provider}-catalog.json`);
+  const index = new DynamicSpecIndex({
+    provider,
+    config: config.specs,
+    cache,
+    fetcher,
+    localSpecsDir,
+    bundledCatalogPath: bundledPath,
+  });
+  await index.initialize();
+  return index;
+}
+
+function buildStaticAwsIndex(specsDir: string) {
+  const index = new AwsSpecIndex(specsDir);
+  index.loadAll();
+  return index;
+}
+
+function buildStaticAzureIndex(specsDir: string) {
+  const index = new AzureSpecIndex(specsDir);
+  index.loadAll();
+  return index;
 }
 
 main().catch((err) => {

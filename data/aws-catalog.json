@@ -1,0 +1,2107 @@
+[
+  {
+    "service": "accessanalyzer",
+    "version": "2019-11-01",
+    "path": "botocore/data/accessanalyzer/2019-11-01/service-2.json"
+  },
+  {
+    "service": "account",
+    "version": "2021-02-01",
+    "path": "botocore/data/account/2021-02-01/service-2.json"
+  },
+  {
+    "service": "acm-pca",
+    "version": "2017-08-22",
+    "path": "botocore/data/acm-pca/2017-08-22/service-2.json"
+  },
+  {
+    "service": "acm",
+    "version": "2015-12-08",
+    "path": "botocore/data/acm/2015-12-08/service-2.json"
+  },
+  {
+    "service": "aiops",
+    "version": "2018-05-10",
+    "path": "botocore/data/aiops/2018-05-10/service-2.json"
+  },
+  {
+    "service": "amp",
+    "version": "2020-08-01",
+    "path": "botocore/data/amp/2020-08-01/service-2.json"
+  },
+  {
+    "service": "amplify",
+    "version": "2017-07-25",
+    "path": "botocore/data/amplify/2017-07-25/service-2.json"
+  },
+  {
+    "service": "amplifybackend",
+    "version": "2020-08-11",
+    "path": "botocore/data/amplifybackend/2020-08-11/service-2.json"
+  },
+  {
+    "service": "amplifyuibuilder",
+    "version": "2021-08-11",
+    "path": "botocore/data/amplifyuibuilder/2021-08-11/service-2.json"
+  },
+  {
+    "service": "apigateway",
+    "version": "2015-07-09",
+    "path": "botocore/data/apigateway/2015-07-09/service-2.json"
+  },
+  {
+    "service": "apigatewaymanagementapi",
+    "version": "2018-11-29",
+    "path": "botocore/data/apigatewaymanagementapi/2018-11-29/service-2.json"
+  },
+  {
+    "service": "apigatewayv2",
+    "version": "2018-11-29",
+    "path": "botocore/data/apigatewayv2/2018-11-29/service-2.json"
+  },
+  {
+    "service": "appconfig",
+    "version": "2019-10-09",
+    "path": "botocore/data/appconfig/2019-10-09/service-2.json"
+  },
+  {
+    "service": "appconfigdata",
+    "version": "2021-11-11",
+    "path": "botocore/data/appconfigdata/2021-11-11/service-2.json"
+  },
+  {
+    "service": "appfabric",
+    "version": "2023-05-19",
+    "path": "botocore/data/appfabric/2023-05-19/service-2.json"
+  },
+  {
+    "service": "appflow",
+    "version": "2020-08-23",
+    "path": "botocore/data/appflow/2020-08-23/service-2.json"
+  },
+  {
+    "service": "appintegrations",
+    "version": "2020-07-29",
+    "path": "botocore/data/appintegrations/2020-07-29/service-2.json"
+  },
+  {
+    "service": "application-autoscaling",
+    "version": "2016-02-06",
+    "path": "botocore/data/application-autoscaling/2016-02-06/service-2.json"
+  },
+  {
+    "service": "application-insights",
+    "version": "2018-11-25",
+    "path": "botocore/data/application-insights/2018-11-25/service-2.json"
+  },
+  {
+    "service": "application-signals",
+    "version": "2024-04-15",
+    "path": "botocore/data/application-signals/2024-04-15/service-2.json"
+  },
+  {
+    "service": "applicationcostprofiler",
+    "version": "2020-09-10",
+    "path": "botocore/data/applicationcostprofiler/2020-09-10/service-2.json"
+  },
+  {
+    "service": "appmesh",
+    "version": "2019-01-25",
+    "path": "botocore/data/appmesh/2019-01-25/service-2.json"
+  },
+  {
+    "service": "apprunner",
+    "version": "2020-05-15",
+    "path": "botocore/data/apprunner/2020-05-15/service-2.json"
+  },
+  {
+    "service": "appstream",
+    "version": "2016-12-01",
+    "path": "botocore/data/appstream/2016-12-01/service-2.json"
+  },
+  {
+    "service": "appsync",
+    "version": "2017-07-25",
+    "path": "botocore/data/appsync/2017-07-25/service-2.json"
+  },
+  {
+    "service": "arc-region-switch",
+    "version": "2022-07-26",
+    "path": "botocore/data/arc-region-switch/2022-07-26/service-2.json"
+  },
+  {
+    "service": "arc-zonal-shift",
+    "version": "2022-10-30",
+    "path": "botocore/data/arc-zonal-shift/2022-10-30/service-2.json"
+  },
+  {
+    "service": "artifact",
+    "version": "2018-05-10",
+    "path": "botocore/data/artifact/2018-05-10/service-2.json"
+  },
+  {
+    "service": "athena",
+    "version": "2017-05-18",
+    "path": "botocore/data/athena/2017-05-18/service-2.json"
+  },
+  {
+    "service": "auditmanager",
+    "version": "2017-07-25",
+    "path": "botocore/data/auditmanager/2017-07-25/service-2.json"
+  },
+  {
+    "service": "autoscaling-plans",
+    "version": "2018-01-06",
+    "path": "botocore/data/autoscaling-plans/2018-01-06/service-2.json"
+  },
+  {
+    "service": "autoscaling",
+    "version": "2011-01-01",
+    "path": "botocore/data/autoscaling/2011-01-01/service-2.json"
+  },
+  {
+    "service": "b2bi",
+    "version": "2022-06-23",
+    "path": "botocore/data/b2bi/2022-06-23/service-2.json"
+  },
+  {
+    "service": "backup-gateway",
+    "version": "2021-01-01",
+    "path": "botocore/data/backup-gateway/2021-01-01/service-2.json"
+  },
+  {
+    "service": "backup",
+    "version": "2018-11-15",
+    "path": "botocore/data/backup/2018-11-15/service-2.json"
+  },
+  {
+    "service": "backupsearch",
+    "version": "2018-05-10",
+    "path": "botocore/data/backupsearch/2018-05-10/service-2.json"
+  },
+  {
+    "service": "batch",
+    "version": "2016-08-10",
+    "path": "botocore/data/batch/2016-08-10/service-2.json"
+  },
+  {
+    "service": "bcm-dashboards",
+    "version": "2025-08-18",
+    "path": "botocore/data/bcm-dashboards/2025-08-18/service-2.json"
+  },
+  {
+    "service": "bcm-data-exports",
+    "version": "2023-11-26",
+    "path": "botocore/data/bcm-data-exports/2023-11-26/service-2.json"
+  },
+  {
+    "service": "bcm-pricing-calculator",
+    "version": "2024-06-19",
+    "path": "botocore/data/bcm-pricing-calculator/2024-06-19/service-2.json"
+  },
+  {
+    "service": "bcm-recommended-actions",
+    "version": "2024-11-14",
+    "path": "botocore/data/bcm-recommended-actions/2024-11-14/service-2.json"
+  },
+  {
+    "service": "bedrock-agent-runtime",
+    "version": "2023-07-26",
+    "path": "botocore/data/bedrock-agent-runtime/2023-07-26/service-2.json"
+  },
+  {
+    "service": "bedrock-agent",
+    "version": "2023-06-05",
+    "path": "botocore/data/bedrock-agent/2023-06-05/service-2.json"
+  },
+  {
+    "service": "bedrock-agentcore-control",
+    "version": "2023-06-05",
+    "path": "botocore/data/bedrock-agentcore-control/2023-06-05/service-2.json"
+  },
+  {
+    "service": "bedrock-agentcore",
+    "version": "2024-02-28",
+    "path": "botocore/data/bedrock-agentcore/2024-02-28/service-2.json"
+  },
+  {
+    "service": "bedrock-data-automation-runtime",
+    "version": "2024-06-13",
+    "path": "botocore/data/bedrock-data-automation-runtime/2024-06-13/service-2.json"
+  },
+  {
+    "service": "bedrock-data-automation",
+    "version": "2023-07-26",
+    "path": "botocore/data/bedrock-data-automation/2023-07-26/service-2.json"
+  },
+  {
+    "service": "bedrock-runtime",
+    "version": "2023-09-30",
+    "path": "botocore/data/bedrock-runtime/2023-09-30/service-2.json"
+  },
+  {
+    "service": "bedrock",
+    "version": "2023-04-20",
+    "path": "botocore/data/bedrock/2023-04-20/service-2.json"
+  },
+  {
+    "service": "billing",
+    "version": "2023-09-07",
+    "path": "botocore/data/billing/2023-09-07/service-2.json"
+  },
+  {
+    "service": "billingconductor",
+    "version": "2021-07-30",
+    "path": "botocore/data/billingconductor/2021-07-30/service-2.json"
+  },
+  {
+    "service": "braket",
+    "version": "2019-09-01",
+    "path": "botocore/data/braket/2019-09-01/service-2.json"
+  },
+  {
+    "service": "budgets",
+    "version": "2016-10-20",
+    "path": "botocore/data/budgets/2016-10-20/service-2.json"
+  },
+  {
+    "service": "ce",
+    "version": "2017-10-25",
+    "path": "botocore/data/ce/2017-10-25/service-2.json"
+  },
+  {
+    "service": "chatbot",
+    "version": "2017-10-11",
+    "path": "botocore/data/chatbot/2017-10-11/service-2.json"
+  },
+  {
+    "service": "chime-sdk-identity",
+    "version": "2021-04-20",
+    "path": "botocore/data/chime-sdk-identity/2021-04-20/service-2.json"
+  },
+  {
+    "service": "chime-sdk-media-pipelines",
+    "version": "2021-07-15",
+    "path": "botocore/data/chime-sdk-media-pipelines/2021-07-15/service-2.json"
+  },
+  {
+    "service": "chime-sdk-meetings",
+    "version": "2021-07-15",
+    "path": "botocore/data/chime-sdk-meetings/2021-07-15/service-2.json"
+  },
+  {
+    "service": "chime-sdk-messaging",
+    "version": "2021-05-15",
+    "path": "botocore/data/chime-sdk-messaging/2021-05-15/service-2.json"
+  },
+  {
+    "service": "chime-sdk-voice",
+    "version": "2022-08-03",
+    "path": "botocore/data/chime-sdk-voice/2022-08-03/service-2.json"
+  },
+  {
+    "service": "chime",
+    "version": "2018-05-01",
+    "path": "botocore/data/chime/2018-05-01/service-2.json"
+  },
+  {
+    "service": "cleanrooms",
+    "version": "2022-02-17",
+    "path": "botocore/data/cleanrooms/2022-02-17/service-2.json"
+  },
+  {
+    "service": "cleanroomsml",
+    "version": "2023-09-06",
+    "path": "botocore/data/cleanroomsml/2023-09-06/service-2.json"
+  },
+  {
+    "service": "cloud9",
+    "version": "2017-09-23",
+    "path": "botocore/data/cloud9/2017-09-23/service-2.json"
+  },
+  {
+    "service": "cloudcontrol",
+    "version": "2021-09-30",
+    "path": "botocore/data/cloudcontrol/2021-09-30/service-2.json"
+  },
+  {
+    "service": "clouddirectory",
+    "version": "2017-01-11",
+    "path": "botocore/data/clouddirectory/2017-01-11/service-2.json"
+  },
+  {
+    "service": "cloudformation",
+    "version": "2010-05-15",
+    "path": "botocore/data/cloudformation/2010-05-15/service-2.json"
+  },
+  {
+    "service": "cloudfront-keyvaluestore",
+    "version": "2022-07-26",
+    "path": "botocore/data/cloudfront-keyvaluestore/2022-07-26/service-2.json"
+  },
+  {
+    "service": "cloudfront",
+    "version": "2020-05-31",
+    "path": "botocore/data/cloudfront/2020-05-31/service-2.json"
+  },
+  {
+    "service": "cloudhsm",
+    "version": "2014-05-30",
+    "path": "botocore/data/cloudhsm/2014-05-30/service-2.json"
+  },
+  {
+    "service": "cloudhsmv2",
+    "version": "2017-04-28",
+    "path": "botocore/data/cloudhsmv2/2017-04-28/service-2.json"
+  },
+  {
+    "service": "cloudsearch",
+    "version": "2013-01-01",
+    "path": "botocore/data/cloudsearch/2013-01-01/service-2.json"
+  },
+  {
+    "service": "cloudsearchdomain",
+    "version": "2013-01-01",
+    "path": "botocore/data/cloudsearchdomain/2013-01-01/service-2.json"
+  },
+  {
+    "service": "cloudtrail-data",
+    "version": "2021-08-11",
+    "path": "botocore/data/cloudtrail-data/2021-08-11/service-2.json"
+  },
+  {
+    "service": "cloudtrail",
+    "version": "2013-11-01",
+    "path": "botocore/data/cloudtrail/2013-11-01/service-2.json"
+  },
+  {
+    "service": "cloudwatch",
+    "version": "2010-08-01",
+    "path": "botocore/data/cloudwatch/2010-08-01/service-2.json"
+  },
+  {
+    "service": "codeartifact",
+    "version": "2018-09-22",
+    "path": "botocore/data/codeartifact/2018-09-22/service-2.json"
+  },
+  {
+    "service": "codebuild",
+    "version": "2016-10-06",
+    "path": "botocore/data/codebuild/2016-10-06/service-2.json"
+  },
+  {
+    "service": "codecatalyst",
+    "version": "2022-09-28",
+    "path": "botocore/data/codecatalyst/2022-09-28/service-2.json"
+  },
+  {
+    "service": "codecommit",
+    "version": "2015-04-13",
+    "path": "botocore/data/codecommit/2015-04-13/service-2.json"
+  },
+  {
+    "service": "codeconnections",
+    "version": "2023-12-01",
+    "path": "botocore/data/codeconnections/2023-12-01/service-2.json"
+  },
+  {
+    "service": "codedeploy",
+    "version": "2014-10-06",
+    "path": "botocore/data/codedeploy/2014-10-06/service-2.json"
+  },
+  {
+    "service": "codeguru-reviewer",
+    "version": "2019-09-19",
+    "path": "botocore/data/codeguru-reviewer/2019-09-19/service-2.json"
+  },
+  {
+    "service": "codeguru-security",
+    "version": "2018-05-10",
+    "path": "botocore/data/codeguru-security/2018-05-10/service-2.json"
+  },
+  {
+    "service": "codeguruprofiler",
+    "version": "2019-07-18",
+    "path": "botocore/data/codeguruprofiler/2019-07-18/service-2.json"
+  },
+  {
+    "service": "codepipeline",
+    "version": "2015-07-09",
+    "path": "botocore/data/codepipeline/2015-07-09/service-2.json"
+  },
+  {
+    "service": "codestar-connections",
+    "version": "2019-12-01",
+    "path": "botocore/data/codestar-connections/2019-12-01/service-2.json"
+  },
+  {
+    "service": "codestar-notifications",
+    "version": "2019-10-15",
+    "path": "botocore/data/codestar-notifications/2019-10-15/service-2.json"
+  },
+  {
+    "service": "cognito-identity",
+    "version": "2014-06-30",
+    "path": "botocore/data/cognito-identity/2014-06-30/service-2.json"
+  },
+  {
+    "service": "cognito-idp",
+    "version": "2016-04-18",
+    "path": "botocore/data/cognito-idp/2016-04-18/service-2.json"
+  },
+  {
+    "service": "cognito-sync",
+    "version": "2014-06-30",
+    "path": "botocore/data/cognito-sync/2014-06-30/service-2.json"
+  },
+  {
+    "service": "comprehend",
+    "version": "2017-11-27",
+    "path": "botocore/data/comprehend/2017-11-27/service-2.json"
+  },
+  {
+    "service": "comprehendmedical",
+    "version": "2018-10-30",
+    "path": "botocore/data/comprehendmedical/2018-10-30/service-2.json"
+  },
+  {
+    "service": "compute-optimizer-automation",
+    "version": "2025-09-22",
+    "path": "botocore/data/compute-optimizer-automation/2025-09-22/service-2.json"
+  },
+  {
+    "service": "compute-optimizer",
+    "version": "2019-11-01",
+    "path": "botocore/data/compute-optimizer/2019-11-01/service-2.json"
+  },
+  {
+    "service": "config",
+    "version": "2014-11-12",
+    "path": "botocore/data/config/2014-11-12/service-2.json"
+  },
+  {
+    "service": "connect-contact-lens",
+    "version": "2020-08-21",
+    "path": "botocore/data/connect-contact-lens/2020-08-21/service-2.json"
+  },
+  {
+    "service": "connect",
+    "version": "2017-08-08",
+    "path": "botocore/data/connect/2017-08-08/service-2.json"
+  },
+  {
+    "service": "connectcampaigns",
+    "version": "2021-01-30",
+    "path": "botocore/data/connectcampaigns/2021-01-30/service-2.json"
+  },
+  {
+    "service": "connectcampaignsv2",
+    "version": "2024-04-23",
+    "path": "botocore/data/connectcampaignsv2/2024-04-23/service-2.json"
+  },
+  {
+    "service": "connectcases",
+    "version": "2022-10-03",
+    "path": "botocore/data/connectcases/2022-10-03/service-2.json"
+  },
+  {
+    "service": "connecthealth",
+    "version": "2025-01-29",
+    "path": "botocore/data/connecthealth/2025-01-29/service-2.json"
+  },
+  {
+    "service": "connectparticipant",
+    "version": "2018-09-07",
+    "path": "botocore/data/connectparticipant/2018-09-07/service-2.json"
+  },
+  {
+    "service": "controlcatalog",
+    "version": "2018-05-10",
+    "path": "botocore/data/controlcatalog/2018-05-10/service-2.json"
+  },
+  {
+    "service": "controltower",
+    "version": "2018-05-10",
+    "path": "botocore/data/controltower/2018-05-10/service-2.json"
+  },
+  {
+    "service": "cost-optimization-hub",
+    "version": "2022-07-26",
+    "path": "botocore/data/cost-optimization-hub/2022-07-26/service-2.json"
+  },
+  {
+    "service": "cur",
+    "version": "2017-01-06",
+    "path": "botocore/data/cur/2017-01-06/service-2.json"
+  },
+  {
+    "service": "customer-profiles",
+    "version": "2020-08-15",
+    "path": "botocore/data/customer-profiles/2020-08-15/service-2.json"
+  },
+  {
+    "service": "databrew",
+    "version": "2017-07-25",
+    "path": "botocore/data/databrew/2017-07-25/service-2.json"
+  },
+  {
+    "service": "dataexchange",
+    "version": "2017-07-25",
+    "path": "botocore/data/dataexchange/2017-07-25/service-2.json"
+  },
+  {
+    "service": "datapipeline",
+    "version": "2012-10-29",
+    "path": "botocore/data/datapipeline/2012-10-29/service-2.json"
+  },
+  {
+    "service": "datasync",
+    "version": "2018-11-09",
+    "path": "botocore/data/datasync/2018-11-09/service-2.json"
+  },
+  {
+    "service": "datazone",
+    "version": "2018-05-10",
+    "path": "botocore/data/datazone/2018-05-10/service-2.json"
+  },
+  {
+    "service": "dax",
+    "version": "2017-04-19",
+    "path": "botocore/data/dax/2017-04-19/service-2.json"
+  },
+  {
+    "service": "deadline",
+    "version": "2023-10-12",
+    "path": "botocore/data/deadline/2023-10-12/service-2.json"
+  },
+  {
+    "service": "detective",
+    "version": "2018-10-26",
+    "path": "botocore/data/detective/2018-10-26/service-2.json"
+  },
+  {
+    "service": "devicefarm",
+    "version": "2015-06-23",
+    "path": "botocore/data/devicefarm/2015-06-23/service-2.json"
+  },
+  {
+    "service": "devops-agent",
+    "version": "2026-01-01",
+    "path": "botocore/data/devops-agent/2026-01-01/service-2.json"
+  },
+  {
+    "service": "devops-guru",
+    "version": "2020-12-01",
+    "path": "botocore/data/devops-guru/2020-12-01/service-2.json"
+  },
+  {
+    "service": "directconnect",
+    "version": "2012-10-25",
+    "path": "botocore/data/directconnect/2012-10-25/service-2.json"
+  },
+  {
+    "service": "discovery",
+    "version": "2015-11-01",
+    "path": "botocore/data/discovery/2015-11-01/service-2.json"
+  },
+  {
+    "service": "dlm",
+    "version": "2018-01-12",
+    "path": "botocore/data/dlm/2018-01-12/service-2.json"
+  },
+  {
+    "service": "dms",
+    "version": "2016-01-01",
+    "path": "botocore/data/dms/2016-01-01/service-2.json"
+  },
+  {
+    "service": "docdb-elastic",
+    "version": "2022-11-28",
+    "path": "botocore/data/docdb-elastic/2022-11-28/service-2.json"
+  },
+  {
+    "service": "docdb",
+    "version": "2014-10-31",
+    "path": "botocore/data/docdb/2014-10-31/service-2.json"
+  },
+  {
+    "service": "drs",
+    "version": "2020-02-26",
+    "path": "botocore/data/drs/2020-02-26/service-2.json"
+  },
+  {
+    "service": "ds-data",
+    "version": "2023-05-31",
+    "path": "botocore/data/ds-data/2023-05-31/service-2.json"
+  },
+  {
+    "service": "ds",
+    "version": "2015-04-16",
+    "path": "botocore/data/ds/2015-04-16/service-2.json"
+  },
+  {
+    "service": "dsql",
+    "version": "2018-05-10",
+    "path": "botocore/data/dsql/2018-05-10/service-2.json"
+  },
+  {
+    "service": "dynamodb",
+    "version": "2012-08-10",
+    "path": "botocore/data/dynamodb/2012-08-10/service-2.json"
+  },
+  {
+    "service": "dynamodbstreams",
+    "version": "2012-08-10",
+    "path": "botocore/data/dynamodbstreams/2012-08-10/service-2.json"
+  },
+  {
+    "service": "ebs",
+    "version": "2019-11-02",
+    "path": "botocore/data/ebs/2019-11-02/service-2.json"
+  },
+  {
+    "service": "ec2-instance-connect",
+    "version": "2018-04-02",
+    "path": "botocore/data/ec2-instance-connect/2018-04-02/service-2.json"
+  },
+  {
+    "service": "ec2",
+    "version": "2016-11-15",
+    "path": "botocore/data/ec2/2016-11-15/service-2.json"
+  },
+  {
+    "service": "ecr-public",
+    "version": "2020-10-30",
+    "path": "botocore/data/ecr-public/2020-10-30/service-2.json"
+  },
+  {
+    "service": "ecr",
+    "version": "2015-09-21",
+    "path": "botocore/data/ecr/2015-09-21/service-2.json"
+  },
+  {
+    "service": "ecs",
+    "version": "2014-11-13",
+    "path": "botocore/data/ecs/2014-11-13/service-2.json"
+  },
+  {
+    "service": "efs",
+    "version": "2015-02-01",
+    "path": "botocore/data/efs/2015-02-01/service-2.json"
+  },
+  {
+    "service": "eks-auth",
+    "version": "2023-11-26",
+    "path": "botocore/data/eks-auth/2023-11-26/service-2.json"
+  },
+  {
+    "service": "eks",
+    "version": "2017-11-01",
+    "path": "botocore/data/eks/2017-11-01/service-2.json"
+  },
+  {
+    "service": "elasticache",
+    "version": "2015-02-02",
+    "path": "botocore/data/elasticache/2015-02-02/service-2.json"
+  },
+  {
+    "service": "elasticbeanstalk",
+    "version": "2010-12-01",
+    "path": "botocore/data/elasticbeanstalk/2010-12-01/service-2.json"
+  },
+  {
+    "service": "elb",
+    "version": "2012-06-01",
+    "path": "botocore/data/elb/2012-06-01/service-2.json"
+  },
+  {
+    "service": "elbv2",
+    "version": "2015-12-01",
+    "path": "botocore/data/elbv2/2015-12-01/service-2.json"
+  },
+  {
+    "service": "elementalinference",
+    "version": "2018-11-14",
+    "path": "botocore/data/elementalinference/2018-11-14/service-2.json"
+  },
+  {
+    "service": "emr-containers",
+    "version": "2020-10-01",
+    "path": "botocore/data/emr-containers/2020-10-01/service-2.json"
+  },
+  {
+    "service": "emr-serverless",
+    "version": "2021-07-13",
+    "path": "botocore/data/emr-serverless/2021-07-13/service-2.json"
+  },
+  {
+    "service": "emr",
+    "version": "2009-03-31",
+    "path": "botocore/data/emr/2009-03-31/service-2.json"
+  },
+  {
+    "service": "entityresolution",
+    "version": "2018-05-10",
+    "path": "botocore/data/entityresolution/2018-05-10/service-2.json"
+  },
+  {
+    "service": "es",
+    "version": "2015-01-01",
+    "path": "botocore/data/es/2015-01-01/service-2.json"
+  },
+  {
+    "service": "events",
+    "version": "2015-10-07",
+    "path": "botocore/data/events/2015-10-07/service-2.json"
+  },
+  {
+    "service": "evs",
+    "version": "2023-07-27",
+    "path": "botocore/data/evs/2023-07-27/service-2.json"
+  },
+  {
+    "service": "finspace-data",
+    "version": "2020-07-13",
+    "path": "botocore/data/finspace-data/2020-07-13/service-2.json"
+  },
+  {
+    "service": "finspace",
+    "version": "2021-03-12",
+    "path": "botocore/data/finspace/2021-03-12/service-2.json"
+  },
+  {
+    "service": "firehose",
+    "version": "2015-08-04",
+    "path": "botocore/data/firehose/2015-08-04/service-2.json"
+  },
+  {
+    "service": "fis",
+    "version": "2020-12-01",
+    "path": "botocore/data/fis/2020-12-01/service-2.json"
+  },
+  {
+    "service": "fms",
+    "version": "2018-01-01",
+    "path": "botocore/data/fms/2018-01-01/service-2.json"
+  },
+  {
+    "service": "forecast",
+    "version": "2018-06-26",
+    "path": "botocore/data/forecast/2018-06-26/service-2.json"
+  },
+  {
+    "service": "forecastquery",
+    "version": "2018-06-26",
+    "path": "botocore/data/forecastquery/2018-06-26/service-2.json"
+  },
+  {
+    "service": "frauddetector",
+    "version": "2019-11-15",
+    "path": "botocore/data/frauddetector/2019-11-15/service-2.json"
+  },
+  {
+    "service": "freetier",
+    "version": "2023-09-07",
+    "path": "botocore/data/freetier/2023-09-07/service-2.json"
+  },
+  {
+    "service": "fsx",
+    "version": "2018-03-01",
+    "path": "botocore/data/fsx/2018-03-01/service-2.json"
+  },
+  {
+    "service": "gamelift",
+    "version": "2015-10-01",
+    "path": "botocore/data/gamelift/2015-10-01/service-2.json"
+  },
+  {
+    "service": "gameliftstreams",
+    "version": "2018-05-10",
+    "path": "botocore/data/gameliftstreams/2018-05-10/service-2.json"
+  },
+  {
+    "service": "geo-maps",
+    "version": "2020-11-19",
+    "path": "botocore/data/geo-maps/2020-11-19/service-2.json"
+  },
+  {
+    "service": "geo-places",
+    "version": "2020-11-19",
+    "path": "botocore/data/geo-places/2020-11-19/service-2.json"
+  },
+  {
+    "service": "geo-routes",
+    "version": "2020-11-19",
+    "path": "botocore/data/geo-routes/2020-11-19/service-2.json"
+  },
+  {
+    "service": "glacier",
+    "version": "2012-06-01",
+    "path": "botocore/data/glacier/2012-06-01/service-2.json"
+  },
+  {
+    "service": "globalaccelerator",
+    "version": "2018-08-08",
+    "path": "botocore/data/globalaccelerator/2018-08-08/service-2.json"
+  },
+  {
+    "service": "glue",
+    "version": "2017-03-31",
+    "path": "botocore/data/glue/2017-03-31/service-2.json"
+  },
+  {
+    "service": "grafana",
+    "version": "2020-08-18",
+    "path": "botocore/data/grafana/2020-08-18/service-2.json"
+  },
+  {
+    "service": "greengrass",
+    "version": "2017-06-07",
+    "path": "botocore/data/greengrass/2017-06-07/service-2.json"
+  },
+  {
+    "service": "greengrassv2",
+    "version": "2020-11-30",
+    "path": "botocore/data/greengrassv2/2020-11-30/service-2.json"
+  },
+  {
+    "service": "groundstation",
+    "version": "2019-05-23",
+    "path": "botocore/data/groundstation/2019-05-23/service-2.json"
+  },
+  {
+    "service": "guardduty",
+    "version": "2017-11-28",
+    "path": "botocore/data/guardduty/2017-11-28/service-2.json"
+  },
+  {
+    "service": "health",
+    "version": "2016-08-04",
+    "path": "botocore/data/health/2016-08-04/service-2.json"
+  },
+  {
+    "service": "healthlake",
+    "version": "2017-07-01",
+    "path": "botocore/data/healthlake/2017-07-01/service-2.json"
+  },
+  {
+    "service": "iam",
+    "version": "2010-05-08",
+    "path": "botocore/data/iam/2010-05-08/service-2.json"
+  },
+  {
+    "service": "identitystore",
+    "version": "2020-06-15",
+    "path": "botocore/data/identitystore/2020-06-15/service-2.json"
+  },
+  {
+    "service": "imagebuilder",
+    "version": "2019-12-02",
+    "path": "botocore/data/imagebuilder/2019-12-02/service-2.json"
+  },
+  {
+    "service": "importexport",
+    "version": "2010-06-01",
+    "path": "botocore/data/importexport/2010-06-01/service-2.json"
+  },
+  {
+    "service": "inspector-scan",
+    "version": "2023-08-08",
+    "path": "botocore/data/inspector-scan/2023-08-08/service-2.json"
+  },
+  {
+    "service": "inspector",
+    "version": "2016-02-16",
+    "path": "botocore/data/inspector/2016-02-16/service-2.json"
+  },
+  {
+    "service": "inspector2",
+    "version": "2020-06-08",
+    "path": "botocore/data/inspector2/2020-06-08/service-2.json"
+  },
+  {
+    "service": "internetmonitor",
+    "version": "2021-06-03",
+    "path": "botocore/data/internetmonitor/2021-06-03/service-2.json"
+  },
+  {
+    "service": "invoicing",
+    "version": "2024-12-01",
+    "path": "botocore/data/invoicing/2024-12-01/service-2.json"
+  },
+  {
+    "service": "iot-data",
+    "version": "2015-05-28",
+    "path": "botocore/data/iot-data/2015-05-28/service-2.json"
+  },
+  {
+    "service": "iot-jobs-data",
+    "version": "2017-09-29",
+    "path": "botocore/data/iot-jobs-data/2017-09-29/service-2.json"
+  },
+  {
+    "service": "iot-managed-integrations",
+    "version": "2025-03-03",
+    "path": "botocore/data/iot-managed-integrations/2025-03-03/service-2.json"
+  },
+  {
+    "service": "iot",
+    "version": "2015-05-28",
+    "path": "botocore/data/iot/2015-05-28/service-2.json"
+  },
+  {
+    "service": "iotdeviceadvisor",
+    "version": "2020-09-18",
+    "path": "botocore/data/iotdeviceadvisor/2020-09-18/service-2.json"
+  },
+  {
+    "service": "iotevents-data",
+    "version": "2018-10-23",
+    "path": "botocore/data/iotevents-data/2018-10-23/service-2.json"
+  },
+  {
+    "service": "iotevents",
+    "version": "2018-07-27",
+    "path": "botocore/data/iotevents/2018-07-27/service-2.json"
+  },
+  {
+    "service": "iotfleetwise",
+    "version": "2021-06-17",
+    "path": "botocore/data/iotfleetwise/2021-06-17/service-2.json"
+  },
+  {
+    "service": "iotsecuretunneling",
+    "version": "2018-10-05",
+    "path": "botocore/data/iotsecuretunneling/2018-10-05/service-2.json"
+  },
+  {
+    "service": "iotsitewise",
+    "version": "2019-12-02",
+    "path": "botocore/data/iotsitewise/2019-12-02/service-2.json"
+  },
+  {
+    "service": "iotthingsgraph",
+    "version": "2018-09-06",
+    "path": "botocore/data/iotthingsgraph/2018-09-06/service-2.json"
+  },
+  {
+    "service": "iottwinmaker",
+    "version": "2021-11-29",
+    "path": "botocore/data/iottwinmaker/2021-11-29/service-2.json"
+  },
+  {
+    "service": "iotwireless",
+    "version": "2020-11-22",
+    "path": "botocore/data/iotwireless/2020-11-22/service-2.json"
+  },
+  {
+    "service": "ivs-realtime",
+    "version": "2020-07-14",
+    "path": "botocore/data/ivs-realtime/2020-07-14/service-2.json"
+  },
+  {
+    "service": "ivs",
+    "version": "2020-07-14",
+    "path": "botocore/data/ivs/2020-07-14/service-2.json"
+  },
+  {
+    "service": "ivschat",
+    "version": "2020-07-14",
+    "path": "botocore/data/ivschat/2020-07-14/service-2.json"
+  },
+  {
+    "service": "kafka",
+    "version": "2018-11-14",
+    "path": "botocore/data/kafka/2018-11-14/service-2.json"
+  },
+  {
+    "service": "kafkaconnect",
+    "version": "2021-09-14",
+    "path": "botocore/data/kafkaconnect/2021-09-14/service-2.json"
+  },
+  {
+    "service": "kendra-ranking",
+    "version": "2022-10-19",
+    "path": "botocore/data/kendra-ranking/2022-10-19/service-2.json"
+  },
+  {
+    "service": "kendra",
+    "version": "2019-02-03",
+    "path": "botocore/data/kendra/2019-02-03/service-2.json"
+  },
+  {
+    "service": "keyspaces",
+    "version": "2022-02-10",
+    "path": "botocore/data/keyspaces/2022-02-10/service-2.json"
+  },
+  {
+    "service": "keyspacesstreams",
+    "version": "2024-09-09",
+    "path": "botocore/data/keyspacesstreams/2024-09-09/service-2.json"
+  },
+  {
+    "service": "kinesis-video-archived-media",
+    "version": "2017-09-30",
+    "path": "botocore/data/kinesis-video-archived-media/2017-09-30/service-2.json"
+  },
+  {
+    "service": "kinesis-video-media",
+    "version": "2017-09-30",
+    "path": "botocore/data/kinesis-video-media/2017-09-30/service-2.json"
+  },
+  {
+    "service": "kinesis-video-signaling",
+    "version": "2019-12-04",
+    "path": "botocore/data/kinesis-video-signaling/2019-12-04/service-2.json"
+  },
+  {
+    "service": "kinesis-video-webrtc-storage",
+    "version": "2018-05-10",
+    "path": "botocore/data/kinesis-video-webrtc-storage/2018-05-10/service-2.json"
+  },
+  {
+    "service": "kinesis",
+    "version": "2013-12-02",
+    "path": "botocore/data/kinesis/2013-12-02/service-2.json"
+  },
+  {
+    "service": "kinesisanalytics",
+    "version": "2015-08-14",
+    "path": "botocore/data/kinesisanalytics/2015-08-14/service-2.json"
+  },
+  {
+    "service": "kinesisanalyticsv2",
+    "version": "2018-05-23",
+    "path": "botocore/data/kinesisanalyticsv2/2018-05-23/service-2.json"
+  },
+  {
+    "service": "kinesisvideo",
+    "version": "2017-09-30",
+    "path": "botocore/data/kinesisvideo/2017-09-30/service-2.json"
+  },
+  {
+    "service": "kms",
+    "version": "2014-11-01",
+    "path": "botocore/data/kms/2014-11-01/service-2.json"
+  },
+  {
+    "service": "lakeformation",
+    "version": "2017-03-31",
+    "path": "botocore/data/lakeformation/2017-03-31/service-2.json"
+  },
+  {
+    "service": "lambda",
+    "version": "2015-03-31",
+    "path": "botocore/data/lambda/2015-03-31/service-2.json"
+  },
+  {
+    "service": "launch-wizard",
+    "version": "2018-05-10",
+    "path": "botocore/data/launch-wizard/2018-05-10/service-2.json"
+  },
+  {
+    "service": "lex-models",
+    "version": "2017-04-19",
+    "path": "botocore/data/lex-models/2017-04-19/service-2.json"
+  },
+  {
+    "service": "lex-runtime",
+    "version": "2016-11-28",
+    "path": "botocore/data/lex-runtime/2016-11-28/service-2.json"
+  },
+  {
+    "service": "lexv2-models",
+    "version": "2020-08-07",
+    "path": "botocore/data/lexv2-models/2020-08-07/service-2.json"
+  },
+  {
+    "service": "lexv2-runtime",
+    "version": "2020-08-07",
+    "path": "botocore/data/lexv2-runtime/2020-08-07/service-2.json"
+  },
+  {
+    "service": "license-manager-linux-subscriptions",
+    "version": "2018-05-10",
+    "path": "botocore/data/license-manager-linux-subscriptions/2018-05-10/service-2.json"
+  },
+  {
+    "service": "license-manager-user-subscriptions",
+    "version": "2018-05-10",
+    "path": "botocore/data/license-manager-user-subscriptions/2018-05-10/service-2.json"
+  },
+  {
+    "service": "license-manager",
+    "version": "2018-08-01",
+    "path": "botocore/data/license-manager/2018-08-01/service-2.json"
+  },
+  {
+    "service": "lightsail",
+    "version": "2016-11-28",
+    "path": "botocore/data/lightsail/2016-11-28/service-2.json"
+  },
+  {
+    "service": "location",
+    "version": "2020-11-19",
+    "path": "botocore/data/location/2020-11-19/service-2.json"
+  },
+  {
+    "service": "logs",
+    "version": "2014-03-28",
+    "path": "botocore/data/logs/2014-03-28/service-2.json"
+  },
+  {
+    "service": "lookoutequipment",
+    "version": "2020-12-15",
+    "path": "botocore/data/lookoutequipment/2020-12-15/service-2.json"
+  },
+  {
+    "service": "m2",
+    "version": "2021-04-28",
+    "path": "botocore/data/m2/2021-04-28/service-2.json"
+  },
+  {
+    "service": "machinelearning",
+    "version": "2014-12-12",
+    "path": "botocore/data/machinelearning/2014-12-12/service-2.json"
+  },
+  {
+    "service": "macie2",
+    "version": "2020-01-01",
+    "path": "botocore/data/macie2/2020-01-01/service-2.json"
+  },
+  {
+    "service": "mailmanager",
+    "version": "2023-10-17",
+    "path": "botocore/data/mailmanager/2023-10-17/service-2.json"
+  },
+  {
+    "service": "managedblockchain-query",
+    "version": "2023-05-04",
+    "path": "botocore/data/managedblockchain-query/2023-05-04/service-2.json"
+  },
+  {
+    "service": "managedblockchain",
+    "version": "2018-09-24",
+    "path": "botocore/data/managedblockchain/2018-09-24/service-2.json"
+  },
+  {
+    "service": "marketplace-agreement",
+    "version": "2020-03-01",
+    "path": "botocore/data/marketplace-agreement/2020-03-01/service-2.json"
+  },
+  {
+    "service": "marketplace-catalog",
+    "version": "2018-09-17",
+    "path": "botocore/data/marketplace-catalog/2018-09-17/service-2.json"
+  },
+  {
+    "service": "marketplace-deployment",
+    "version": "2023-01-25",
+    "path": "botocore/data/marketplace-deployment/2023-01-25/service-2.json"
+  },
+  {
+    "service": "marketplace-entitlement",
+    "version": "2017-01-11",
+    "path": "botocore/data/marketplace-entitlement/2017-01-11/service-2.json"
+  },
+  {
+    "service": "marketplace-reporting",
+    "version": "2018-05-10",
+    "path": "botocore/data/marketplace-reporting/2018-05-10/service-2.json"
+  },
+  {
+    "service": "marketplacecommerceanalytics",
+    "version": "2015-07-01",
+    "path": "botocore/data/marketplacecommerceanalytics/2015-07-01/service-2.json"
+  },
+  {
+    "service": "mediaconnect",
+    "version": "2018-11-14",
+    "path": "botocore/data/mediaconnect/2018-11-14/service-2.json"
+  },
+  {
+    "service": "mediaconvert",
+    "version": "2017-08-29",
+    "path": "botocore/data/mediaconvert/2017-08-29/service-2.json"
+  },
+  {
+    "service": "medialive",
+    "version": "2017-10-14",
+    "path": "botocore/data/medialive/2017-10-14/service-2.json"
+  },
+  {
+    "service": "mediapackage-vod",
+    "version": "2018-11-07",
+    "path": "botocore/data/mediapackage-vod/2018-11-07/service-2.json"
+  },
+  {
+    "service": "mediapackage",
+    "version": "2017-10-12",
+    "path": "botocore/data/mediapackage/2017-10-12/service-2.json"
+  },
+  {
+    "service": "mediapackagev2",
+    "version": "2022-12-25",
+    "path": "botocore/data/mediapackagev2/2022-12-25/service-2.json"
+  },
+  {
+    "service": "mediastore-data",
+    "version": "2017-09-01",
+    "path": "botocore/data/mediastore-data/2017-09-01/service-2.json"
+  },
+  {
+    "service": "mediastore",
+    "version": "2017-09-01",
+    "path": "botocore/data/mediastore/2017-09-01/service-2.json"
+  },
+  {
+    "service": "mediatailor",
+    "version": "2018-04-23",
+    "path": "botocore/data/mediatailor/2018-04-23/service-2.json"
+  },
+  {
+    "service": "medical-imaging",
+    "version": "2023-07-19",
+    "path": "botocore/data/medical-imaging/2023-07-19/service-2.json"
+  },
+  {
+    "service": "memorydb",
+    "version": "2021-01-01",
+    "path": "botocore/data/memorydb/2021-01-01/service-2.json"
+  },
+  {
+    "service": "meteringmarketplace",
+    "version": "2016-01-14",
+    "path": "botocore/data/meteringmarketplace/2016-01-14/service-2.json"
+  },
+  {
+    "service": "mgh",
+    "version": "2017-05-31",
+    "path": "botocore/data/mgh/2017-05-31/service-2.json"
+  },
+  {
+    "service": "mgn",
+    "version": "2020-02-26",
+    "path": "botocore/data/mgn/2020-02-26/service-2.json"
+  },
+  {
+    "service": "migration-hub-refactor-spaces",
+    "version": "2021-10-26",
+    "path": "botocore/data/migration-hub-refactor-spaces/2021-10-26/service-2.json"
+  },
+  {
+    "service": "migrationhub-config",
+    "version": "2019-06-30",
+    "path": "botocore/data/migrationhub-config/2019-06-30/service-2.json"
+  },
+  {
+    "service": "migrationhuborchestrator",
+    "version": "2021-08-28",
+    "path": "botocore/data/migrationhuborchestrator/2021-08-28/service-2.json"
+  },
+  {
+    "service": "migrationhubstrategy",
+    "version": "2020-02-19",
+    "path": "botocore/data/migrationhubstrategy/2020-02-19/service-2.json"
+  },
+  {
+    "service": "mpa",
+    "version": "2022-07-26",
+    "path": "botocore/data/mpa/2022-07-26/service-2.json"
+  },
+  {
+    "service": "mq",
+    "version": "2017-11-27",
+    "path": "botocore/data/mq/2017-11-27/service-2.json"
+  },
+  {
+    "service": "mturk",
+    "version": "2017-01-17",
+    "path": "botocore/data/mturk/2017-01-17/service-2.json"
+  },
+  {
+    "service": "mwaa-serverless",
+    "version": "2024-07-26",
+    "path": "botocore/data/mwaa-serverless/2024-07-26/service-2.json"
+  },
+  {
+    "service": "mwaa",
+    "version": "2020-07-01",
+    "path": "botocore/data/mwaa/2020-07-01/service-2.json"
+  },
+  {
+    "service": "neptune-graph",
+    "version": "2023-11-29",
+    "path": "botocore/data/neptune-graph/2023-11-29/service-2.json"
+  },
+  {
+    "service": "neptune",
+    "version": "2014-10-31",
+    "path": "botocore/data/neptune/2014-10-31/service-2.json"
+  },
+  {
+    "service": "neptunedata",
+    "version": "2023-08-01",
+    "path": "botocore/data/neptunedata/2023-08-01/service-2.json"
+  },
+  {
+    "service": "network-firewall",
+    "version": "2020-11-12",
+    "path": "botocore/data/network-firewall/2020-11-12/service-2.json"
+  },
+  {
+    "service": "networkflowmonitor",
+    "version": "2023-04-19",
+    "path": "botocore/data/networkflowmonitor/2023-04-19/service-2.json"
+  },
+  {
+    "service": "networkmanager",
+    "version": "2019-07-05",
+    "path": "botocore/data/networkmanager/2019-07-05/service-2.json"
+  },
+  {
+    "service": "networkmonitor",
+    "version": "2023-08-01",
+    "path": "botocore/data/networkmonitor/2023-08-01/service-2.json"
+  },
+  {
+    "service": "notifications",
+    "version": "2018-05-10",
+    "path": "botocore/data/notifications/2018-05-10/service-2.json"
+  },
+  {
+    "service": "notificationscontacts",
+    "version": "2018-05-10",
+    "path": "botocore/data/notificationscontacts/2018-05-10/service-2.json"
+  },
+  {
+    "service": "nova-act",
+    "version": "2025-08-22",
+    "path": "botocore/data/nova-act/2025-08-22/service-2.json"
+  },
+  {
+    "service": "oam",
+    "version": "2022-06-10",
+    "path": "botocore/data/oam/2022-06-10/service-2.json"
+  },
+  {
+    "service": "observabilityadmin",
+    "version": "2018-05-10",
+    "path": "botocore/data/observabilityadmin/2018-05-10/service-2.json"
+  },
+  {
+    "service": "odb",
+    "version": "2024-08-20",
+    "path": "botocore/data/odb/2024-08-20/service-2.json"
+  },
+  {
+    "service": "omics",
+    "version": "2022-11-28",
+    "path": "botocore/data/omics/2022-11-28/service-2.json"
+  },
+  {
+    "service": "opensearch",
+    "version": "2021-01-01",
+    "path": "botocore/data/opensearch/2021-01-01/service-2.json"
+  },
+  {
+    "service": "opensearchserverless",
+    "version": "2021-11-01",
+    "path": "botocore/data/opensearchserverless/2021-11-01/service-2.json"
+  },
+  {
+    "service": "organizations",
+    "version": "2016-11-28",
+    "path": "botocore/data/organizations/2016-11-28/service-2.json"
+  },
+  {
+    "service": "osis",
+    "version": "2022-01-01",
+    "path": "botocore/data/osis/2022-01-01/service-2.json"
+  },
+  {
+    "service": "outposts",
+    "version": "2019-12-03",
+    "path": "botocore/data/outposts/2019-12-03/service-2.json"
+  },
+  {
+    "service": "panorama",
+    "version": "2019-07-24",
+    "path": "botocore/data/panorama/2019-07-24/service-2.json"
+  },
+  {
+    "service": "partnercentral-account",
+    "version": "2025-04-04",
+    "path": "botocore/data/partnercentral-account/2025-04-04/service-2.json"
+  },
+  {
+    "service": "partnercentral-benefits",
+    "version": "2018-05-10",
+    "path": "botocore/data/partnercentral-benefits/2018-05-10/service-2.json"
+  },
+  {
+    "service": "partnercentral-channel",
+    "version": "2024-03-18",
+    "path": "botocore/data/partnercentral-channel/2024-03-18/service-2.json"
+  },
+  {
+    "service": "partnercentral-selling",
+    "version": "2022-07-26",
+    "path": "botocore/data/partnercentral-selling/2022-07-26/service-2.json"
+  },
+  {
+    "service": "payment-cryptography-data",
+    "version": "2022-02-03",
+    "path": "botocore/data/payment-cryptography-data/2022-02-03/service-2.json"
+  },
+  {
+    "service": "payment-cryptography",
+    "version": "2021-09-14",
+    "path": "botocore/data/payment-cryptography/2021-09-14/service-2.json"
+  },
+  {
+    "service": "pca-connector-ad",
+    "version": "2018-05-10",
+    "path": "botocore/data/pca-connector-ad/2018-05-10/service-2.json"
+  },
+  {
+    "service": "pca-connector-scep",
+    "version": "2018-05-10",
+    "path": "botocore/data/pca-connector-scep/2018-05-10/service-2.json"
+  },
+  {
+    "service": "pcs",
+    "version": "2023-02-10",
+    "path": "botocore/data/pcs/2023-02-10/service-2.json"
+  },
+  {
+    "service": "personalize-events",
+    "version": "2018-03-22",
+    "path": "botocore/data/personalize-events/2018-03-22/service-2.json"
+  },
+  {
+    "service": "personalize-runtime",
+    "version": "2018-05-22",
+    "path": "botocore/data/personalize-runtime/2018-05-22/service-2.json"
+  },
+  {
+    "service": "personalize",
+    "version": "2018-05-22",
+    "path": "botocore/data/personalize/2018-05-22/service-2.json"
+  },
+  {
+    "service": "pi",
+    "version": "2018-02-27",
+    "path": "botocore/data/pi/2018-02-27/service-2.json"
+  },
+  {
+    "service": "pinpoint-email",
+    "version": "2018-07-26",
+    "path": "botocore/data/pinpoint-email/2018-07-26/service-2.json"
+  },
+  {
+    "service": "pinpoint-sms-voice-v2",
+    "version": "2022-03-31",
+    "path": "botocore/data/pinpoint-sms-voice-v2/2022-03-31/service-2.json"
+  },
+  {
+    "service": "pinpoint-sms-voice",
+    "version": "2018-09-05",
+    "path": "botocore/data/pinpoint-sms-voice/2018-09-05/service-2.json"
+  },
+  {
+    "service": "pinpoint",
+    "version": "2016-12-01",
+    "path": "botocore/data/pinpoint/2016-12-01/service-2.json"
+  },
+  {
+    "service": "pipes",
+    "version": "2015-10-07",
+    "path": "botocore/data/pipes/2015-10-07/service-2.json"
+  },
+  {
+    "service": "polly",
+    "version": "2016-06-10",
+    "path": "botocore/data/polly/2016-06-10/service-2.json"
+  },
+  {
+    "service": "pricing",
+    "version": "2017-10-15",
+    "path": "botocore/data/pricing/2017-10-15/service-2.json"
+  },
+  {
+    "service": "proton",
+    "version": "2020-07-20",
+    "path": "botocore/data/proton/2020-07-20/service-2.json"
+  },
+  {
+    "service": "qapps",
+    "version": "2023-11-27",
+    "path": "botocore/data/qapps/2023-11-27/service-2.json"
+  },
+  {
+    "service": "qbusiness",
+    "version": "2023-11-27",
+    "path": "botocore/data/qbusiness/2023-11-27/service-2.json"
+  },
+  {
+    "service": "qconnect",
+    "version": "2020-10-19",
+    "path": "botocore/data/qconnect/2020-10-19/service-2.json"
+  },
+  {
+    "service": "quicksight",
+    "version": "2018-04-01",
+    "path": "botocore/data/quicksight/2018-04-01/service-2.json"
+  },
+  {
+    "service": "ram",
+    "version": "2018-01-04",
+    "path": "botocore/data/ram/2018-01-04/service-2.json"
+  },
+  {
+    "service": "rbin",
+    "version": "2021-06-15",
+    "path": "botocore/data/rbin/2021-06-15/service-2.json"
+  },
+  {
+    "service": "rds-data",
+    "version": "2018-08-01",
+    "path": "botocore/data/rds-data/2018-08-01/service-2.json"
+  },
+  {
+    "service": "rds",
+    "version": "2014-10-31",
+    "path": "botocore/data/rds/2014-10-31/service-2.json"
+  },
+  {
+    "service": "redshift-data",
+    "version": "2019-12-20",
+    "path": "botocore/data/redshift-data/2019-12-20/service-2.json"
+  },
+  {
+    "service": "redshift-serverless",
+    "version": "2021-04-21",
+    "path": "botocore/data/redshift-serverless/2021-04-21/service-2.json"
+  },
+  {
+    "service": "redshift",
+    "version": "2012-12-01",
+    "path": "botocore/data/redshift/2012-12-01/service-2.json"
+  },
+  {
+    "service": "rekognition",
+    "version": "2016-06-27",
+    "path": "botocore/data/rekognition/2016-06-27/service-2.json"
+  },
+  {
+    "service": "repostspace",
+    "version": "2022-05-13",
+    "path": "botocore/data/repostspace/2022-05-13/service-2.json"
+  },
+  {
+    "service": "resiliencehub",
+    "version": "2020-04-30",
+    "path": "botocore/data/resiliencehub/2020-04-30/service-2.json"
+  },
+  {
+    "service": "resource-explorer-2",
+    "version": "2022-07-28",
+    "path": "botocore/data/resource-explorer-2/2022-07-28/service-2.json"
+  },
+  {
+    "service": "resource-groups",
+    "version": "2017-11-27",
+    "path": "botocore/data/resource-groups/2017-11-27/service-2.json"
+  },
+  {
+    "service": "resourcegroupstaggingapi",
+    "version": "2017-01-26",
+    "path": "botocore/data/resourcegroupstaggingapi/2017-01-26/service-2.json"
+  },
+  {
+    "service": "rolesanywhere",
+    "version": "2018-05-10",
+    "path": "botocore/data/rolesanywhere/2018-05-10/service-2.json"
+  },
+  {
+    "service": "route53-recovery-cluster",
+    "version": "2019-12-02",
+    "path": "botocore/data/route53-recovery-cluster/2019-12-02/service-2.json"
+  },
+  {
+    "service": "route53-recovery-control-config",
+    "version": "2020-11-02",
+    "path": "botocore/data/route53-recovery-control-config/2020-11-02/service-2.json"
+  },
+  {
+    "service": "route53-recovery-readiness",
+    "version": "2019-12-02",
+    "path": "botocore/data/route53-recovery-readiness/2019-12-02/service-2.json"
+  },
+  {
+    "service": "route53",
+    "version": "2013-04-01",
+    "path": "botocore/data/route53/2013-04-01/service-2.json"
+  },
+  {
+    "service": "route53domains",
+    "version": "2014-05-15",
+    "path": "botocore/data/route53domains/2014-05-15/service-2.json"
+  },
+  {
+    "service": "route53globalresolver",
+    "version": "2022-09-27",
+    "path": "botocore/data/route53globalresolver/2022-09-27/service-2.json"
+  },
+  {
+    "service": "route53profiles",
+    "version": "2018-05-10",
+    "path": "botocore/data/route53profiles/2018-05-10/service-2.json"
+  },
+  {
+    "service": "route53resolver",
+    "version": "2018-04-01",
+    "path": "botocore/data/route53resolver/2018-04-01/service-2.json"
+  },
+  {
+    "service": "rtbfabric",
+    "version": "2023-05-15",
+    "path": "botocore/data/rtbfabric/2023-05-15/service-2.json"
+  },
+  {
+    "service": "rum",
+    "version": "2018-05-10",
+    "path": "botocore/data/rum/2018-05-10/service-2.json"
+  },
+  {
+    "service": "s3",
+    "version": "2006-03-01",
+    "path": "botocore/data/s3/2006-03-01/service-2.json"
+  },
+  {
+    "service": "s3control",
+    "version": "2018-08-20",
+    "path": "botocore/data/s3control/2018-08-20/service-2.json"
+  },
+  {
+    "service": "s3outposts",
+    "version": "2017-07-25",
+    "path": "botocore/data/s3outposts/2017-07-25/service-2.json"
+  },
+  {
+    "service": "s3tables",
+    "version": "2018-05-10",
+    "path": "botocore/data/s3tables/2018-05-10/service-2.json"
+  },
+  {
+    "service": "s3vectors",
+    "version": "2025-07-15",
+    "path": "botocore/data/s3vectors/2025-07-15/service-2.json"
+  },
+  {
+    "service": "sagemaker-a2i-runtime",
+    "version": "2019-11-07",
+    "path": "botocore/data/sagemaker-a2i-runtime/2019-11-07/service-2.json"
+  },
+  {
+    "service": "sagemaker-edge",
+    "version": "2020-09-23",
+    "path": "botocore/data/sagemaker-edge/2020-09-23/service-2.json"
+  },
+  {
+    "service": "sagemaker-featurestore-runtime",
+    "version": "2020-07-01",
+    "path": "botocore/data/sagemaker-featurestore-runtime/2020-07-01/service-2.json"
+  },
+  {
+    "service": "sagemaker-geospatial",
+    "version": "2020-05-27",
+    "path": "botocore/data/sagemaker-geospatial/2020-05-27/service-2.json"
+  },
+  {
+    "service": "sagemaker-metrics",
+    "version": "2022-09-30",
+    "path": "botocore/data/sagemaker-metrics/2022-09-30/service-2.json"
+  },
+  {
+    "service": "sagemaker-runtime",
+    "version": "2017-05-13",
+    "path": "botocore/data/sagemaker-runtime/2017-05-13/service-2.json"
+  },
+  {
+    "service": "sagemaker",
+    "version": "2017-07-24",
+    "path": "botocore/data/sagemaker/2017-07-24/service-2.json"
+  },
+  {
+    "service": "savingsplans",
+    "version": "2019-06-28",
+    "path": "botocore/data/savingsplans/2019-06-28/service-2.json"
+  },
+  {
+    "service": "scheduler",
+    "version": "2021-06-30",
+    "path": "botocore/data/scheduler/2021-06-30/service-2.json"
+  },
+  {
+    "service": "schemas",
+    "version": "2019-12-02",
+    "path": "botocore/data/schemas/2019-12-02/service-2.json"
+  },
+  {
+    "service": "sdb",
+    "version": "2009-04-15",
+    "path": "botocore/data/sdb/2009-04-15/service-2.json"
+  },
+  {
+    "service": "secretsmanager",
+    "version": "2017-10-17",
+    "path": "botocore/data/secretsmanager/2017-10-17/service-2.json"
+  },
+  {
+    "service": "security-ir",
+    "version": "2018-05-10",
+    "path": "botocore/data/security-ir/2018-05-10/service-2.json"
+  },
+  {
+    "service": "securityagent",
+    "version": "2025-09-06",
+    "path": "botocore/data/securityagent/2025-09-06/service-2.json"
+  },
+  {
+    "service": "securityhub",
+    "version": "2018-10-26",
+    "path": "botocore/data/securityhub/2018-10-26/service-2.json"
+  },
+  {
+    "service": "securitylake",
+    "version": "2018-05-10",
+    "path": "botocore/data/securitylake/2018-05-10/service-2.json"
+  },
+  {
+    "service": "serverlessrepo",
+    "version": "2017-09-08",
+    "path": "botocore/data/serverlessrepo/2017-09-08/service-2.json"
+  },
+  {
+    "service": "service-quotas",
+    "version": "2019-06-24",
+    "path": "botocore/data/service-quotas/2019-06-24/service-2.json"
+  },
+  {
+    "service": "servicecatalog-appregistry",
+    "version": "2020-06-24",
+    "path": "botocore/data/servicecatalog-appregistry/2020-06-24/service-2.json"
+  },
+  {
+    "service": "servicecatalog",
+    "version": "2015-12-10",
+    "path": "botocore/data/servicecatalog/2015-12-10/service-2.json"
+  },
+  {
+    "service": "servicediscovery",
+    "version": "2017-03-14",
+    "path": "botocore/data/servicediscovery/2017-03-14/service-2.json"
+  },
+  {
+    "service": "ses",
+    "version": "2010-12-01",
+    "path": "botocore/data/ses/2010-12-01/service-2.json"
+  },
+  {
+    "service": "sesv2",
+    "version": "2019-09-27",
+    "path": "botocore/data/sesv2/2019-09-27/service-2.json"
+  },
+  {
+    "service": "shield",
+    "version": "2016-06-02",
+    "path": "botocore/data/shield/2016-06-02/service-2.json"
+  },
+  {
+    "service": "signer-data",
+    "version": "2017-08-25",
+    "path": "botocore/data/signer-data/2017-08-25/service-2.json"
+  },
+  {
+    "service": "signer",
+    "version": "2017-08-25",
+    "path": "botocore/data/signer/2017-08-25/service-2.json"
+  },
+  {
+    "service": "signin",
+    "version": "2023-01-01",
+    "path": "botocore/data/signin/2023-01-01/service-2.json"
+  },
+  {
+    "service": "simpledbv2",
+    "version": "2025-09-26",
+    "path": "botocore/data/simpledbv2/2025-09-26/service-2.json"
+  },
+  {
+    "service": "simspaceweaver",
+    "version": "2022-10-28",
+    "path": "botocore/data/simspaceweaver/2022-10-28/service-2.json"
+  },
+  {
+    "service": "sms-voice",
+    "version": "2018-09-05",
+    "path": "botocore/data/sms-voice/2018-09-05/service-2.json"
+  },
+  {
+    "service": "snow-device-management",
+    "version": "2021-08-04",
+    "path": "botocore/data/snow-device-management/2021-08-04/service-2.json"
+  },
+  {
+    "service": "snowball",
+    "version": "2016-06-30",
+    "path": "botocore/data/snowball/2016-06-30/service-2.json"
+  },
+  {
+    "service": "sns",
+    "version": "2010-03-31",
+    "path": "botocore/data/sns/2010-03-31/service-2.json"
+  },
+  {
+    "service": "socialmessaging",
+    "version": "2024-01-01",
+    "path": "botocore/data/socialmessaging/2024-01-01/service-2.json"
+  },
+  {
+    "service": "sqs",
+    "version": "2012-11-05",
+    "path": "botocore/data/sqs/2012-11-05/service-2.json"
+  },
+  {
+    "service": "ssm-contacts",
+    "version": "2021-05-03",
+    "path": "botocore/data/ssm-contacts/2021-05-03/service-2.json"
+  },
+  {
+    "service": "ssm-guiconnect",
+    "version": "2021-05-01",
+    "path": "botocore/data/ssm-guiconnect/2021-05-01/service-2.json"
+  },
+  {
+    "service": "ssm-incidents",
+    "version": "2018-05-10",
+    "path": "botocore/data/ssm-incidents/2018-05-10/service-2.json"
+  },
+  {
+    "service": "ssm-quicksetup",
+    "version": "2018-05-10",
+    "path": "botocore/data/ssm-quicksetup/2018-05-10/service-2.json"
+  },
+  {
+    "service": "ssm-sap",
+    "version": "2018-05-10",
+    "path": "botocore/data/ssm-sap/2018-05-10/service-2.json"
+  },
+  {
+    "service": "ssm",
+    "version": "2014-11-06",
+    "path": "botocore/data/ssm/2014-11-06/service-2.json"
+  },
+  {
+    "service": "sso-admin",
+    "version": "2020-07-20",
+    "path": "botocore/data/sso-admin/2020-07-20/service-2.json"
+  },
+  {
+    "service": "sso-oidc",
+    "version": "2019-06-10",
+    "path": "botocore/data/sso-oidc/2019-06-10/service-2.json"
+  },
+  {
+    "service": "sso",
+    "version": "2019-06-10",
+    "path": "botocore/data/sso/2019-06-10/service-2.json"
+  },
+  {
+    "service": "stepfunctions",
+    "version": "2016-11-23",
+    "path": "botocore/data/stepfunctions/2016-11-23/service-2.json"
+  },
+  {
+    "service": "storagegateway",
+    "version": "2013-06-30",
+    "path": "botocore/data/storagegateway/2013-06-30/service-2.json"
+  },
+  {
+    "service": "sts",
+    "version": "2011-06-15",
+    "path": "botocore/data/sts/2011-06-15/service-2.json"
+  },
+  {
+    "service": "supplychain",
+    "version": "2024-01-01",
+    "path": "botocore/data/supplychain/2024-01-01/service-2.json"
+  },
+  {
+    "service": "support-app",
+    "version": "2021-08-20",
+    "path": "botocore/data/support-app/2021-08-20/service-2.json"
+  },
+  {
+    "service": "support",
+    "version": "2013-04-15",
+    "path": "botocore/data/support/2013-04-15/service-2.json"
+  },
+  {
+    "service": "sustainability",
+    "version": "2018-05-10",
+    "path": "botocore/data/sustainability/2018-05-10/service-2.json"
+  },
+  {
+    "service": "swf",
+    "version": "2012-01-25",
+    "path": "botocore/data/swf/2012-01-25/service-2.json"
+  },
+  {
+    "service": "synthetics",
+    "version": "2017-10-11",
+    "path": "botocore/data/synthetics/2017-10-11/service-2.json"
+  },
+  {
+    "service": "taxsettings",
+    "version": "2018-05-10",
+    "path": "botocore/data/taxsettings/2018-05-10/service-2.json"
+  },
+  {
+    "service": "textract",
+    "version": "2018-06-27",
+    "path": "botocore/data/textract/2018-06-27/service-2.json"
+  },
+  {
+    "service": "timestream-influxdb",
+    "version": "2023-01-27",
+    "path": "botocore/data/timestream-influxdb/2023-01-27/service-2.json"
+  },
+  {
+    "service": "timestream-query",
+    "version": "2018-11-01",
+    "path": "botocore/data/timestream-query/2018-11-01/service-2.json"
+  },
+  {
+    "service": "timestream-write",
+    "version": "2018-11-01",
+    "path": "botocore/data/timestream-write/2018-11-01/service-2.json"
+  },
+  {
+    "service": "tnb",
+    "version": "2008-10-21",
+    "path": "botocore/data/tnb/2008-10-21/service-2.json"
+  },
+  {
+    "service": "transcribe",
+    "version": "2017-10-26",
+    "path": "botocore/data/transcribe/2017-10-26/service-2.json"
+  },
+  {
+    "service": "transfer",
+    "version": "2018-11-05",
+    "path": "botocore/data/transfer/2018-11-05/service-2.json"
+  },
+  {
+    "service": "translate",
+    "version": "2017-07-01",
+    "path": "botocore/data/translate/2017-07-01/service-2.json"
+  },
+  {
+    "service": "trustedadvisor",
+    "version": "2022-09-15",
+    "path": "botocore/data/trustedadvisor/2022-09-15/service-2.json"
+  },
+  {
+    "service": "uxc",
+    "version": "2024-07-01",
+    "path": "botocore/data/uxc/2024-07-01/service-2.json"
+  },
+  {
+    "service": "verifiedpermissions",
+    "version": "2021-12-01",
+    "path": "botocore/data/verifiedpermissions/2021-12-01/service-2.json"
+  },
+  {
+    "service": "voice-id",
+    "version": "2021-09-27",
+    "path": "botocore/data/voice-id/2021-09-27/service-2.json"
+  },
+  {
+    "service": "vpc-lattice",
+    "version": "2022-11-30",
+    "path": "botocore/data/vpc-lattice/2022-11-30/service-2.json"
+  },
+  {
+    "service": "waf-regional",
+    "version": "2016-11-28",
+    "path": "botocore/data/waf-regional/2016-11-28/service-2.json"
+  },
+  {
+    "service": "waf",
+    "version": "2015-08-24",
+    "path": "botocore/data/waf/2015-08-24/service-2.json"
+  },
+  {
+    "service": "wafv2",
+    "version": "2019-07-29",
+    "path": "botocore/data/wafv2/2019-07-29/service-2.json"
+  },
+  {
+    "service": "wellarchitected",
+    "version": "2020-03-31",
+    "path": "botocore/data/wellarchitected/2020-03-31/service-2.json"
+  },
+  {
+    "service": "wickr",
+    "version": "2024-02-01",
+    "path": "botocore/data/wickr/2024-02-01/service-2.json"
+  },
+  {
+    "service": "wisdom",
+    "version": "2020-10-19",
+    "path": "botocore/data/wisdom/2020-10-19/service-2.json"
+  },
+  {
+    "service": "workdocs",
+    "version": "2016-05-01",
+    "path": "botocore/data/workdocs/2016-05-01/service-2.json"
+  },
+  {
+    "service": "workmail",
+    "version": "2017-10-01",
+    "path": "botocore/data/workmail/2017-10-01/service-2.json"
+  },
+  {
+    "service": "workmailmessageflow",
+    "version": "2019-05-01",
+    "path": "botocore/data/workmailmessageflow/2019-05-01/service-2.json"
+  },
+  {
+    "service": "workspaces-instances",
+    "version": "2022-07-26",
+    "path": "botocore/data/workspaces-instances/2022-07-26/service-2.json"
+  },
+  {
+    "service": "workspaces-thin-client",
+    "version": "2023-08-22",
+    "path": "botocore/data/workspaces-thin-client/2023-08-22/service-2.json"
+  },
+  {
+    "service": "workspaces-web",
+    "version": "2020-07-08",
+    "path": "botocore/data/workspaces-web/2020-07-08/service-2.json"
+  },
+  {
+    "service": "workspaces",
+    "version": "2015-04-08",
+    "path": "botocore/data/workspaces/2015-04-08/service-2.json"
+  },
+  {
+    "service": "xray",
+    "version": "2016-04-12",
+    "path": "botocore/data/xray/2016-04-12/service-2.json"
+  }
+]

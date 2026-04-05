@@ -9,3 +9,5 @@ config.local.yaml
 *.log
 .DS_Store
 coverage/
+# Dynamic spec cache (runtime, not committed)
+.cloud-pilot/
