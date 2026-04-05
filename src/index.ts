@@ -13,6 +13,7 @@ import { FileAuditLogger } from "./audit/file.js";
 import { AwsProvider } from "./providers/aws/provider.js";
 import { AzureProvider } from "./providers/azure/provider.js";
 import { GcpProvider } from "./providers/gcp/provider.js";
+import { AlibabaProvider } from "./providers/alibaba/provider.js";
 import { AwsSpecIndex } from "./providers/aws/specs.js";
 import { AzureSpecIndex } from "./providers/azure/specs.js";
 import { DynamicSpecIndex } from "./specs/dynamic-spec-index.js";
@@ -272,6 +273,14 @@ async function buildProviders(
         providerConfigs.set("gcp", pc);
         break;
       }
+      case "alibaba": {
+        const localDir = resolve("specs/alibaba");
+        const specIndex = await buildDynamicIndex("alibaba", localDir, config, cache, fetcher);
+
+        providers.set("alibaba", new AlibabaProvider(pc, auth, specIndex));
+        providerConfigs.set("alibaba", pc);
+        break;
+      }
     }
   }
 
@@ -279,7 +288,7 @@ async function buildProviders(
 }
 
 async function buildDynamicIndex(
-  provider: "aws" | "azure" | "gcp",
+  provider: "aws" | "azure" | "gcp" | "alibaba",
   localSpecsDir: string,
   config: Config,
   cache: SpecCache,

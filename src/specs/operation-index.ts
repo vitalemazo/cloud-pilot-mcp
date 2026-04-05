@@ -141,6 +141,55 @@ export class OperationIndex {
     walk(spec.resources);
     return entries;
   }
+
+  static extractFromAlibabaSpec(
+    service: string,
+    spec: {
+      apis?: Array<{
+        name?: string;
+        title?: string;
+        summary?: string;
+        method?: string;
+      }>;
+      apiDoc?: {
+        hasDoc?: string[];
+        noDoc?: string[];
+      };
+    },
+  ): OperationIndexEntry[] {
+    const entries: OperationIndexEntry[] = [];
+
+    // Format 1: overview response with apis array
+    if (spec.apis) {
+      for (const api of spec.apis) {
+        if (api.name) {
+          entries.push({
+            service,
+            operation: api.name,
+            method: (api.method ?? "POST").toUpperCase(),
+            description: (api.title ?? api.summary ?? "").slice(0, 120),
+          });
+        }
+      }
+      return entries;
+    }
+
+    // Format 2: apiDoc with hasDoc/noDoc arrays (operation names only)
+    const opNames = [
+      ...(spec.apiDoc?.hasDoc ?? []),
+      ...(spec.apiDoc?.noDoc ?? []),
+    ];
+    for (const name of opNames) {
+      entries.push({
+        service,
+        operation: name,
+        method: "POST",
+        description: "",
+      });
+    }
+
+    return entries;
+  }
 }
 
 function stripHtml(s: string): string {

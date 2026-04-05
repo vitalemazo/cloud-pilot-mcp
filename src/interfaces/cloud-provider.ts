@@ -26,7 +26,7 @@ export interface CloudProviderCallResult {
 }
 
 export interface CloudProvider {
-  name: "aws" | "azure" | "gcp";
+  name: "aws" | "azure" | "gcp" | "alibaba";
   searchSpec(query: string, service?: string): Promise<OperationSpec[]>;
   call(
     service: string,

@@ -149,6 +149,66 @@ export class SpecFetcher {
     return this.fetchJson(discoveryUrl);
   }
 
+  // ── Alibaba Cloud ─────────────────────────────────────────────────
+
+  async fetchAlibabaCatalog(): Promise<CatalogEntry[]> {
+    const url = "https://api.aliyun.com/meta/v1/products";
+    const data = (await this.fetchJson(url)) as Array<{
+      code: string;
+      name?: string;
+      defaultVersion?: string;
+      versions?: string[];
+      style?: string;
+    }>;
+
+    return data.map((product) => ({
+      service: product.code,
+      version: product.defaultVersion ?? product.versions?.[0],
+      path: product.code,
+      fullName: product.name,
+    }));
+  }
+
+  async fetchAlibabaApiList(
+    product: string,
+    version: string,
+  ): Promise<unknown> {
+    const url = `https://api.aliyun.com/api/product/apiDir?product=${encodeURIComponent(product)}&version=${encodeURIComponent(version)}`;
+    const raw = (await this.fetchJson(url)) as {
+      code: number;
+      data: Array<{
+        node_title?: string;
+        title?: string;
+        children?: Array<{
+          name?: string;
+          title?: string;
+          summary?: string;
+          method?: string;
+          deprecated?: number;
+        }>;
+      }>;
+    };
+
+    // Flatten the directory tree into an apis array
+    const apis: Array<{
+      name: string;
+      title: string;
+      method: string;
+    }> = [];
+    for (const dir of raw.data ?? []) {
+      for (const child of dir.children ?? []) {
+        if (child.name && !child.deprecated) {
+          apis.push({
+            name: child.name,
+            title: child.title ?? child.summary ?? "",
+            method: (child.method ?? "POST").split("|")[0],
+          });
+        }
+      }
+    }
+    return { apis };
+  }
+
   // ── Internals ─────────────────────────────────────────────────────
 
   private async fetchGitTree(

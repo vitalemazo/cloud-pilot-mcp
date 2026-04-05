@@ -3,7 +3,7 @@ import { parse as parseYaml } from "yaml";
 import { z } from "zod";
 
 const ProviderConfigSchema = z.object({
-  type: z.enum(["aws", "azure", "gcp"]),
+  type: z.enum(["aws", "azure", "gcp", "alibaba"]),
   region: z.string().default("us-east-1"),
   mode: z.enum(["read-only", "read-write", "full"]).default("read-only"),
   allowedServices: z.array(z.string()).default([]),

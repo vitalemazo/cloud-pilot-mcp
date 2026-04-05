@@ -9,7 +9,7 @@ import { OperationIndex } from "./operation-index.js";
 import { AwsSpecIndex } from "../providers/aws/specs.js";
 import { AzureSpecIndex } from "../providers/azure/specs.js";
 
-type Provider = "aws" | "azure" | "gcp";
+type Provider = "aws" | "azure" | "gcp" | "alibaba";
 
 interface DynamicSpecIndexOptions {
   provider: Provider;
@@ -70,7 +70,9 @@ export class DynamicSpecIndex {
             ? await this.fetcher.fetchAwsCatalog()
             : this.provider === "gcp"
               ? await this.fetcher.fetchGcpCatalog()
-              : await this.fetcher.fetchAzureCatalog();
+              : this.provider === "alibaba"
+                ? await this.fetcher.fetchAlibabaCatalog()
+                : await this.fetcher.fetchAzureCatalog();
         this.cache.writeCatalog(this.provider, entries);
         this.setCatalog(entries);
         return;
@@ -141,7 +143,9 @@ export class DynamicSpecIndex {
             ? OperationIndex.extractFromAwsSpec(service, spec as Parameters<typeof OperationIndex.extractFromAwsSpec>[1])
             : this.provider === "gcp"
               ? OperationIndex.extractFromGcpSpec(service, spec as Parameters<typeof OperationIndex.extractFromGcpSpec>[1])
-              : OperationIndex.extractFromAzureSpec(service, spec as Parameters<typeof OperationIndex.extractFromAzureSpec>[1]);
+              : this.provider === "alibaba"
+                ? OperationIndex.extractFromAlibabaSpec(service, spec as Parameters<typeof OperationIndex.extractFromAlibabaSpec>[1])
+                : OperationIndex.extractFromAzureSpec(service, spec as Parameters<typeof OperationIndex.extractFromAzureSpec>[1]);
         this.opIndex.addService(service, ops);
       } catch {
         // Skip unparseable files
@@ -226,6 +230,9 @@ export class DynamicSpecIndex {
     if (this.provider === "gcp") {
       return this.getGcpOperation(service, operation, spec);
     }
+    if (this.provider === "alibaba") {
+      return this.getAlibabaOperation(service, operation, spec);
+    }
     return this.getAzureOperation(service, operation, spec);
   }
 
@@ -288,7 +295,12 @@ export class DynamicSpecIndex {
             )
           : this.provider === "gcp"
             ? await this.fetcher.fetchGcpSpec(catalogEntry.path)
-            : await this.fetcher.fetchAzureSpec(catalogEntry.path);
+            : this.provider === "alibaba"
+              ? await this.fetcher.fetchAlibabaApiList(
+                  catalogEntry.service,
+                  catalogEntry.version ?? "",
+                )
+              : await this.fetcher.fetchAzureSpec(catalogEntry.path);
 
       this.cache.writeSpec(this.provider, service, spec);
       this.specLRU.set(service, spec);
@@ -407,7 +419,9 @@ export class DynamicSpecIndex {
           ? this.getAwsOperation(match.service, match.operation, spec)
           : this.provider === "gcp"
             ? this.getGcpOperation(match.service, match.operation, spec)
-            : this.getAzureOperation(match.service, match.operation, spec);
+            : this.provider === "alibaba"
+              ? this.getAlibabaOperation(match.service, match.operation, spec)
+              : this.getAzureOperation(match.service, match.operation, spec);
 
       if (opSpec) results.push(opSpec);
     }
@@ -449,6 +463,44 @@ export class DynamicSpecIndex {
     spec: unknown,
   ): OperationSpec | null {
     return extractGcpOperationSpec(service, operation, spec);
+  }
+
+  private getAlibabaOperation(
+    service: string,
+    operation: string,
+    spec: unknown,
+  ): OperationSpec | null {
+    // Alibaba overview API returns minimal info — return what we have
+    const typedSpec = spec as {
+      apis?: Array<{
+        name?: string;
+        title?: string;
+        summary?: string;
+        method?: string;
+      }>;
+    };
+    if (typedSpec.apis) {
+      const api = typedSpec.apis.find((a) => a.name === operation);
+      if (api) {
+        return {
+          service,
+          operation: api.name ?? operation,
+          httpMethod: (api.method ?? "POST").toUpperCase(),
+          description: api.title ?? api.summary ?? "",
+          inputParams: [],
+          outputFields: [],
+        };
+      }
+    }
+    // Fallback: return stub from operation name
+    return {
+      service,
+      operation,
+      httpMethod: "POST",
+      description: "",
+      inputParams: [],
+      outputFields: [],
+    };
   }
 }
 
