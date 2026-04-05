@@ -5,8 +5,10 @@ import { loadConfig } from "./config.js";
 import { createServer } from "./server.js";
 import { EnvAuthProvider } from "./auth/env.js";
 import { VaultAuthProvider } from "./auth/vault.js";
+import { AzureADAuthProvider } from "./auth/azure-ad.js";
 import { FileAuditLogger } from "./audit/file.js";
 import { AwsProvider } from "./providers/aws/provider.js";
+import { AzureProvider } from "./providers/azure/provider.js";
 import type { AuthProvider } from "./interfaces/auth.js";
 import type { AuditLogger } from "./interfaces/audit.js";
 import type { CloudProvider } from "./interfaces/cloud-provider.js";
@@ -59,6 +61,19 @@ function buildAuth(config: Config): AuthProvider {
         secretPath: vc.secretPath,
       });
     }
+    case "azure-ad": {
+      const ac = config.auth.azureAd;
+      if (!ac?.tenantId || !ac.clientId || !ac.clientSecret) {
+        throw new Error(
+          "Azure AD auth requires tenantId, clientId, and clientSecret. Set in config or AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET env vars.",
+        );
+      }
+      return new AzureADAuthProvider({
+        tenantId: ac.tenantId,
+        clientId: ac.clientId,
+        clientSecret: ac.clientSecret,
+      });
+    }
     case "env":
       return new EnvAuthProvider();
     default:
@@ -91,16 +106,19 @@ function buildProviders(
 } {
   const providers = new Map<string, CloudProvider>();
   const providerConfigs = new Map<string, Config["providers"][number]>();
-  const specsDir = resolve("specs/aws");
 
   for (const pc of config.providers) {
     switch (pc.type) {
       case "aws":
-        providers.set("aws", new AwsProvider(pc, auth, specsDir));
+        providers.set("aws", new AwsProvider(pc, auth, resolve("specs/aws")));
         providerConfigs.set("aws", pc);
         break;
       case "azure":
-        console.error("[cloud-pilot] Azure provider not yet implemented, skipping");
+        providers.set(
+          "azure",
+          new AzureProvider(pc, auth, resolve("specs/azure"), pc.subscriptionId),
+        );
+        providerConfigs.set("azure", pc);
         break;
     }
   }

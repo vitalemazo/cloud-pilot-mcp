@@ -20,6 +20,19 @@ providers:
       - ecs
       - cloudwatch
 
+  - type: azure
+    region: eastus
+    mode: read-only
+    allowedServices:
+      - compute
+      - storage
+      - network
+      - sql
+      - web
+      - keyvault
+      - monitor
+      - containerservice
+
 sandbox:
   memoryLimitMB: 128
   timeoutMs: 30000

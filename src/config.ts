@@ -9,6 +9,7 @@ const ProviderConfigSchema = z.object({
   allowedServices: z.array(z.string()).default([]),
   blockedActions: z.array(z.string()).default([]),
   requireConfirmation: z.array(z.string()).default([]),
+  subscriptionId: z.string().optional(),
 });
 
 const ConfigSchema = z.object({
@@ -28,6 +29,13 @@ const ConfigSchema = z.object({
           roleId: z.string().optional(),
           secretId: z.string().optional(),
           secretPath: z.string().default("secret/cloud-pilot"),
+        })
+        .optional(),
+      azureAd: z
+        .object({
+          tenantId: z.string().optional(),
+          clientId: z.string().optional(),
+          clientSecret: z.string().optional(),
         })
         .optional(),
     })
