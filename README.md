@@ -38,10 +38,10 @@ The agent reasons about what APIs exist, plans the sequence, and executes — al
 
 | Provider | Services | Operations | Spec Source | Auth |
 |----------|----------|------------|-------------|------|
-| **AWS** | 421 | 18,109 | [boto/botocore](https://github.com/boto/botocore) via jsDelivr CDN | SigV4 request signing |
-| **Azure** | 240+ | 3,157 | [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) via GitHub CDN | OAuth2 Bearer token |
-| **GCP** | 305 | 12,599 | [Google Discovery API](https://www.googleapis.com/discovery/v1/apis) (live) | OAuth2 Bearer token |
-| **Alibaba** | 323 | 18,058 | [Alibaba Cloud API](https://api.aliyun.com/meta/v1/products) + api-docs.json | ACS3-HMAC-SHA256 |
+| **AWS** | 421 | 18,109 | [boto/botocore](https://github.com/boto/botocore) via jsDelivr CDN | AWS CLI / SDK credential chain → SigV4 signing |
+| **Azure** | 240+ | 3,157 | [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) via GitHub CDN | Azure CLI / DefaultAzureCredential → Bearer token |
+| **GCP** | 305 | 12,599 | [Google Discovery API](https://www.googleapis.com/discovery/v1/apis) (live) | gcloud CLI / GoogleAuth → Bearer token |
+| **Alibaba** | 323 | 18,058 | [Alibaba Cloud API](https://api.aliyun.com/meta/v1/products) + api-docs.json | aliyun CLI / credential chain → ACS3-HMAC-SHA256 |
 | **Total** | **1,289+** | **51,923** | | |
 
 All services are discovered dynamically — no pre-configuration needed. When a cloud provider launches a new service, it becomes available automatically on the next catalog refresh.
@@ -188,7 +188,11 @@ When running as a Streamable HTTP service, the server includes:
 
 ### Prerequisites
 - Node.js 20+
-- Cloud provider credentials (for actual API calls)
+- One or more cloud provider CLIs installed and authenticated:
+  - **AWS**: [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) — `aws configure` or `aws sso login`
+  - **Azure**: [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) — `az login`
+  - **GCP**: [gcloud CLI](https://cloud.google.com/sdk/docs/install) — `gcloud auth application-default login`
+  - **Alibaba**: [aliyun CLI](https://www.alibabacloud.com/help/en/cli/) — `aliyun configure`
 
 ### Install and Run
 
@@ -206,7 +210,29 @@ npm run download-specs
 
 ### Configure Credentials
 
-Copy `.env.example` to `.env` and fill in your cloud credentials:
+Credentials are discovered automatically using each cloud provider's native SDK credential chain. If you have a CLI installed and authenticated, it just works — no `.env` file needed.
+
+| Provider | Auto-Discovery Sources (checked in order) |
+|----------|------------------------------------------|
+| **AWS** | Environment vars → `~/.aws/credentials` → `~/.aws/config` (profiles/SSO) → IMDS/ECS container role |
+| **Azure** | Environment vars → `az login` session → Managed Identity → VS Code / PowerShell |
+| **GCP** | Environment vars → `gcloud auth` session (`~/.config/gcloud`) → `GOOGLE_APPLICATION_CREDENTIALS` → metadata server |
+| **Alibaba** | Environment vars → `~/.alibabacloud/credentials` → `~/.aliyun/config.json` → ECS RAM role |
+
+The fastest way to get started:
+
+```bash
+# Pick the providers you need:
+aws configure          # or: aws sso login --profile my-profile
+az login               # interactive browser login
+gcloud auth application-default login
+aliyun configure       # access key mode
+```
+
+<details>
+<summary>Manual credential configuration (environment variables)</summary>
+
+If you prefer not to use CLI-based auth, copy `.env.example` to `.env` and set credentials directly:
 
 ```bash
 cp .env.example .env
@@ -225,13 +251,40 @@ AZURE_CLIENT_SECRET=...
 AZURE_SUBSCRIPTION_ID=...
 
 # GCP
+GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
 GCP_PROJECT_ID=...
-GCP_ACCESS_TOKEN=...    # Or use GOOGLE_APPLICATION_CREDENTIALS
 
 # Alibaba
-ALIBABA_ACCESS_KEY_ID=...
-ALIBABA_ACCESS_KEY_SECRET=...
-ALIBABA_REGION=cn-hangzhou
+ALIBABA_CLOUD_ACCESS_KEY_ID=...
+ALIBABA_CLOUD_ACCESS_KEY_SECRET=...
+ALIBABA_CLOUD_REGION=cn-hangzhou
+```
+</details>
+
+#### Vault Integration
+
+For production deployments, credentials can be sourced from **HashiCorp Vault** via AppRole auth. Set `auth.type: vault` in `config.yaml` and configure the Vault connection:
+
+```yaml
+auth:
+  type: vault
+  vault:
+    address: https://vault.example.com
+    roleId: "..."       # or VAULT_ROLE_ID env var
+    secretId: "..."     # or VAULT_SECRET_ID env var
+    secretPath: secret/cloud-pilot   # reads secret/cloud-pilot/{aws,azure,gcp,alibaba}
+```
+
+Vault secrets are read from `{secretPath}/{provider}` and mapped to credentials automatically. All four providers are supported.
+
+#### Resilient Provider Initialization
+
+Each provider initializes independently. If one provider's credentials are unavailable (e.g., no AWS CLI configured), the server starts with the remaining providers instead of failing entirely. Check the startup logs to see which providers loaded:
+
+```
+[cloud-pilot] Provider "aws" initialized (read-only, region: us-east-1)
+[cloud-pilot] WARNING: Failed to initialize provider "azure": Azure credentials not found...
+[cloud-pilot] Providers: aws
 ```
 
 ### Run with Docker
@@ -381,7 +434,7 @@ http:
   rateLimitPerMinute: 60     # Max requests per IP per minute
 
 auth:
-  type: env                  # env | vault | azure-ad
+  type: env                  # env (auto-discovers from CLIs/SDK chains) | vault | azure-ad
 
 providers:
   - type: aws
@@ -427,10 +480,10 @@ audit:
 | `TRANSPORT` | `transport` |
 | `HTTP_PORT` / `HTTP_HOST` / `HTTP_API_KEY` | `http.*` |
 | `AUTH_TYPE` | `auth.type` |
-| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_REGION` | AWS credentials |
-| `AZURE_TENANT_ID` / `AZURE_CLIENT_ID` / `AZURE_CLIENT_SECRET` / `AZURE_SUBSCRIPTION_ID` | Azure credentials |
-| `GCP_PROJECT_ID` / `GCP_ACCESS_TOKEN` | GCP credentials |
-| `ALIBABA_ACCESS_KEY_ID` / `ALIBABA_ACCESS_KEY_SECRET` / `ALIBABA_REGION` | Alibaba credentials |
+| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_REGION` | AWS credentials (also auto-discovered from `~/.aws/credentials`, SSO, IMDS) |
+| `AZURE_TENANT_ID` / `AZURE_CLIENT_ID` / `AZURE_CLIENT_SECRET` / `AZURE_SUBSCRIPTION_ID` | Azure credentials (also auto-discovered from `az login`, Managed Identity) |
+| `GOOGLE_APPLICATION_CREDENTIALS` / `GCP_PROJECT_ID` | GCP credentials (also auto-discovered from `gcloud auth`, metadata server) |
+| `ALIBABA_CLOUD_ACCESS_KEY_ID` / `ALIBABA_CLOUD_ACCESS_KEY_SECRET` / `ALIBABA_CLOUD_REGION` | Alibaba credentials (also auto-discovered from `~/.alibabacloud/credentials`, ECS RAM role) |
 | `CLOUD_PILOT_SPECS_DYNAMIC` / `CLOUD_PILOT_SPECS_OFFLINE` | `specs.*` |
 | `GITHUB_TOKEN` | Increases GitHub API rate limit (60/hr -> 5,000/hr) |
 
@@ -495,8 +548,8 @@ src/
 |       +-- signer.ts            # ACS3-HMAC-SHA256
 |
 +-- auth/
-|   +-- env.ts                   # Environment variable auth
-|   +-- vault.ts                 # HashiCorp Vault AppRole
+|   +-- env.ts                   # Auto-discovery credential chain (AWS CLI/SDK, az CLI, gcloud, aliyun CLI)
+|   +-- vault.ts                 # HashiCorp Vault AppRole (all 4 providers)
 |   +-- azure-ad.ts              # Azure AD OAuth2 client credentials
 |
 +-- audit/

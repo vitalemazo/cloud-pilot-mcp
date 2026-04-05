@@ -19,14 +19,27 @@ export async function handleSearch(
   const cloudProvider = providers.get(args.provider);
 
   if (!cloudProvider) {
-    const available = Array.from(providers.keys()).join(", ");
+    const available = Array.from(providers.keys());
+    const setupHints: Record<string, string> = {
+      aws: "Install AWS CLI and run: aws configure (or aws sso login)",
+      azure: "Install Azure CLI and run: az login",
+      gcp: "Install gcloud CLI and run: gcloud auth application-default login",
+      alibaba: "Install aliyun CLI and run: aliyun configure",
+    };
+    const hint = setupHints[args.provider] ?? "Check cloud-pilot config.yaml";
+    const lines = [
+      `Provider "${args.provider}" is not available.`,
+      ``,
+      `To fix: ${hint}`,
+      `Then ensure "${args.provider}" is listed under "providers" in config.yaml and restart the server.`,
+    ];
+    if (available.length > 0) {
+      lines.push(``, `Available providers: ${available.join(", ")}`);
+    } else {
+      lines.push(``, `No providers are currently configured. Add providers to config.yaml and ensure credentials are available.`);
+    }
     return {
-      content: [
-        {
-          type: "text" as const,
-          text: `Provider "${args.provider}" not configured. Available: ${available}`,
-        },
-      ],
+      content: [{ type: "text" as const, text: lines.join("\n") }],
       isError: true,
     };
   }
@@ -37,7 +50,7 @@ export async function handleSearch(
     await audit.log({
       timestamp: new Date().toISOString(),
       tool: "search",
-      provider: args.provider as "aws" | "azure",
+      provider: args.provider,
       service: args.service,
       dryRun: false,
       success: true,
@@ -82,7 +95,7 @@ export async function handleSearch(
     await audit.log({
       timestamp: new Date().toISOString(),
       tool: "search",
-      provider: args.provider as "aws" | "azure",
+      provider: args.provider,
       service: args.service,
       dryRun: false,
       success: false,

@@ -244,49 +244,56 @@ async function buildProviders(
   const fetcher = new SpecFetcher();
 
   for (const pc of config.providers) {
-    switch (pc.type) {
-      case "aws": {
-        const localDir = resolve("specs/aws");
-        const specIndex = config.specs.dynamic
-          ? await buildDynamicIndex("aws", localDir, config, cache, fetcher)
-          : buildStaticAwsIndex(localDir);
+    try {
+      switch (pc.type) {
+        case "aws": {
+          const localDir = resolve("specs/aws");
+          const specIndex = config.specs.dynamic
+            ? await buildDynamicIndex("aws", localDir, config, cache, fetcher)
+            : buildStaticAwsIndex(localDir);
 
-        providers.set("aws", new AwsProvider(pc, auth, specIndex));
-        providerConfigs.set("aws", pc);
-        break;
-      }
-      case "azure": {
-        const localDir = resolve("specs/azure");
-        const specIndex = config.specs.dynamic
-          ? await buildDynamicIndex("azure", localDir, config, cache, fetcher)
-          : buildStaticAzureIndex(localDir);
+          providers.set("aws", new AwsProvider(pc, auth, specIndex));
+          providerConfigs.set("aws", pc);
+          break;
+        }
+        case "azure": {
+          const localDir = resolve("specs/azure");
+          const specIndex = config.specs.dynamic
+            ? await buildDynamicIndex("azure", localDir, config, cache, fetcher)
+            : buildStaticAzureIndex(localDir);
 
-        providers.set(
-          "azure",
-          new AzureProvider(pc, auth, specIndex, pc.subscriptionId),
-        );
-        providerConfigs.set("azure", pc);
-        break;
-      }
-      case "gcp": {
-        const localDir = resolve("specs/gcp");
-        const specIndex = await buildDynamicIndex("gcp", localDir, config, cache, fetcher);
+          providers.set(
+            "azure",
+            new AzureProvider(pc, auth, specIndex, pc.subscriptionId),
+          );
+          providerConfigs.set("azure", pc);
+          break;
+        }
+        case "gcp": {
+          const localDir = resolve("specs/gcp");
+          const specIndex = await buildDynamicIndex("gcp", localDir, config, cache, fetcher);
 
-        providers.set(
-          "gcp",
-          new GcpProvider(pc, auth, specIndex, pc.subscriptionId),
-        );
-        providerConfigs.set("gcp", pc);
-        break;
-      }
-      case "alibaba": {
-        const localDir = resolve("specs/alibaba");
-        const specIndex = await buildDynamicIndex("alibaba", localDir, config, cache, fetcher);
+          providers.set(
+            "gcp",
+            new GcpProvider(pc, auth, specIndex, pc.subscriptionId),
+          );
+          providerConfigs.set("gcp", pc);
+          break;
+        }
+        case "alibaba": {
+          const localDir = resolve("specs/alibaba");
+          const specIndex = await buildDynamicIndex("alibaba", localDir, config, cache, fetcher);
 
-        providers.set("alibaba", new AlibabaProvider(pc, auth, specIndex));
-        providerConfigs.set("alibaba", pc);
-        break;
+          providers.set("alibaba", new AlibabaProvider(pc, auth, specIndex));
+          providerConfigs.set("alibaba", pc);
+          break;
+        }
       }
+      console.error(`[cloud-pilot] Provider "${pc.type}" initialized (${pc.mode}, region: ${pc.region})`);
+    } catch (err) {
+      console.error(
+        `[cloud-pilot] WARNING: Failed to initialize provider "${pc.type}": ${err instanceof Error ? err.message : String(err)}`,
+      );
     }
   }
 

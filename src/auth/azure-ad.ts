@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Vitale Mazo. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root.
 
-import type { AuthProvider, CloudCredentials } from "../interfaces/auth.js";
+import type { AuthProvider, CloudCredentials, CloudProviderType } from "../interfaces/auth.js";
 
 interface AzureADConfig {
   tenantId: string;
@@ -18,7 +18,7 @@ export class AzureADAuthProvider implements AuthProvider {
     this.config = config;
   }
 
-  async getCredentials(provider: "aws" | "azure"): Promise<CloudCredentials> {
+  async getCredentials(provider: CloudProviderType): Promise<CloudCredentials> {
     if (provider !== "azure") {
       throw new Error("AzureADAuthProvider only supports Azure credentials");
     }

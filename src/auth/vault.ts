@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Vitale Mazo. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root.
 
-import type { AuthProvider, CloudCredentials } from "../interfaces/auth.js";
+import type { AuthProvider, CloudCredentials, CloudProviderType } from "../interfaces/auth.js";
 
 interface VaultConfig {
   address: string;
@@ -53,34 +53,52 @@ export class VaultAuthProvider implements AuthProvider {
     return body.data.data;
   }
 
-  async getCredentials(provider: "aws" | "azure"): Promise<CloudCredentials> {
+  async getCredentials(provider: CloudProviderType): Promise<CloudCredentials> {
     const secretPath = `${this.config.secretPath}/${provider}`;
     const data = await this.readSecret(secretPath);
 
-    if (provider === "aws") {
-      return {
-        provider: "aws",
-        aws: {
-          accessKeyId: data.access_key_id,
-          secretAccessKey: data.secret_access_key,
-          sessionToken: data.session_token,
-          region: data.region ?? "us-east-1",
-        },
-      };
+    switch (provider) {
+      case "aws":
+        return {
+          provider: "aws",
+          aws: {
+            accessKeyId: data.access_key_id,
+            secretAccessKey: data.secret_access_key,
+            sessionToken: data.session_token,
+            region: data.region ?? "us-east-1",
+          },
+        };
+      case "azure":
+        return {
+          provider: "azure",
+          azure: {
+            tenantId: data.tenant_id,
+            clientId: data.client_id,
+            clientSecret: data.client_secret,
+            subscriptionId: data.subscription_id,
+          },
+        };
+      case "gcp":
+        return {
+          provider: "gcp",
+          gcp: {
+            accessToken: data.access_token,
+            projectId: data.project_id,
+          },
+        };
+      case "alibaba":
+        return {
+          provider: "alibaba",
+          alibaba: {
+            accessKeyId: data.access_key_id,
+            accessKeySecret: data.access_key_secret,
+            securityToken: data.security_token,
+            region: data.region ?? "cn-hangzhou",
+          },
+        };
+      default:
+        throw new Error(`Unsupported provider: ${provider}`);
     }
-
-    if (provider === "azure") {
-      return {
-        provider: "azure",
-        azure: {
-          tenantId: data.tenant_id,
-          clientId: data.client_id,
-          clientSecret: data.client_secret,
-        },
-      };
-    }
-
-    throw new Error(`Unsupported provider: ${provider}`);
   }
 
   isExpired(creds: CloudCredentials): boolean {

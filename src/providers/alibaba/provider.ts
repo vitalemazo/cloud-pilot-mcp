@@ -59,20 +59,16 @@ export class AlibabaProvider implements CloudProvider {
     this.enforceAllowlist(service);
     this.enforceSafetyMode(action);
 
-    const accessKeyId =
-      process.env.ALIBABA_ACCESS_KEY_ID ?? "";
-    const accessKeySecret =
-      process.env.ALIBABA_ACCESS_KEY_SECRET ?? "";
-    const region =
-      this.config.region ?? process.env.ALIBABA_REGION ?? "cn-hangzhou";
-
-    if (!accessKeyId || !accessKeySecret) {
+    const creds = await this.auth.getCredentials("alibaba");
+    if (!creds.alibaba?.accessKeyId || !creds.alibaba?.accessKeySecret) {
       return {
         success: false,
         error:
-          "Alibaba Cloud credentials not available. Set ALIBABA_ACCESS_KEY_ID and ALIBABA_ACCESS_KEY_SECRET.",
+          "Alibaba Cloud credentials not available. Run: aliyun configure",
       };
     }
+    const { accessKeyId, accessKeySecret, securityToken } = creds.alibaba;
+    const region = this.config.region ?? creds.alibaba.region ?? "cn-hangzhou";
 
     // Alibaba RPC-style: POST to endpoint with action in header, params as query string
     const endpoint = `https://${service.toLowerCase()}.${region}.aliyuncs.com`;
@@ -84,14 +80,19 @@ export class AlibabaProvider implements CloudProvider {
       ? `${endpoint}/?${queryParams.toString()}`
       : `${endpoint}/`;
 
+    const reqHeaders: Record<string, string> = {
+      "x-acs-action": action,
+      "x-acs-version": params._version as string ?? "2014-05-26",
+      "content-type": "application/json",
+    };
+    if (securityToken) {
+      reqHeaders["x-acs-security-token"] = securityToken;
+    }
+
     const headers = signAlibabaRequest({
       method: "POST",
       url,
-      headers: {
-        "x-acs-action": action,
-        "x-acs-version": params._version as string ?? "2014-05-26",
-        "content-type": "application/json",
-      },
+      headers: reqHeaders,
       body: "",
       accessKeyId,
       accessKeySecret,

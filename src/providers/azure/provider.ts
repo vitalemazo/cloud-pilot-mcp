@@ -68,16 +68,16 @@ export class AzureProvider implements CloudProvider {
     this.enforceSafetyMode(method);
 
     const creds = await this.auth.getCredentials("azure");
-    if (!creds.azure) {
-      return { success: false, error: "No Azure credentials available" };
+    if (!creds.azure?.accessToken) {
+      return {
+        success: false,
+        error: "Azure access token not available. Run: az login",
+      };
     }
 
     const token = creds.azure.accessToken;
-    if (!token) {
-      return {
-        success: false,
-        error: "Azure access token not available. Authenticate first.",
-      };
+    if (!this.subscriptionId && creds.azure.subscriptionId) {
+      this.subscriptionId = creds.azure.subscriptionId;
     }
 
     const apiVersion =

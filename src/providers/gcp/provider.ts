@@ -63,18 +63,17 @@ export class GcpProvider implements CloudProvider {
 
     this.enforceSafetyMode(method);
 
-    const creds = await this.auth.getCredentials("gcp" as "aws" | "azure");
-    const token =
-      (creds as unknown as { gcp?: { accessToken?: string } }).gcp
-        ?.accessToken ??
-      process.env.GCP_ACCESS_TOKEN;
-
-    if (!token) {
+    const creds = await this.auth.getCredentials("gcp");
+    if (!creds.gcp?.accessToken) {
       return {
         success: false,
         error:
-          "GCP access token not available. Set GCP_ACCESS_TOKEN or configure auth.",
+          "GCP access token not available. Run: gcloud auth application-default login",
       };
+    }
+    const token = creds.gcp.accessToken;
+    if (!this.projectId && creds.gcp.projectId) {
+      this.projectId = creds.gcp.projectId;
     }
 
     const start = Date.now();
