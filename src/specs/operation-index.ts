@@ -103,6 +103,44 @@ export class OperationIndex {
 
     return entries;
   }
+
+  static extractFromGcpSpec(
+    service: string,
+    spec: {
+      resources?: Record<string, unknown>;
+    },
+  ): OperationIndexEntry[] {
+    const entries: OperationIndexEntry[] = [];
+    if (!spec.resources) return entries;
+
+    function walk(resources: Record<string, unknown>): void {
+      for (const resource of Object.values(resources)) {
+        const res = resource as {
+          methods?: Record<
+            string,
+            { id: string; httpMethod: string; description?: string }
+          >;
+          resources?: Record<string, unknown>;
+        };
+        if (res.methods) {
+          for (const method of Object.values(res.methods)) {
+            entries.push({
+              service,
+              operation: method.id,
+              method: method.httpMethod,
+              description: (method.description ?? "").slice(0, 120),
+            });
+          }
+        }
+        if (res.resources) {
+          walk(res.resources);
+        }
+      }
+    }
+
+    walk(spec.resources);
+    return entries;
+  }
 }
 
 function stripHtml(s: string): string {

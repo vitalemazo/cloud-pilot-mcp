@@ -9,7 +9,7 @@ import { OperationIndex } from "./operation-index.js";
 import { AwsSpecIndex } from "../providers/aws/specs.js";
 import { AzureSpecIndex } from "../providers/azure/specs.js";
 
-type Provider = "aws" | "azure";
+type Provider = "aws" | "azure" | "gcp";
 
 interface DynamicSpecIndexOptions {
   provider: Provider;
@@ -68,7 +68,9 @@ export class DynamicSpecIndex {
         const entries =
           this.provider === "aws"
             ? await this.fetcher.fetchAwsCatalog()
-            : await this.fetcher.fetchAzureCatalog();
+            : this.provider === "gcp"
+              ? await this.fetcher.fetchGcpCatalog()
+              : await this.fetcher.fetchAzureCatalog();
         this.cache.writeCatalog(this.provider, entries);
         this.setCatalog(entries);
         return;
@@ -137,7 +139,9 @@ export class DynamicSpecIndex {
         const ops =
           this.provider === "aws"
             ? OperationIndex.extractFromAwsSpec(service, spec as Parameters<typeof OperationIndex.extractFromAwsSpec>[1])
-            : OperationIndex.extractFromAzureSpec(service, spec as Parameters<typeof OperationIndex.extractFromAzureSpec>[1]);
+            : this.provider === "gcp"
+              ? OperationIndex.extractFromGcpSpec(service, spec as Parameters<typeof OperationIndex.extractFromGcpSpec>[1])
+              : OperationIndex.extractFromAzureSpec(service, spec as Parameters<typeof OperationIndex.extractFromAzureSpec>[1]);
         this.opIndex.addService(service, ops);
       } catch {
         // Skip unparseable files
@@ -217,9 +221,10 @@ export class DynamicSpecIndex {
     if (!spec) return null;
 
     if (this.provider === "aws") {
-      const index = new AwsSpecIndex(this.localSpecsDir);
-      // Use the loaded spec data directly
       return this.getAwsOperation(service, operation, spec);
+    }
+    if (this.provider === "gcp") {
+      return this.getGcpOperation(service, operation, spec);
     }
     return this.getAzureOperation(service, operation, spec);
   }
@@ -281,7 +286,9 @@ export class DynamicSpecIndex {
               service,
               catalogEntry.version ?? "",
             )
-          : await this.fetcher.fetchAzureSpec(catalogEntry.path);
+          : this.provider === "gcp"
+            ? await this.fetcher.fetchGcpSpec(catalogEntry.path)
+            : await this.fetcher.fetchAzureSpec(catalogEntry.path);
 
       this.cache.writeSpec(this.provider, service, spec);
       this.specLRU.set(service, spec);
@@ -398,7 +405,9 @@ export class DynamicSpecIndex {
       const opSpec =
         this.provider === "aws"
           ? this.getAwsOperation(match.service, match.operation, spec)
-          : this.getAzureOperation(match.service, match.operation, spec);
+          : this.provider === "gcp"
+            ? this.getGcpOperation(match.service, match.operation, spec)
+            : this.getAzureOperation(match.service, match.operation, spec);
 
       if (opSpec) results.push(opSpec);
     }
@@ -432,6 +441,14 @@ export class DynamicSpecIndex {
     spec: unknown,
   ): OperationSpec | null {
     return extractAzureOperationSpec(service, operation, spec);
+  }
+
+  private getGcpOperation(
+    service: string,
+    operation: string,
+    spec: unknown,
+  ): OperationSpec | null {
+    return extractGcpOperationSpec(service, operation, spec);
   }
 }
 
@@ -593,6 +610,85 @@ function extractAzureOperationSpec(
   }
 
   return null;
+}
+
+function extractGcpOperationSpec(
+  service: string,
+  operationId: string,
+  rawSpec: unknown,
+): OperationSpec | null {
+  const spec = rawSpec as {
+    resources?: Record<string, unknown>;
+    schemas?: Record<
+      string,
+      {
+        properties?: Record<
+          string,
+          { type?: string; description?: string; $ref?: string }
+        >;
+        required?: string[];
+      }
+    >;
+  };
+
+  if (!spec.resources) return null;
+
+  function findMethod(
+    resources: Record<string, unknown>,
+  ): { id: string; httpMethod: string; description?: string; parameters?: Record<string, { type: string; description?: string; required?: boolean }>; request?: { $ref: string }; response?: { $ref: string } } | null {
+    for (const resource of Object.values(resources)) {
+      const res = resource as {
+        methods?: Record<string, { id: string; httpMethod: string; description?: string; parameters?: Record<string, { type: string; description?: string; required?: boolean }>; request?: { $ref: string }; response?: { $ref: string } }>;
+        resources?: Record<string, unknown>;
+      };
+      if (res.methods) {
+        for (const method of Object.values(res.methods)) {
+          if (method.id === operationId) return method;
+        }
+      }
+      if (res.resources) {
+        const found = findMethod(res.resources);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  const method = findMethod(spec.resources);
+  if (!method) return null;
+
+  const inputParams = method.parameters
+    ? Object.entries(method.parameters).map(([name, p]) => ({
+        name,
+        type: p.type,
+        required: p.required ?? false,
+        description: p.description,
+      }))
+    : [];
+
+  const outputFields: OperationSpec["outputFields"] = [];
+  if (method.response?.$ref && spec.schemas) {
+    const schema = spec.schemas[method.response.$ref];
+    if (schema?.properties) {
+      for (const [name, prop] of Object.entries(schema.properties)) {
+        outputFields.push({
+          name,
+          type: prop.type ?? (prop.$ref ?? "object"),
+          required: false,
+          description: prop.description,
+        });
+      }
+    }
+  }
+
+  return {
+    service,
+    operation: operationId,
+    httpMethod: method.httpMethod,
+    description: method.description ?? "",
+    inputParams,
+    outputFields,
+  };
 }
 
 function stripHtml(s: string): string {

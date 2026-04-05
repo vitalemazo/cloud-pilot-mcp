@@ -12,6 +12,7 @@ import { AzureADAuthProvider } from "./auth/azure-ad.js";
 import { FileAuditLogger } from "./audit/file.js";
 import { AwsProvider } from "./providers/aws/provider.js";
 import { AzureProvider } from "./providers/azure/provider.js";
+import { GcpProvider } from "./providers/gcp/provider.js";
 import { AwsSpecIndex } from "./providers/aws/specs.js";
 import { AzureSpecIndex } from "./providers/azure/specs.js";
 import { DynamicSpecIndex } from "./specs/dynamic-spec-index.js";
@@ -166,6 +167,17 @@ async function buildProviders(
         providerConfigs.set("azure", pc);
         break;
       }
+      case "gcp": {
+        const localDir = resolve("specs/gcp");
+        const specIndex = await buildDynamicIndex("gcp", localDir, config, cache, fetcher);
+
+        providers.set(
+          "gcp",
+          new GcpProvider(pc, auth, specIndex, pc.subscriptionId),
+        );
+        providerConfigs.set("gcp", pc);
+        break;
+      }
     }
   }
 
@@ -173,7 +185,7 @@ async function buildProviders(
 }
 
 async function buildDynamicIndex(
-  provider: "aws" | "azure",
+  provider: "aws" | "azure" | "gcp",
   localSpecsDir: string,
   config: Config,
   cache: SpecCache,

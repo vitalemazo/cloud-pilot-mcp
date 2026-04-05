@@ -119,6 +119,36 @@ export class SpecFetcher {
     return this.fetchJson(url);
   }
 
+  // ── GCP ───────────────────────────────────────────────────────────
+
+  async fetchGcpCatalog(): Promise<CatalogEntry[]> {
+    const url =
+      "https://www.googleapis.com/discovery/v1/apis";
+    const data = (await this.fetchJson(url)) as {
+      items: Array<{
+        name: string;
+        version: string;
+        title?: string;
+        discoveryRestUrl: string;
+        preferred: boolean;
+      }>;
+    };
+
+    // Only take preferred versions to avoid duplicates
+    return data.items
+      .filter((item) => item.preferred)
+      .map((item) => ({
+        service: item.name,
+        version: item.version,
+        path: item.discoveryRestUrl,
+        fullName: item.title,
+      }));
+  }
+
+  async fetchGcpSpec(discoveryUrl: string): Promise<unknown> {
+    return this.fetchJson(discoveryUrl);
+  }
+
   // ── Internals ─────────────────────────────────────────────────────
 
   private async fetchGitTree(

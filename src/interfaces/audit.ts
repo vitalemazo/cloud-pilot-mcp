@@ -1,7 +1,7 @@
 export interface AuditEntry {
   timestamp: string;
   tool: "search" | "execute";
-  provider: "aws" | "azure";
+  provider: string;
   service?: string;
   action?: string;
   params?: Record<string, unknown>;
