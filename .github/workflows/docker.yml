@@ -12,6 +12,7 @@ permissions:
 
 env:
   GHCR_REGISTRY: ghcr.io
+  PRIVATE_REGISTRY: registry.vitalemazo.com
   IMAGE_NAME: cloud-pilot-mcp
 
 jobs:
@@ -51,3 +52,50 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  mirror-to-private-registry:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Install skopeo
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq skopeo > /dev/null
+
+      - name: Get Cloudflare Access token
+        id: cf
+        run: |
+          CF_TOKEN=$(curl -s -X POST "https://vitalemazo.cloudflareaccess.com/cdn-cgi/access/service-token" \
+            -H "CF-Access-Client-Id: ${{ secrets.CF_ACCESS_CLIENT_ID }}" \
+            -H "CF-Access-Client-Secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}" \
+            | jq -r '.token // empty')
+          if [ -n "$CF_TOKEN" ]; then
+            echo "token=$CF_TOKEN" >> "$GITHUB_OUTPUT"
+            echo "has_token=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_token=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Mirror latest to private registry
+        run: |
+          skopeo copy --all \
+            --src-creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
+            --dest-tls-verify=true \
+            --dest-registry-token "${{ secrets.CF_ACCESS_CLIENT_ID }}:${{ secrets.CF_ACCESS_CLIENT_SECRET }}" \
+            "docker://${{ env.GHCR_REGISTRY }}/${{ github.repository }}:latest" \
+            "docker://${{ env.PRIVATE_REGISTRY }}/${{ env.IMAGE_NAME }}:latest" || \
+          skopeo copy --all \
+            --src-creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
+            --dest-creds "${{ secrets.PRIVATE_REGISTRY_USER }}:${{ secrets.PRIVATE_REGISTRY_PASS }}" \
+            --dest-tls-verify=true \
+            "docker://${{ env.GHCR_REGISTRY }}/${{ github.repository }}:latest" \
+            "docker://${{ env.PRIVATE_REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+
+      - name: Mirror SHA tag
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          skopeo copy --all \
+            --src-creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
+            --dest-creds "${{ secrets.PRIVATE_REGISTRY_USER }}:${{ secrets.PRIVATE_REGISTRY_PASS }}" \
+            --dest-tls-verify=true \
+            "docker://${{ env.GHCR_REGISTRY }}/${{ github.repository }}:${SHORT_SHA}" \
+            "docker://${{ env.PRIVATE_REGISTRY }}/${{ env.IMAGE_NAME }}:${SHORT_SHA}"
