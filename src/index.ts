@@ -39,13 +39,93 @@ async function main() {
     });
     await server.connect(transport);
 
+    // Rate limiter: simple sliding window per IP
+    const rateMap = new Map<string, { count: number; resetAt: number }>();
+    const rateLimit = config.http.rateLimitPerMinute;
+
     const httpServer = createHttpServer((req, res) => {
-      // Health check endpoint
-      if (req.url === "/health" && req.method === "GET") {
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ status: "ok", providers: Array.from(providers.keys()) }));
+      const start = Date.now();
+      const clientIp =
+        (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ??
+        req.socket.remoteAddress ??
+        "unknown";
+
+      // CORS headers
+      const origin = req.headers.origin ?? "*";
+      const allowedOrigins = config.http.corsOrigins;
+      const corsOrigin =
+        allowedOrigins.includes("*") || allowedOrigins.includes(origin)
+          ? origin
+          : "";
+      if (corsOrigin) {
+        res.setHeader("Access-Control-Allow-Origin", corsOrigin);
+        res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, Mcp-Session-Id");
+        res.setHeader("Access-Control-Expose-Headers", "Mcp-Session-Id");
+      }
+
+      // Preflight
+      if (req.method === "OPTIONS") {
+        res.writeHead(204);
+        res.end();
         return;
       }
+
+      // Health check (no auth required)
+      if (req.url === "/health" && req.method === "GET") {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            status: "ok",
+            providers: Array.from(providers.keys()),
+            uptime: process.uptime(),
+          }),
+        );
+        return;
+      }
+
+      // API key auth (if configured)
+      if (config.http.apiKey) {
+        const authHeader = req.headers.authorization;
+        const providedKey =
+          authHeader?.startsWith("Bearer ")
+            ? authHeader.slice(7)
+            : req.headers["x-api-key"] as string | undefined;
+
+        if (providedKey !== config.http.apiKey) {
+          res.writeHead(401, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Unauthorized" }));
+          console.error(
+            `[cloud-pilot] 401 ${req.method} ${req.url} from ${clientIp}`,
+          );
+          return;
+        }
+      }
+
+      // Rate limiting
+      const now = Date.now();
+      let bucket = rateMap.get(clientIp);
+      if (!bucket || now >= bucket.resetAt) {
+        bucket = { count: 0, resetAt: now + 60000 };
+        rateMap.set(clientIp, bucket);
+      }
+      bucket.count++;
+      if (bucket.count > rateLimit) {
+        res.writeHead(429, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Rate limit exceeded" }));
+        console.error(
+          `[cloud-pilot] 429 ${req.method} ${req.url} from ${clientIp}`,
+        );
+        return;
+      }
+
+      // Request logging
+      res.on("finish", () => {
+        const duration = Date.now() - start;
+        console.error(
+          `[cloud-pilot] ${res.statusCode} ${req.method} ${req.url} ${duration}ms ${clientIp}`,
+        );
+      });
 
       // MCP endpoint
       if (req.url === "/mcp" || req.url === "/") {
@@ -53,13 +133,27 @@ async function main() {
         return;
       }
 
-      res.writeHead(404);
-      res.end("Not found");
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Not found" }));
     });
+
+    // Clean up stale rate limit entries every 5 minutes
+    setInterval(() => {
+      const now = Date.now();
+      for (const [ip, bucket] of rateMap) {
+        if (now >= bucket.resetAt) rateMap.delete(ip);
+      }
+    }, 300000).unref();
 
     httpServer.listen(config.http.port, config.http.host, () => {
       console.error(
         `[cloud-pilot] Streamable HTTP listening on http://${config.http.host}:${config.http.port}/mcp`,
+      );
+      if (config.http.apiKey) {
+        console.error("[cloud-pilot] API key auth: enabled");
+      }
+      console.error(
+        `[cloud-pilot] Rate limit: ${rateLimit} req/min per IP`,
       );
     });
   } else {

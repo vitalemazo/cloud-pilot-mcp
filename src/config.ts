@@ -18,6 +18,9 @@ const ConfigSchema = z.object({
     .object({
       port: z.number().default(8400),
       host: z.string().default("127.0.0.1"),
+      apiKey: z.string().optional(),
+      corsOrigins: z.array(z.string()).default(["*"]),
+      rateLimitPerMinute: z.number().default(60),
     })
     .default({}),
   auth: z
@@ -101,6 +104,9 @@ function applyEnvOverrides(raw: Record<string, unknown>): Record<string, unknown
   }
   if (process.env.HTTP_HOST) {
     raw.http = { ...(raw.http as object), host: process.env.HTTP_HOST };
+  }
+  if (process.env.HTTP_API_KEY) {
+    raw.http = { ...(raw.http as object), apiKey: process.env.HTTP_API_KEY };
   }
   if (process.env.AUTH_TYPE) {
     raw.auth = { ...(raw.auth as object), type: process.env.AUTH_TYPE };
