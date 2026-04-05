@@ -1,0 +1,28 @@
+services:
+  cloud-pilot-mcp:
+    build: .
+    ports:
+      - "8400:8400"
+    environment:
+      - TRANSPORT=http
+      - HTTP_HOST=0.0.0.0
+      - HTTP_PORT=8400
+      - AUTH_TYPE=env
+      - CLOUD_PILOT_SPECS_DYNAMIC=true
+      # AWS credentials
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      # Azure credentials
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+      - AZURE_SUBSCRIPTION_ID=${AZURE_SUBSCRIPTION_ID}
+      # Optional: GitHub token for higher API rate limits
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+    volumes:
+      - cloud-pilot-cache:/root/.cloud-pilot/cache
+    restart: unless-stopped
+
+volumes:
+  cloud-pilot-cache:

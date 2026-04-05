@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
+import { createServer as createHttpServer } from "node:http";
+import { randomUUID } from "node:crypto";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { loadConfig } from "./config.js";
 import { createServer } from "./server.js";
 import { EnvAuthProvider } from "./auth/env.js";
@@ -30,11 +33,34 @@ async function main() {
   const server = createServer({ providers, providerConfigs, audit, config });
 
   if (config.transport === "http") {
-    console.error(
-      `[cloud-pilot] Streamable HTTP transport on ${config.http.host}:${config.http.port} — not yet implemented, falling back to stdio`,
-    );
-    const transport = new StdioServerTransport();
+    const transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: () => randomUUID(),
+    });
     await server.connect(transport);
+
+    const httpServer = createHttpServer((req, res) => {
+      // Health check endpoint
+      if (req.url === "/health" && req.method === "GET") {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ status: "ok", providers: Array.from(providers.keys()) }));
+        return;
+      }
+
+      // MCP endpoint
+      if (req.url === "/mcp" || req.url === "/") {
+        transport.handleRequest(req, res);
+        return;
+      }
+
+      res.writeHead(404);
+      res.end("Not found");
+    });
+
+    httpServer.listen(config.http.port, config.http.host, () => {
+      console.error(
+        `[cloud-pilot] Streamable HTTP listening on http://${config.http.host}:${config.http.port}/mcp`,
+      );
+    });
   } else {
     const transport = new StdioServerTransport();
     await server.connect(transport);
