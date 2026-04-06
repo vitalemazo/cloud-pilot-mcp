@@ -18,9 +18,15 @@
 
 <br/>
 
-> Instead of building hundreds of individual tools, cloud-pilot exposes just two — **search** and **execute** — that together cover **1,289+ services** and **51,900+ API operations**, discovered and fetched dynamically at runtime.
+> cloud-pilot exposes three tools — **search**, **execute**, and **tofu** — that together cover **1,289+ services** and **51,900+ API operations** with full infrastructure lifecycle management. Discover APIs at runtime, execute scripts against live cloud state, and manage stateful deployments with plan/apply/destroy through OpenTofu.
 
 When an agent connects, the server delivers a **Senior Cloud Platform Engineer persona** — complete with engineering principles, provider-specific expertise, safety awareness, and structured workflow prompts — so the agent automatically operates with production-grade cloud architecture and security standards.
+
+**What changed in v0.2:**
+- **Native SDK execution** — AWS calls use `@aws-sdk/client-*` packages (not custom HTTP). Azure uses `@azure/core-rest-pipeline` with automatic retry/throttling. Zero serialization bugs.
+- **OpenTofu integration** — new `tofu` tool for stateful infrastructure lifecycle: write HCL, plan, apply, destroy, import existing resources, drift detection, and rollback.
+- **4-level dry-run system** — native cloud provider validation (AWS DryRun), session-enforced gate, impact summaries with cost warnings, and session changeset with rollback plans.
+- **Configurable safety** — `dryRunPolicy` per provider: `enforced` (interactive sessions), `optional` (approved automation), `disabled` (read-only bots).
 
 ---
 
@@ -29,13 +35,14 @@ When an agent connects, the server delivers a **Senior Cloud Platform Engineer p
 | Section | Description |
 |---------|-------------|
 | [The Problem](#the-problem) | Why existing approaches fall short |
-| [How It Works](#how-it-works) | The search-and-execute pattern |
+| [How It Works](#how-it-works) | The three-tool pattern: search, execute, tofu |
 | [Cloud Provider Coverage](#cloud-provider-coverage) | 4 providers, 1,289 services, 51,900+ operations |
 | [Architecture](#architecture) | System design and component overview |
 | [Built-In Cloud Engineering Persona](#built-in-cloud-engineering-persona) | Instructions, resources, prompts, configuration |
 | [Why cloud-pilot?](#why-cloud-pilot) | When you need a control plane between AI agents and your cloud |
 | [Agents That Act, Not Advise](#agents-that-act-not-advise) | How cloud-pilot turns AI from advisor to actor — real deployment example |
 | [Enterprise Integration](#enterprise-integration) | ServiceNow, Teams/Slack, and how MCP enables one integration for all clouds |
+| [Infrastructure Lifecycle with OpenTofu](#infrastructure-lifecycle-with-opentofu) | Stateful deployments: plan, apply, destroy, import, drift detection, rollback |
 | [Real-World Use Cases](#real-world-use-cases) | Landing zones, global WAN, K8s, incident response, cost analysis |
 | **Getting Started** | |
 | &nbsp;&nbsp;&nbsp;&nbsp;[Quick Start](#quick-start) | Prerequisites, install, and run |
@@ -161,22 +168,24 @@ All services are discovered dynamically — no pre-configuration needed. When a 
     |  | Platform     |  |  |              |          |  | read-only    |  |
     |  | Engineer     |  |  | Tier 1:      |          |  | allowlists   |  |
     |  |              |  |  |  Catalog     |          |  | blocklists   |  |
-    |  | 8 principles |  |  |  (1,289 svc) |          |  | dry-run      |  |
-    |  | 6 prompts    |  |  | Tier 2:      |          |  | audit trail  |  |
-    |  | 4 provider   |  |  |  Op Index    |          |  | API key auth |  |
-    |  |   guides     |  |  | Tier 3:      |          |  | CORS         |  |
+    |  | 8 principles |  |  |  (1,289 svc) |          |  | 4-level      |  |
+    |  | 6 prompts    |  |  | Tier 2:      |          |  |  dry-run     |  |
+    |  | 4 provider   |  |  |  Op Index    |          |  | audit trail  |  |
+    |  |   guides     |  |  | Tier 3:      |          |  | dryRunPolicy |  |
     |  |              |  |  |  Full Spec   |          |  | rate limit   |  |
     |  +--------------+  |  +--------------+          |  +--------------+  |
     |                    |                            |                    |
-    |                    |  +--------------+          |                    |
-    |                    |  |   execute    |          |                    |
-    |                    |  +--------------+          |                    |
-    |                    |  | QuickJS WASM |          |                    |
-    |                    |  | sandbox      |          |                    |
-    |                    |  |              |          |                    |
-    |                    |  | sdk.request()|          |                    |
-    |                    |  |   bridge     |          |                    |
-    |                    |  +--------------+          |                    |
+    |  +--------------+  |  +--------------+          |                    |
+    |  |   execute    |  |  |    tofu      |          |                    |
+    |  +--------------+  |  +--------------+          |                    |
+    |  | VM sandbox   |  |  | OpenTofu     |          |                    |
+    |  | Native SDK   |  |  | plan/apply   |          |                    |
+    |  | calls        |  |  | destroy      |          |                    |
+    |  |              |  |  | import       |          |                    |
+    |  | Fast reads,  |  |  | State mgmt   |          |                    |
+    |  | ad-hoc       |  |  | Drift detect |          |                    |
+    |  | scripts      |  |  | Rollback     |          |                    |
+    |  +--------------+  |  +--------------+          |                    |
     +--------------------+----------------------------+--------------------+
                          |    |         |         |
                 +--------+    +---+     +---+     +--------+
@@ -342,9 +351,132 @@ With cloud-pilot as the MCP layer:
 
 ---
 
+## Infrastructure Lifecycle with OpenTofu
+
+cloud-pilot integrates [OpenTofu](https://opentofu.org) (open-source Terraform) as a third tool, giving AI agents full infrastructure lifecycle management with state tracking, dependency resolution, and rollback.
+
+### Why not just use the execute tool?
+
+The `execute` tool is fast and flexible — perfect for reads, ad-hoc queries, and scripted multi-step operations. But it's **stateless**. If an agent creates 14 resources across a VPC and something fails on resource #12, there's no record of what was created and no way to roll back.
+
+OpenTofu solves this:
+
+| Capability | execute (SDK) | tofu (OpenTofu) |
+|---|---|---|
+| Speed | Fast (direct API calls) | Slower (plan + apply cycle) |
+| State tracking | None | Full state file with every resource attribute |
+| Dependency graph | Manual | Automatic (knows subnets depend on VPC) |
+| Drift detection | Manual describe calls | `tofu plan` shows any drift |
+| Rollback | Manual (delete in reverse order) | `tofu destroy` handles dependency order |
+| Import existing | N/A | `tofu import` adopts resources into state |
+| Multi-resource changes | Script it yourself | Declarative — describe desired state |
+
+### The three-tool workflow
+
+```
+1. search   → "What APIs exist for VPC, subnets, ALB?"
+2. execute  → Read current state: "What VPCs exist? What's running?"
+3. tofu     → Write HCL → plan → review → apply → state tracked
+             → Later: plan (drift check) → destroy (clean rollback)
+```
+
+### Example: Deploy and rollback
+
+```
+Agent: "Deploy a three-tier architecture in us-east-1"
+
+→ tofu write (workspace: "prod-web", hcl: VPC + subnets + ALB + ASG + RDS)
+→ tofu init
+→ tofu plan
+    Plan: 14 to add, 0 to change, 0 to destroy.
+    + aws_vpc.main
+    + aws_subnet.public_1, public_2
+    + aws_subnet.private_1, private_2
+    + aws_internet_gateway.main
+    + aws_nat_gateway.main
+    + aws_lb.main
+    + aws_autoscaling_group.app
+    + aws_db_instance.main
+    ...
+→ tofu apply
+    Apply complete! Resources: 14 added.
+
+--- One week later ---
+
+Agent: "Tear down the prod-web environment"
+
+→ tofu destroy (workspace: "prod-web")
+    Destroy complete! Resources: 14 destroyed.
+    (NAT Gateway before route tables, subnets before VPC — dependency order)
+```
+
+### Example: Import existing resources
+
+Already have infrastructure that wasn't created through cloud-pilot? Import it:
+
+```
+→ tofu write (hcl: resource "aws_vpc" "legacy" { cidr_block = "10.0.0.0/16" })
+→ tofu import (resource: "aws_vpc.legacy", id: "vpc-0abc123")
+    Import successful!
+→ tofu state
+    aws_vpc.legacy
+→ tofu plan
+    No changes. Your infrastructure matches the configuration.
+```
+
+Now that VPC is state-tracked. Future changes go through plan/apply, and destroy handles cleanup.
+
+### Example: Drift detection
+
+```
+Agent: "Has anything changed in prod-web since last apply?"
+
+→ tofu plan (workspace: "prod-web")
+    Note: Objects have changed outside of OpenTofu
+    ~ aws_security_group.web: ingress rules changed
+        + ingress rule: 0.0.0.0/0 → port 22 (SSH)
+
+    Someone opened SSH to the world. This was not in the HCL config.
+```
+
+The agent detects unauthorized changes and can either fix them (`tofu apply` to revert) or update the HCL to match.
+
+### Configuration
+
+```yaml
+tofu:
+  enabled: true
+  workspacesDir: /data/tofu-workspaces   # Persistent storage for state files
+  binary: tofu                            # Path to OpenTofu binary
+  stateBackend: local                     # local | s3 | http (Vault-compatible)
+  timeoutMs: 300000                       # 5 min timeout for long operations
+```
+
+State backends:
+- **`local`** — state files in the workspace directory (default, simple)
+- **`s3`** — state in S3 bucket with locking via DynamoDB
+- **`http`** — state via HTTP API (compatible with Vault, Consul, custom backends)
+
+Credentials are automatically injected from cloud-pilot's auth provider (Vault, env, Azure AD) into the OpenTofu process. No separate credential configuration needed.
+
+### When to use which tool
+
+| Scenario | Tool | Why |
+|---|---|---|
+| "What instances are running?" | `execute` | Fast read, no state needed |
+| "What APIs does EKS have?" | `search` | API discovery |
+| "Create a VPC with 6 subnets" | `tofu` | Stateful, rollbackable |
+| "Check CloudWatch metrics" | `execute` | Read-only, ad-hoc |
+| "Deploy a full environment" | `tofu` | Complex, needs dependency ordering |
+| "Emergency: scale up ASG" | `execute` | Fast, single API call |
+| "Tear down staging" | `tofu` | Clean destroy in dependency order |
+| "What changed since last deploy?" | `tofu plan` | Drift detection |
+
+---
+
 ## Real-World Use Cases
 
-The following examples show what agents can accomplish through cloud-pilot's search-and-execute pattern — discovering and orchestrating dozens of API calls in a single conversation without pre-built tools.
+The following examples show what agents can accomplish through cloud-pilot's three-tool pattern — discovering APIs, executing against live state, and managing stateful infrastructure lifecycle in a single conversation.
 
 ### Deploy an Azure Landing Zone
 An agent can discover and orchestrate calls across 15+ Azure resource providers in a single conversation:
@@ -778,6 +910,16 @@ persona:
   # additionalGuidance: ""   # Append custom policies to default instructions
   enablePrompts: true        # Expose workflow prompts (landing-zone, security-audit, etc.)
   enableResources: true      # Expose persona resources (cloud-pilot://persona/*)
+
+tofu:
+  enabled: false             # Enable OpenTofu infrastructure lifecycle tool
+  workspacesDir: /data/tofu-workspaces  # Persistent workspace storage
+  binary: tofu               # Path to OpenTofu binary
+  stateBackend: local        # local | s3 | http
+  # stateConfig:             # Backend-specific config
+  #   bucket: my-state-bucket  # For s3 backend
+  #   region: us-east-1
+  timeoutMs: 300000          # 5 minute timeout for plan/apply
 ```
 
 ### Environment Variable Overrides
