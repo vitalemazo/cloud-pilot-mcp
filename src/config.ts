@@ -79,6 +79,16 @@ const ConfigSchema = z.object({
       enableResources: z.boolean().default(true),
     })
     .default({}),
+  tofu: z
+    .object({
+      enabled: z.boolean().default(false),
+      workspacesDir: z.string().default("/tmp/cloud-pilot-tofu/workspaces"),
+      binary: z.string().default("tofu"),
+      stateBackend: z.enum(["local", "s3", "http"]).default("local"),
+      stateConfig: z.record(z.string()).optional(),
+      timeoutMs: z.number().default(300000),
+    })
+    .default({}),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;

@@ -8,6 +8,8 @@ import type { AuditLogger } from "./interfaces/audit.js";
 import type { Config } from "./config.js";
 import { handleSearch } from "./tools/search.js";
 import { handleExecute } from "./tools/execute.js";
+import { handleTofu } from "./tools/tofu.js";
+import { TofuWorkspaceManager } from "./tofu/workspace.js";
 import { buildInstructions, registerPersonaResources, registerPersonaPrompts } from "./persona/index.js";
 
 interface ServerDeps {
@@ -79,6 +81,60 @@ export function createServer(deps: ServerDeps): McpServer {
     async (args) =>
       handleExecute(args, deps.providers, deps.providerConfigs, deps.audit, deps.config),
   );
+
+  // Register tofu tool if enabled
+  if (deps.config.tofu.enabled) {
+    const tofuManager = new TofuWorkspaceManager(
+      {
+        workspacesDir: deps.config.tofu.workspacesDir,
+        binary: deps.config.tofu.binary,
+        stateBackend: deps.config.tofu.stateBackend,
+        stateConfig: deps.config.tofu.stateConfig,
+        timeoutMs: deps.config.tofu.timeoutMs,
+      },
+      deps.providerConfigs,
+    );
+
+    server.tool(
+      "tofu",
+      "Manage infrastructure as code with OpenTofu (Terraform-compatible). " +
+        "Use this for stateful infrastructure operations that need rollback, drift detection, and dependency management. " +
+        "Subcommands: init (initialize workspace), write (save HCL config), plan (preview changes), " +
+        "apply (create/update resources), destroy (tear down), import (adopt existing resources), " +
+        "state (list/show tracked resources), output (read outputs), show (current state), workspaces (list all). " +
+        "Workflow: write HCL → init → plan → apply. To rollback: destroy. To check drift: plan with no changes.",
+      {
+        subcommand: z
+          .string()
+          .describe("OpenTofu operation: init, write, plan, apply, destroy, import, state, output, show, workspaces"),
+        workspace: z
+          .string()
+          .default("default")
+          .describe("Workspace name — isolates state and config per project/environment"),
+        hcl: z
+          .string()
+          .optional()
+          .describe("HCL configuration to write (for write/plan/apply subcommands)"),
+        filename: z
+          .string()
+          .optional()
+          .describe("Filename for HCL (default: main.tf)"),
+        providers: z
+          .array(z.string())
+          .optional()
+          .describe("Cloud providers to configure (default: ['aws'])"),
+        resource: z
+          .string()
+          .optional()
+          .describe("Resource address for import/state show (e.g., 'aws_vpc.main')"),
+        id: z
+          .string()
+          .optional()
+          .describe("Resource ID for import (e.g., 'vpc-0abc123')"),
+      },
+      async (args) => handleTofu(args, tofuManager, deps.audit, deps.config),
+    );
+  }
 
   // Register persona resources and prompts
   if (deps.config.persona.enabled && deps.config.persona.enableResources) {

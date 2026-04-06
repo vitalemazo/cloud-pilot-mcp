@@ -3,7 +3,7 @@
 
 export interface AuditEntry {
   timestamp: string;
-  tool: "search" | "execute";
+  tool: "search" | "execute" | "tofu";
   provider: string;
   service?: string;
   action?: string;
