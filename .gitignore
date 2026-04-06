@@ -11,3 +11,10 @@ config.local.yaml
 coverage/
 # Dynamic spec cache (runtime, not committed)
 .cloud-pilot/
+
+# Runtime artifacts
+audit.json
+specs/
+
+# Local config with credentials (use config.yaml.example or env vars)
+config.yaml
