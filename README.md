@@ -447,19 +447,93 @@ The agent detects unauthorized changes and can either fix them (`tofu apply` to 
 
 ### Configuration
 
+All OpenTofu settings are configurable via `config.yaml` or environment variables, so developers can adjust state storage based on where and how their MCP server runs.
+
 ```yaml
 tofu:
   enabled: true
-  workspacesDir: /data/tofu-workspaces   # Persistent storage for state files
-  binary: tofu                            # Path to OpenTofu binary
-  stateBackend: local                     # local | s3 | http (Vault-compatible)
-  timeoutMs: 300000                       # 5 min timeout for long operations
+  workspacesDir: ~/.cloud-pilot/tofu-workspaces  # Where workspaces and local state live
+  binary: tofu                                    # Path to OpenTofu binary
+  stateBackend: local                             # local | s3 | http | consul | pg
+  timeoutMs: 300000                               # 5 min timeout for long operations
 ```
 
-State backends:
-- **`local`** — state files in the workspace directory (default, simple)
-- **`s3`** — state in S3 bucket with locking via DynamoDB
-- **`http`** — state via HTTP API (compatible with Vault, Consul, custom backends)
+#### State backends
+
+Choose a backend based on your deployment model:
+
+**Local** (default) — state files on disk. Simple, no dependencies. Good for single-user or development.
+
+```yaml
+tofu:
+  stateBackend: local
+  workspacesDir: /persistent/volume/tofu-workspaces  # Must be persistent storage
+```
+
+**S3** — state in S3 with optional DynamoDB locking. Best for multi-agent AWS environments.
+
+```yaml
+tofu:
+  stateBackend: s3
+  stateConfig:
+    bucket: my-company-tofu-state
+    region: us-east-1
+    dynamodbTable: tofu-locks     # Optional: enables state locking
+    encrypt: true                 # Optional: encrypt state at rest
+```
+
+**HTTP** — state via HTTP API. Compatible with HashiCorp Vault, Consul, or any custom backend.
+
+```yaml
+tofu:
+  stateBackend: http
+  stateConfig:
+    address: https://vault.internal/v1/secret/data/tofu-state
+    username: tofu-agent          # Optional: basic auth
+    password: ${VAULT_TOKEN}
+```
+
+**Consul** — state in Consul KV store with built-in locking.
+
+```yaml
+tofu:
+  stateBackend: consul
+  stateConfig:
+    address: consul.internal:8500
+    path: cloud-pilot/tofu-state  # KV path prefix
+```
+
+**PostgreSQL** — state in a PostgreSQL database. Good for teams with existing Postgres infrastructure.
+
+```yaml
+tofu:
+  stateBackend: pg
+  stateConfig:
+    connStr: postgres://user:pass@db.internal/tofu_state
+    schemaName: cloud_pilot       # Optional: schema isolation
+```
+
+#### Environment variable overrides
+
+All tofu settings can be overridden via environment variables, useful for Docker deployments and CI/CD:
+
+| Variable | Overrides | Example |
+|----------|-----------|---------|
+| `CLOUD_PILOT_TOFU_ENABLED` | `tofu.enabled` | `true` |
+| `CLOUD_PILOT_TOFU_WORKSPACES_DIR` | `tofu.workspacesDir` | `/data/tofu-workspaces` |
+| `CLOUD_PILOT_TOFU_BINARY` | `tofu.binary` | `/usr/local/bin/tofu` |
+| `CLOUD_PILOT_TOFU_STATE_BACKEND` | `tofu.stateBackend` | `s3` |
+
+Example Docker deployment with S3 state:
+
+```bash
+docker run -d \
+  -e CLOUD_PILOT_TOFU_ENABLED=true \
+  -e CLOUD_PILOT_TOFU_STATE_BACKEND=s3 \
+  -e CLOUD_PILOT_TOFU_WORKSPACES_DIR=/data/workspaces \
+  -v tofu-workspaces:/data/workspaces \
+  ghcr.io/vitalemazo/cloud-pilot-mcp:latest
+```
 
 Credentials are automatically injected from cloud-pilot's auth provider (Vault, env, Azure AD) into the OpenTofu process. No separate credential configuration needed.
 
@@ -938,6 +1012,10 @@ tofu:
 | `GOOGLE_APPLICATION_CREDENTIALS` / `GCP_PROJECT_ID` | GCP credentials |
 | `ALIBABA_CLOUD_ACCESS_KEY_ID` / `ALIBABA_CLOUD_ACCESS_KEY_SECRET` / `ALIBABA_CLOUD_REGION` | Alibaba credentials |
 | `CLOUD_PILOT_SPECS_DYNAMIC` / `CLOUD_PILOT_SPECS_OFFLINE` | `specs.*` |
+| `CLOUD_PILOT_TOFU_ENABLED` | `tofu.enabled` |
+| `CLOUD_PILOT_TOFU_WORKSPACES_DIR` | `tofu.workspacesDir` |
+| `CLOUD_PILOT_TOFU_BINARY` | `tofu.binary` |
+| `CLOUD_PILOT_TOFU_STATE_BACKEND` | `tofu.stateBackend` |
 | `CLOUD_PILOT_PERSONA_ENABLED` | `persona.enabled` (set `false` to disable persona) |
 | `GITHUB_TOKEN` | Increases GitHub API rate limit (60/hr -> 5,000/hr) |
 

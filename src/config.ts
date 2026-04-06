@@ -82,10 +82,30 @@ const ConfigSchema = z.object({
   tofu: z
     .object({
       enabled: z.boolean().default(false),
-      workspacesDir: z.string().default("/tmp/cloud-pilot-tofu/workspaces"),
+      workspacesDir: z.string().default("~/.cloud-pilot/tofu-workspaces"),
       binary: z.string().default("tofu"),
-      stateBackend: z.enum(["local", "s3", "http"]).default("local"),
-      stateConfig: z.record(z.string()).optional(),
+      stateBackend: z.enum(["local", "s3", "http", "consul", "pg"]).default("local"),
+      stateConfig: z
+        .object({
+          // S3 backend
+          bucket: z.string().optional(),
+          region: z.string().optional(),
+          key: z.string().optional(),
+          dynamodbTable: z.string().optional(),
+          encrypt: z.boolean().optional(),
+          // HTTP backend (Vault, custom API)
+          address: z.string().optional(),
+          lockAddress: z.string().optional(),
+          unlockAddress: z.string().optional(),
+          username: z.string().optional(),
+          password: z.string().optional(),
+          // Consul backend
+          path: z.string().optional(),
+          // PostgreSQL backend
+          connStr: z.string().optional(),
+          schemaName: z.string().optional(),
+        })
+        .optional(),
       timeoutMs: z.number().default(300000),
     })
     .default({}),
@@ -150,6 +170,31 @@ function applyEnvOverrides(raw: Record<string, unknown>): Record<string, unknown
     raw.persona = {
       ...(raw.persona as object),
       enabled: process.env.CLOUD_PILOT_PERSONA_ENABLED === "true",
+    };
+  }
+  // OpenTofu overrides
+  if (process.env.CLOUD_PILOT_TOFU_ENABLED !== undefined) {
+    raw.tofu = {
+      ...(raw.tofu as object),
+      enabled: process.env.CLOUD_PILOT_TOFU_ENABLED === "true",
+    };
+  }
+  if (process.env.CLOUD_PILOT_TOFU_WORKSPACES_DIR) {
+    raw.tofu = {
+      ...(raw.tofu as object),
+      workspacesDir: process.env.CLOUD_PILOT_TOFU_WORKSPACES_DIR,
+    };
+  }
+  if (process.env.CLOUD_PILOT_TOFU_BINARY) {
+    raw.tofu = {
+      ...(raw.tofu as object),
+      binary: process.env.CLOUD_PILOT_TOFU_BINARY,
+    };
+  }
+  if (process.env.CLOUD_PILOT_TOFU_STATE_BACKEND) {
+    raw.tofu = {
+      ...(raw.tofu as object),
+      stateBackend: process.env.CLOUD_PILOT_TOFU_STATE_BACKEND,
     };
   }
   return raw;

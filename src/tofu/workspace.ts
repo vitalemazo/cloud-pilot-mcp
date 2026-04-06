@@ -13,8 +13,22 @@ const execFileAsync = promisify(execFile);
 export interface TofuConfig {
   workspacesDir: string;
   binary: string;
-  stateBackend: "local" | "s3" | "http";
-  stateConfig?: Record<string, string>;
+  stateBackend: "local" | "s3" | "http" | "consul" | "pg";
+  stateConfig?: {
+    bucket?: string;
+    region?: string;
+    key?: string;
+    dynamodbTable?: string;
+    encrypt?: boolean;
+    address?: string;
+    lockAddress?: string;
+    unlockAddress?: string;
+    username?: string;
+    password?: string;
+    path?: string;
+    connStr?: string;
+    schemaName?: string;
+  };
   timeoutMs: number;
 }
 
@@ -49,6 +63,14 @@ export class TofuWorkspaceManager {
     this.config = { ...DEFAULT_TOFU_CONFIG, ...tofuConfig };
     this.providerConfigs = providerConfigs;
     this.auth = auth;
+
+    // Resolve ~ to home directory
+    if (this.config.workspacesDir.startsWith("~")) {
+      this.config.workspacesDir = this.config.workspacesDir.replace(
+        "~",
+        process.env.HOME ?? "/root",
+      );
+    }
 
     // Ensure workspaces directory exists
     if (!existsSync(this.config.workspacesDir)) {
@@ -336,29 +358,58 @@ export class TofuWorkspaceManager {
 
   /** Generate backend.tf content. */
   private generateBackendConfig(workspace: string): string {
+    const sc = this.config.stateConfig;
     switch (this.config.stateBackend) {
-      case "s3":
-        return [
+      case "s3": {
+        const lines = [
           `terraform {`,
           `  backend "s3" {`,
-          `    bucket = "${this.config.stateConfig?.bucket ?? "cloud-pilot-state"}"`,
-          `    key    = "workspaces/${workspace}/terraform.tfstate"`,
-          `    region = "${this.config.stateConfig?.region ?? "us-east-1"}"`,
-          `  }`,
-          `}`,
-        ].join("\n");
-      case "http":
-        return [
+          `    bucket = "${sc?.bucket ?? "cloud-pilot-state"}"`,
+          `    key    = "${sc?.key ?? `workspaces/${workspace}/terraform.tfstate`}"`,
+          `    region = "${sc?.region ?? "us-east-1"}"`,
+        ];
+        if (sc?.dynamodbTable) lines.push(`    dynamodb_table = "${sc.dynamodbTable}"`);
+        if (sc?.encrypt) lines.push(`    encrypt = true`);
+        lines.push(`  }`, `}`);
+        return lines.join("\n");
+      }
+      case "http": {
+        const baseAddr = sc?.address ?? "http://localhost:8200/v1/secret/data/tofu-state";
+        const lines = [
           `terraform {`,
           `  backend "http" {`,
-          `    address = "${this.config.stateConfig?.address ?? "http://localhost:8200/v1/secret/data/tofu-state"}/${workspace}"`,
-          `  }`,
-          `}`,
-        ].join("\n");
+          `    address        = "${baseAddr}/${workspace}"`,
+          `    lock_address   = "${sc?.lockAddress ?? `${baseAddr}/${workspace}`}"`,
+          `    unlock_address = "${sc?.unlockAddress ?? `${baseAddr}/${workspace}`}"`,
+        ];
+        if (sc?.username) lines.push(`    username = "${sc.username}"`);
+        if (sc?.password) lines.push(`    password = "${sc.password}"`);
+        lines.push(`  }`, `}`);
+        return lines.join("\n");
+      }
+      case "consul": {
+        const lines = [
+          `terraform {`,
+          `  backend "consul" {`,
+          `    address = "${sc?.address ?? "localhost:8500"}"`,
+          `    path    = "${sc?.path ?? `cloud-pilot/tofu-state/${workspace}`}"`,
+        ];
+        lines.push(`  }`, `}`);
+        return lines.join("\n");
+      }
+      case "pg": {
+        const lines = [
+          `terraform {`,
+          `  backend "pg" {`,
+          `    conn_str    = "${sc?.connStr ?? "postgres://localhost/terraform_state"}"`,
+        ];
+        if (sc?.schemaName) lines.push(`    schema_name = "${sc.schemaName}"`);
+        lines.push(`  }`, `}`);
+        return lines.join("\n");
+      }
       case "local":
       default:
-        // Local backend is the default, no config needed
-        return `# State stored locally in this workspace directory\n`;
+        return `# State stored locally in ${this.config.workspacesDir}/${workspace}/\n`;
     }
   }
 }
