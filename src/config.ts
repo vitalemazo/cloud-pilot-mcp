@@ -50,7 +50,7 @@ const ConfigSchema = z.object({
   sandbox: z
     .object({
       memoryLimitMB: z.number().default(128),
-      timeoutMs: z.number().default(30000),
+      timeoutMs: z.number().default(120000),
     })
     .default({}),
   specs: z
