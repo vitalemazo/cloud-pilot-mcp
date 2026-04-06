@@ -220,7 +220,11 @@ export async function executeInSandbox(
       // Resolve all pending requests
       for (const key of queue) {
         if (!resolvedCache.has(key)) {
-          const [service, action, params] = key.split(":");
+          const firstColon = key.indexOf(":");
+          const secondColon = key.indexOf(":", firstColon + 1);
+          const service = key.substring(0, firstColon);
+          const action = key.substring(firstColon + 1, secondColon);
+          const params = key.substring(secondColon + 1);
           const result = await requestBridge(service, action, params);
           resolvedCache.set(key, result);
         }
