@@ -13,7 +13,7 @@ FROM node:22-slim
 # Only installed when INSTALL_TOFU=true build arg is set (opt-in).
 ARG INSTALL_TOFU=true
 RUN if [ "$INSTALL_TOFU" = "true" ]; then \
-      apt-get update && apt-get install -y --no-install-recommends curl unzip && \
+      apt-get update && apt-get install -y --no-install-recommends ca-certificates curl unzip && \
       ARCH=$(dpkg --print-architecture) && \
       TOFU_VERSION="1.9.0" && \
       curl -fsSL "https://github.com/opentofu/opentofu/releases/download/v${TOFU_VERSION}/tofu_${TOFU_VERSION}_linux_${ARCH}.zip" -o /tmp/tofu.zip && \
