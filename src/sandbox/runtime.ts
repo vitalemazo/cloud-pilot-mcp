@@ -151,23 +151,69 @@ export async function executeInSandbox(
       vm.setProp(vm.global, "_request", syncRequestHandle);
       syncRequestHandle.dispose();
 
+      // Clear logs so each retry produces clean output
+      logs.length = 0;
+
       const result = vm.evalCode(wrappedCode);
 
+      let retryError: { err: unknown } | null = null;
       if (result.error) {
-        const err = vm.dump(result.error);
+        retryError = { err: vm.dump(result.error) };
         result.error.dispose();
         if (timedOut) {
           return { success: false, output: null, error: "Execution timed out", logs };
         }
-        return { success: false, output: null, error: JSON.stringify(err), logs };
+      } else {
+        result.value.dispose();
       }
 
-      const output = vm.dump(result.value);
-      result.value.dispose();
+      // Check for new pending requests (code may have thrown partway through a loop)
+      const retryQueueResult = vm.evalCode("JSON.stringify(__requestQueue)");
+      if (!retryQueueResult.error) {
+        const queue = JSON.parse(vm.getString(retryQueueResult.value)) as string[];
+        retryQueueResult.value.dispose();
 
-      // Check if there were unresolved requests in the output or logs
-      // For v0.1, we resolve all _request calls before execution
-      return { success: true, output, logs };
+        let newPending = false;
+        for (const key of queue) {
+          if (!resolvedCache.has(key)) {
+            const firstColon = key.indexOf(":");
+            const secondColon = key.indexOf(":", firstColon + 1);
+            const service = key.substring(0, firstColon);
+            const action = key.substring(firstColon + 1, secondColon);
+            const params = key.substring(secondColon + 1);
+            const bridgeResult = await requestBridge(service, action, params);
+            resolvedCache.set(key, bridgeResult);
+            newPending = true;
+          }
+        }
+
+        if (newPending) {
+          // Inject all resolved results and retry
+          for (const [key, value] of resolvedCache) {
+            const escaped = value.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+            const injectResult = vm.evalCode(`__requestResults['${key}'] = '${escaped}';`);
+            if (!injectResult.error) {
+              injectResult.value.dispose();
+            } else {
+              injectResult.error.dispose();
+            }
+          }
+          // Reset queue for next pass
+          const resetResult = vm.evalCode("__requestQueue = [];");
+          if (!resetResult.error) resetResult.value.dispose();
+          else resetResult.error.dispose();
+
+          return executeWithRetries();
+        }
+      } else {
+        retryQueueResult.error.dispose();
+      }
+
+      if (retryError) {
+        return { success: false, output: null, error: JSON.stringify(retryError.err), logs };
+      }
+
+      return { success: true, output: null, logs };
     };
 
     // Pre-flight: extract all API calls by doing a dry parse,
