@@ -1,8 +1,53 @@
-# cloud-pilot-mcp
+<p align="center">
+  <h1 align="center">cloud-pilot-mcp</h1>
+  <p align="center">
+    Give AI agents the ability to control cloud infrastructure across<br/>
+    <b>AWS, Azure, GCP, and Alibaba Cloud</b> through natural language.
+  </p>
+  <p align="center">
+    <a href="#quick-start"><img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen?logo=node.js&logoColor=white" alt="Node 20+"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT License"></a>
+    <a href="https://github.com/vitalemazo/cloud-pilot-mcp/pkgs/container/cloud-pilot-mcp"><img src="https://img.shields.io/badge/docker-ghcr.io-blue?logo=docker&logoColor=white" alt="Docker"></a>
+    <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/protocol-MCP-purple" alt="MCP"></a>
+  </p>
+</p>
 
-An MCP server that gives AI agents the ability to control cloud infrastructure across **AWS, Azure, GCP, and Alibaba Cloud** through natural language. Instead of building hundreds of individual tools, it exposes just two — **search** and **execute** — that together cover **1,289+ services and 51,900+ API operations**, discovered and fetched dynamically at runtime.
+<br/>
+
+> Instead of building hundreds of individual tools, cloud-pilot exposes just two — **search** and **execute** — that together cover **1,289+ services** and **51,900+ API operations**, discovered and fetched dynamically at runtime.
 
 When an agent connects, the server delivers a **Senior Cloud Platform Engineer persona** — complete with engineering principles, provider-specific expertise, safety awareness, and structured workflow prompts — so the agent automatically operates with production-grade cloud architecture and security standards.
+
+---
+
+## Table of Contents
+
+| Section | Description |
+|---------|-------------|
+| [The Problem](#the-problem) | Why existing approaches fall short |
+| [How It Works](#how-it-works) | The search-and-execute pattern |
+| [Cloud Provider Coverage](#cloud-provider-coverage) | 4 providers, 1,289 services, 51,900+ operations |
+| [Architecture](#architecture) | System design and component overview |
+| [Built-In Cloud Engineering Persona](#built-in-cloud-engineering-persona) | Instructions, resources, prompts, configuration |
+| [Real-World Use Cases](#real-world-use-cases) | Landing zones, global WAN, K8s, incident response, cost analysis |
+| **Getting Started** | |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Quick Start](#quick-start) | Prerequisites, install, and run |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Configure Credentials](#configure-credentials) | Auto-discovery, env vars, Vault, Azure AD |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Run with Docker](#run-with-docker) | Container deployment |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Connect to Your MCP Client](#connect-to-your-mcp-client) | stdio, HTTP, API key auth |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Platform Integration Examples](#platform-integration-examples) | OpenAI SDK, Cursor, LangChain, custom agents |
+| **Reference** | |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Configuration Reference](#configuration-reference) | Full `config.yaml` schema and env var overrides |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Dynamic API Discovery](#dynamic-api-discovery) | Three-tier spec system: catalog, index, full specs |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Safety Model](#safety-model) | Sandbox, modes, allowlists, audit trail |
+| &nbsp;&nbsp;&nbsp;&nbsp;[HTTP Transport Security](#http-transport-security) | Auth, CORS, rate limiting |
+| **Operations** | |
+| &nbsp;&nbsp;&nbsp;&nbsp;[CI/CD Pipeline](#cicd-pipeline) | Build, test, Docker, catalog refresh |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Project Structure](#project-structure) | Source tree walkthrough |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Extending](#extending) | Add providers, auth backends, deployment targets |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Troubleshooting](#troubleshooting) | Common issues and diagnostic steps |
+
+---
 
 ## The Problem
 
@@ -14,88 +59,129 @@ Cloud providers expose thousands of API operations across hundreds of services. 
 
 cloud-pilot-mcp solves this with a **search-and-execute pattern**: the agent discovers what it needs at runtime, then calls it through a sandboxed execution environment. No pre-built tools, no fixed service list, no manual updates.
 
+---
+
 ## How It Works
 
 ```
-You: "Set up a Transit Gateway connecting three VPCs across us-east-1 and eu-west-1"
-
-Agent -> search("create transit gateway", provider: "aws")
-      <- Returns: CreateTransitGateway, CreateTransitGatewayVpcAttachment,
-                 CreateTransitGatewayRouteTable... with full parameter schemas
-
-Agent -> execute(provider: "aws", code: `
-          const tgw = await sdk.request({
-            service: "ec2",
-            action: "CreateTransitGateway",
-            params: { Description: "Multi-region hub", Options: { AmazonSideAsn: 64512 } }
-          });
-          console.log(tgw);
-        `)
-      <- Returns: Transit Gateway ID, state, creation details
+                  User                        Agent                      cloud-pilot-mcp
+                   |                            |                              |
+                   |  "Set up a Transit Gateway |                              |
+                   |   connecting three VPCs"    |                              |
+                   |--------------------------->|                              |
+                   |                            |                              |
+                   |                            |  search("transit gateway")   |
+                   |                            |----------------------------->|
+                   |                            |                              |
+                   |                            |  CreateTransitGateway,       |
+                   |                            |  CreateTGWVpcAttachment,     |
+                   |                            |  CreateTGWRouteTable + schemas|
+                   |                            |<-----------------------------|
+                   |                            |                              |
+                   |                            |  execute(provider: "aws",    |
+                   |                            |    code: sdk.request({       |
+                   |                            |      service: "ec2",         |
+                   |                            |      action: "CreateTGW",    |
+                   |                            |      params: {...}           |
+                   |                            |    })                        |
+                   |                            |----------------------------->|
+                   |                            |                              |  QuickJS
+                   |                            |                              |  Sandbox
+                   |                            |                              |----+
+                   |                            |                              |    | SigV4
+                   |                            |                              |    | signed
+                   |                            |                              |<---+
+                   |                            |  Transit Gateway ID, state   |
+                   |                            |<-----------------------------|
+                   |                            |                              |
+                   |  "Done! TGW tgw-0abc123    |                              |
+                   |   created in us-east-1"    |                              |
+                   |<---------------------------|                              |
 ```
 
 The agent reasons about what APIs exist, plans the sequence, and executes — all within the conversation.
 
+---
+
 ## Cloud Provider Coverage
+
+```
+  +-------------------------------------------+
+  |          51,900+ API Operations            |
+  |                                            |
+  |   +----------+  +---------+  +--------+   |
+  |   |   AWS    |  |  Azure  |  |  GCP   |   |
+  |   | 421 svcs |  | 240+    |  | 305    |   |
+  |   | 18,109   |  | 3,157   |  | 12,599 |   |
+  |   |   ops    |  |   ops   |  |  ops   |   |
+  |   +----------+  +---------+  +--------+   |
+  |                                            |
+  |              +-----------+                 |
+  |              |  Alibaba  |                 |
+  |              |  323 svcs |                 |
+  |              |  18,058   |                 |
+  |              |    ops    |                 |
+  |              +-----------+                 |
+  +-------------------------------------------+
+```
 
 | Provider | Services | Operations | Spec Source | Auth |
 |----------|----------|------------|-------------|------|
-| **AWS** | 421 | 18,109 | [boto/botocore](https://github.com/boto/botocore) via jsDelivr CDN | AWS CLI / SDK credential chain → SigV4 signing |
-| **Azure** | 240+ | 3,157 | [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) via GitHub CDN | Azure CLI / DefaultAzureCredential → Bearer token |
-| **GCP** | 305 | 12,599 | [Google Discovery API](https://www.googleapis.com/discovery/v1/apis) (live) | gcloud CLI / GoogleAuth → Bearer token |
-| **Alibaba** | 323 | 18,058 | [Alibaba Cloud API](https://api.aliyun.com/meta/v1/products) + api-docs.json | aliyun CLI / credential chain → ACS3-HMAC-SHA256 |
+| **AWS** | 421 | 18,109 | [boto/botocore](https://github.com/boto/botocore) via jsDelivr CDN | AWS CLI / SDK credential chain -> SigV4 signing |
+| **Azure** | 240+ | 3,157 | [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) via GitHub CDN | Azure CLI / DefaultAzureCredential -> Bearer token |
+| **GCP** | 305 | 12,599 | [Google Discovery API](https://www.googleapis.com/discovery/v1/apis) (live) | gcloud CLI / GoogleAuth -> Bearer token |
+| **Alibaba** | 323 | 18,058 | [Alibaba Cloud API](https://api.aliyun.com/meta/v1/products) + api-docs.json | aliyun CLI / credential chain -> ACS3-HMAC-SHA256 |
 | **Total** | **1,289+** | **51,923** | | |
 
 All services are discovered dynamically — no pre-configuration needed. When a cloud provider launches a new service, it becomes available automatically on the next catalog refresh.
 
+---
+
 ## Architecture
 
 ```
-                    MCP Protocol (stdio or Streamable HTTP)
-                              |
-                    +---------v----------+
-                    |  cloud-pilot-mcp   |
-                    |                    |
-                    |  +--------------+  |
-                    |  |  Persona     |  |  Sr. Cloud Platform Engineer identity
-                    |  |              |  |  instructions + resources + prompts
-                    |  |  8 engineering principles, provider expertise,
-                    |  |  6 workflow prompts, safety awareness
-                    |  +--------------+  |
-                    |                    |
-                    |  +--------------+  |
-                    |  |   search     |  |  "What APIs exist for X?"
-                    |  |              |  |  Searches 51,900+ operations
-                    |  |  Tier 1: Service catalog (1,289 services)
-                    |  |  Tier 2: Operation index (keyword match)
-                    |  |  Tier 3: Full spec hydration (params, output)
-                    |  +--------------+  |
-                    |                    |
-                    |  +--------------+  |
-                    |  |   execute    |  |  "Call this API with these params"
-                    |  |              |  |
-                    |  |  QuickJS sandbox (no fs/net access)
-                    |  |    +-- sdk.request() bridge
-                    |  |         |-- AWS: SigV4 signed request
-                    |  |         |-- Azure: Bearer token + ARM REST
-                    |  |         |-- GCP: Bearer token + REST
-                    |  |         +-- Alibaba: ACS3-HMAC-SHA256 + RPC
-                    |  +--------------+  |
-                    |                    |
-                    |  +--------------+  |
-                    |  |  Safety      |  |  API key auth, CORS, rate limiting,
-                    |  |  + Audit     |  |  read-only mode, allowlists, blocklists,
-                    |  |              |  |  dry-run, audit trail
-                    |  +--------------+  |
-                    +--------------------+
-                      |    |    |    |
-               +------+  +--+  +-+  +--------+
-               |          |      |            |
-          +----v---+ +---v----+ +v-----+ +---v------+
-          |  AWS   | | Azure  | |  GCP | | Alibaba  |
-          |421 svcs| |240+pvdr| |305svc| | 323 svcs |
-          +--------+ +--------+ +------+ +----------+
+                         MCP Protocol (stdio or Streamable HTTP)
+                                       |
+                         +-------------v--------------+
+                         |      cloud-pilot-mcp       |
+                         |                            |
+    +--------------------+----------------------------+--------------------+
+    |                    |                            |                    |
+    |  +--------------+  |  +--------------+          |  +--------------+  |
+    |  |   Persona    |  |  |    search    |          |  |   Safety     |  |
+    |  +--------------+  |  +--------------+          |  |   + Audit    |  |
+    |  | Sr. Cloud    |  |  | 51,900+ ops  |          |  +--------------+  |
+    |  | Platform     |  |  |              |          |  | read-only    |  |
+    |  | Engineer     |  |  | Tier 1:      |          |  | allowlists   |  |
+    |  |              |  |  |  Catalog     |          |  | blocklists   |  |
+    |  | 8 principles |  |  |  (1,289 svc) |          |  | dry-run      |  |
+    |  | 6 prompts    |  |  | Tier 2:      |          |  | audit trail  |  |
+    |  | 4 provider   |  |  |  Op Index    |          |  | API key auth |  |
+    |  |   guides     |  |  | Tier 3:      |          |  | CORS         |  |
+    |  |              |  |  |  Full Spec   |          |  | rate limit   |  |
+    |  +--------------+  |  +--------------+          |  +--------------+  |
+    |                    |                            |                    |
+    |                    |  +--------------+          |                    |
+    |                    |  |   execute    |          |                    |
+    |                    |  +--------------+          |                    |
+    |                    |  | QuickJS WASM |          |                    |
+    |                    |  | sandbox      |          |                    |
+    |                    |  |              |          |                    |
+    |                    |  | sdk.request()|          |                    |
+    |                    |  |   bridge     |          |                    |
+    |                    |  +--------------+          |                    |
+    +--------------------+----------------------------+--------------------+
+                         |    |         |         |
+                +--------+    +---+     +---+     +--------+
+                |                 |         |              |
+           +----v-----+    +-----v---+  +--v-----+  +-----v------+
+           |   AWS    |    |  Azure  |  |  GCP   |  |  Alibaba   |
+           | SigV4    |    | Bearer  |  | Bearer |  | ACS3-HMAC  |
+           | 421 svcs |    | 240+    |  | 305    |  | 323 svcs   |
+           +----------+    +---------+  +--------+  +------------+
 ```
+
+---
 
 ## Built-In Cloud Engineering Persona
 
@@ -156,6 +242,8 @@ persona:
 
 Or via environment variable: `CLOUD_PILOT_PERSONA_ENABLED=false`
 
+---
+
 ## Real-World Use Cases
 
 ### Deploy an Azure Landing Zone
@@ -195,62 +283,7 @@ Manage clusters across all four providers in one conversation:
 - `cloudbilling.billingAccounts.projects.list` — GCP billing
 - `BssOpenApi:QueryBill` — Alibaba billing
 
-## Dynamic API Discovery
-
-The server discovers APIs at runtime using a three-tier system:
-
-### Tier 1: Service Catalog
-On startup (or when the 7-day cache expires), the server fetches the complete service list:
-- **AWS**: GitHub Git Trees API on [boto/botocore](https://github.com/boto/botocore) — 1 API call
-- **Azure**: GitHub Git Trees API on [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) — 2 API calls
-- **GCP**: Google Discovery API at `googleapis.com/discovery/v1/apis` — 1 API call
-- **Alibaba**: Product metadata at `api.aliyun.com/meta/v1/products` — 1 API call
-
-Catalogs are cached to disk and ship as bundled fallbacks for offline use.
-
-### Tier 2: Operation Index
-A keyword-searchable index of every operation across all services (51,900+ total). Built progressively on first search — pre-downloaded specs indexed immediately, remaining services fetched from CDN in the background (~2-5 minutes). Once built, the index is cached to disk and loads instantly on subsequent startups.
-
-### Tier 3: Full Specs
-Complete API specifications with parameter schemas, response types, and documentation. Fetched on demand from CDN when a search match needs hydration. Cached to disk (30-day TTL) and held in an LRU memory cache (max 10 specs).
-
-### Self-Updating
-When cloud providers launch new services, specs appear in their repositories within days. The server picks them up automatically on the next catalog refresh. A monthly GitHub Action also refreshes the bundled fallback catalogs.
-
-## Safety Model
-
-The agent never gets raw credentials. The sandboxed execution environment (QuickJS WASM) has no access to the filesystem, network, or host process. It can only interact with cloud APIs through a constrained `sdk.request()` bridge that enforces:
-
-| Control | How It Works |
-|---------|-------------|
-| **Read-only mode** | Blocks mutating operations. Default for all providers. |
-| **Service allowlist** | Only configured services can be called. Empty = all allowed. |
-| **Action blocklist** | Specific dangerous operations permanently blocked. |
-| **Dry-run mode** | `dryRun: true` logs what would happen without executing. |
-| **Audit trail** | Every search and execution logged with timestamp, service, action, params, success/failure, duration. |
-| **Credential isolation** | Credentials live in the host process. The sandbox never sees them. |
-
-### Safety Modes
-
-```yaml
-providers:
-  - type: aws
-    mode: read-only      # Default. Only Describe/Get/List operations allowed.
-    # mode: read-write   # Allows Create/Update/Put. Still respects blocklist.
-    # mode: full         # No restrictions. Use with caution.
-```
-
-## HTTP Transport Security
-
-When running as a Streamable HTTP service, the server includes:
-
-| Feature | Details |
-|---------|---------|
-| **API key auth** | Bearer token or `x-api-key` header. Optional — set `HTTP_API_KEY` to enable. |
-| **CORS** | Configurable allowed origins. Preflight handling. MCP session headers exposed. |
-| **Rate limiting** | Sliding window per client IP. Default 60 req/min, configurable. |
-| **Request logging** | Every request logged: status code, method, URL, duration, client IP. |
-| **Health endpoint** | `GET /health` returns provider status and uptime. Bypasses auth for monitoring. |
+---
 
 ## Quick Start
 
@@ -276,16 +309,18 @@ Optionally pre-download common specs for faster first searches:
 npm run download-specs
 ```
 
-### Configure Credentials
+---
+
+## Configure Credentials
 
 Credentials are discovered automatically using each cloud provider's native SDK credential chain. If you have a CLI installed and authenticated, it just works — no `.env` file needed.
 
 | Provider | Auto-Discovery Sources (checked in order) |
 |----------|------------------------------------------|
-| **AWS** | Environment vars → `~/.aws/credentials` → `~/.aws/config` (profiles/SSO) → IMDS/ECS container role |
-| **Azure** | Environment vars → `az login` session → Managed Identity → VS Code / PowerShell |
-| **GCP** | Environment vars → `gcloud auth` session (`~/.config/gcloud`) → `GOOGLE_APPLICATION_CREDENTIALS` → metadata server |
-| **Alibaba** | Environment vars → `~/.alibabacloud/credentials` → `~/.aliyun/config.json` → ECS RAM role |
+| **AWS** | Environment vars -> `~/.aws/credentials` -> `~/.aws/config` (profiles/SSO) -> IMDS/ECS container role |
+| **Azure** | Environment vars -> `az login` session -> Managed Identity -> VS Code / PowerShell |
+| **GCP** | Environment vars -> `gcloud auth` session (`~/.config/gcloud`) -> `GOOGLE_APPLICATION_CREDENTIALS` -> metadata server |
+| **Alibaba** | Environment vars -> `~/.alibabacloud/credentials` -> `~/.aliyun/config.json` -> ECS RAM role |
 
 The fastest way to get started:
 
@@ -329,11 +364,12 @@ ALIBABA_CLOUD_REGION=cn-hangzhou
 ```
 </details>
 
-#### Vault Integration
+### Vault Integration
 
 For production deployments, credentials can be sourced from **HashiCorp Vault** via AppRole auth. This keeps secrets out of config files and environment variables.
 
-##### Step 1: Create Vault Secrets
+<details>
+<summary><b>Step 1: Create Vault Secrets</b></summary>
 
 Create a secret for each cloud provider at `secret/cloud-pilot/{provider}`. The server reads from `{secretPath}/{provider}` and maps fields automatically.
 
@@ -354,7 +390,10 @@ vault kv put secret/cloud-pilot/aws \
 | **GCP** | `access_token`, `project_id` | |
 | **Alibaba** | `access_key_id`, `access_key_secret` | `security_token`, `region` (default: cn-hangzhou) |
 
-##### Step 2: Create an AppRole
+</details>
+
+<details>
+<summary><b>Step 2: Create an AppRole</b></summary>
 
 Create a Vault AppRole with read access to the secret path:
 
@@ -380,7 +419,10 @@ vault read auth/approle/role/cloud-pilot/role-id
 vault write -f auth/approle/role/cloud-pilot/secret-id
 ```
 
-##### Step 3: Configure cloud-pilot
+</details>
+
+<details>
+<summary><b>Step 3: Configure cloud-pilot</b></summary>
 
 Set `auth.type: vault` in `config.yaml`:
 
@@ -404,7 +446,10 @@ export VAULT_ROLE_ID="905670cc-..."
 export VAULT_SECRET_ID="6e84df5b-..."
 ```
 
-##### Step 4: Verify
+</details>
+
+<details>
+<summary><b>Step 4: Verify</b></summary>
 
 Test the connection before starting the server:
 
@@ -418,7 +463,9 @@ vault write auth/approle/login \
 vault kv get secret/cloud-pilot/aws
 ```
 
-#### Resilient Provider Initialization
+</details>
+
+### Resilient Provider Initialization
 
 Each provider initializes independently. If one provider's credentials are unavailable (e.g., no AWS CLI configured), the server starts with the remaining providers instead of failing entirely. Check the startup logs to see which providers loaded:
 
@@ -428,7 +475,9 @@ Each provider initializes independently. If one provider's credentials are unava
 [cloud-pilot] Providers: aws
 ```
 
-### Run with Docker
+---
+
+## Run with Docker
 
 ```bash
 docker pull ghcr.io/vitalemazo/cloud-pilot-mcp:latest
@@ -440,7 +489,9 @@ Or with docker-compose:
 docker-compose up -d
 ```
 
-### Connect to Your MCP Client
+---
+
+## Connect to Your MCP Client
 
 The server speaks standard MCP protocol and works with any compatible client.
 
@@ -487,7 +538,9 @@ The server speaks standard MCP protocol and works with any compatible client.
 }
 ```
 
-### Platform Integration Examples
+---
+
+## Platform Integration Examples
 
 <details>
 <summary>OpenAI Agents SDK (Python)</summary>
@@ -560,6 +613,8 @@ async with streamablehttp_client(url="http://your-server:8400/mcp") as (r, w, _)
 ```
 </details>
 
+---
+
 ## Configuration Reference
 
 ### `config.yaml`
@@ -628,26 +683,126 @@ persona:
 | `TRANSPORT` | `transport` |
 | `HTTP_PORT` / `HTTP_HOST` / `HTTP_API_KEY` | `http.*` |
 | `AUTH_TYPE` | `auth.type` |
-| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_REGION` | AWS credentials (also auto-discovered from `~/.aws/credentials`, SSO, IMDS) |
-| `AZURE_TENANT_ID` / `AZURE_CLIENT_ID` / `AZURE_CLIENT_SECRET` / `AZURE_SUBSCRIPTION_ID` | Azure credentials (also auto-discovered from `az login`, Managed Identity) |
-| `GOOGLE_APPLICATION_CREDENTIALS` / `GCP_PROJECT_ID` | GCP credentials (also auto-discovered from `gcloud auth`, metadata server) |
-| `ALIBABA_CLOUD_ACCESS_KEY_ID` / `ALIBABA_CLOUD_ACCESS_KEY_SECRET` / `ALIBABA_CLOUD_REGION` | Alibaba credentials (also auto-discovered from `~/.alibabacloud/credentials`, ECS RAM role) |
+| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_REGION` | AWS credentials |
+| `AZURE_TENANT_ID` / `AZURE_CLIENT_ID` / `AZURE_CLIENT_SECRET` / `AZURE_SUBSCRIPTION_ID` | Azure credentials |
+| `GOOGLE_APPLICATION_CREDENTIALS` / `GCP_PROJECT_ID` | GCP credentials |
+| `ALIBABA_CLOUD_ACCESS_KEY_ID` / `ALIBABA_CLOUD_ACCESS_KEY_SECRET` / `ALIBABA_CLOUD_REGION` | Alibaba credentials |
 | `CLOUD_PILOT_SPECS_DYNAMIC` / `CLOUD_PILOT_SPECS_OFFLINE` | `specs.*` |
 | `CLOUD_PILOT_PERSONA_ENABLED` | `persona.enabled` (set `false` to disable persona) |
 | `GITHUB_TOKEN` | Increases GitHub API rate limit (60/hr -> 5,000/hr) |
+
+---
+
+## Dynamic API Discovery
+
+The server discovers APIs at runtime using a three-tier system:
+
+```
+  Request: "create transit gateway"
+       |
+       v
+  +------------------+     +--------------------+     +------------------+
+  |  Tier 1: Catalog |---->|  Tier 2: Op Index  |---->|  Tier 3: Spec   |
+  +------------------+     +--------------------+     +------------------+
+  | 1,289 services   |     | 51,900+ operations |     | Full params,    |
+  | Names + metadata |     | Keyword-searchable |     | response types, |
+  | Cached 7 days    |     | Built progressively|     | documentation   |
+  | 1 API call/init  |     | Cached to disk     |     | Fetched on-demand|
+  +------------------+     +--------------------+     | Cached 30 days  |
+                                                      | LRU mem (10)    |
+                                                      +------------------+
+```
+
+### Tier 1: Service Catalog
+On startup (or when the 7-day cache expires), the server fetches the complete service list:
+- **AWS**: GitHub Git Trees API on [boto/botocore](https://github.com/boto/botocore) — 1 API call
+- **Azure**: GitHub Git Trees API on [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) — 2 API calls
+- **GCP**: Google Discovery API at `googleapis.com/discovery/v1/apis` — 1 API call
+- **Alibaba**: Product metadata at `api.aliyun.com/meta/v1/products` — 1 API call
+
+Catalogs are cached to disk and ship as bundled fallbacks for offline use.
+
+### Tier 2: Operation Index
+A keyword-searchable index of every operation across all services (51,900+ total). Built progressively on first search — pre-downloaded specs indexed immediately, remaining services fetched from CDN in the background (~2-5 minutes). Once built, the index is cached to disk and loads instantly on subsequent startups.
+
+### Tier 3: Full Specs
+Complete API specifications with parameter schemas, response types, and documentation. Fetched on demand from CDN when a search match needs hydration. Cached to disk (30-day TTL) and held in an LRU memory cache (max 10 specs).
+
+### Self-Updating
+When cloud providers launch new services, specs appear in their repositories within days. The server picks them up automatically on the next catalog refresh. A monthly GitHub Action also refreshes the bundled fallback catalogs.
+
+---
+
+## Safety Model
+
+The agent never gets raw credentials. The sandboxed execution environment (QuickJS WASM) has no access to the filesystem, network, or host process. It can only interact with cloud APIs through a constrained `sdk.request()` bridge that enforces:
+
+```
+  +--------------------------------------------------+
+  |              Credential Isolation                  |
+  |                                                    |
+  |   Host Process          QuickJS Sandbox            |
+  |  +---------------+    +--------------------+       |
+  |  | AWS keys      |    |  sdk.request()     |       |
+  |  | Azure tokens  |<-->|  bridge only       |       |
+  |  | GCP tokens    |    |                    |       |
+  |  | Alibaba keys  |    |  No fs / no net    |       |
+  |  +---------------+    |  No process access |       |
+  |                        +--------------------+       |
+  +--------------------------------------------------+
+```
+
+| Control | How It Works |
+|---------|-------------|
+| **Read-only mode** | Blocks mutating operations. Default for all providers. |
+| **Service allowlist** | Only configured services can be called. Empty = all allowed. |
+| **Action blocklist** | Specific dangerous operations permanently blocked. |
+| **Dry-run mode** | `dryRun: true` logs what would happen without executing. |
+| **Audit trail** | Every search and execution logged with timestamp, service, action, params, success/failure, duration. |
+| **Credential isolation** | Credentials live in the host process. The sandbox never sees them. |
+
+### Safety Modes
+
+```yaml
+providers:
+  - type: aws
+    mode: read-only      # Default. Only Describe/Get/List operations allowed.
+    # mode: read-write   # Allows Create/Update/Put. Still respects blocklist.
+    # mode: full         # No restrictions. Use with caution.
+```
+
+---
+
+## HTTP Transport Security
+
+When running as a Streamable HTTP service, the server includes:
+
+| Feature | Details |
+|---------|---------|
+| **API key auth** | Bearer token or `x-api-key` header. Optional — set `HTTP_API_KEY` to enable. |
+| **CORS** | Configurable allowed origins. Preflight handling. MCP session headers exposed. |
+| **Rate limiting** | Sliding window per client IP. Default 60 req/min, configurable. |
+| **Request logging** | Every request logged: status code, method, URL, duration, client IP. |
+| **Health endpoint** | `GET /health` returns provider status and uptime. Bypasses auth for monitoring. |
+
+---
 
 ## CI/CD Pipeline
 
 Every push to `main` triggers an automated pipeline:
 
 ```
-Push to main
-  |
-  +-- CI: typecheck -> build -> unit tests (vitest) -> HTTP smoke test
-  |
-  +-- Docker: tests pass -> build image -> push to GHCR -> verify container
-  |
-  +-- Monthly: refresh bundled API catalogs (GitHub Action)
+  Push to main
+       |
+       +---> CI --------> Docker ---------> Registry
+       |     |             |                  |
+       |     typecheck     tests pass?        ghcr.io/vitalemazo/
+       |     build         |                  cloud-pilot-mcp
+       |     unit tests    build image        :latest :main :sha
+       |     smoke test    push to GHCR
+       |                   verify container
+       |
+       +---> Monthly: refresh bundled API catalogs (GitHub Action)
 ```
 
 - **CI gate**: Docker image is only built after all tests pass
@@ -655,6 +810,8 @@ Push to main
 - **Tags**: `:latest`, `:main`, `:sha` (short commit hash)
 - **Cache**: GitHub Actions layer cache for fast rebuilds
 - **Verify**: Post-push pulls and runs the container to confirm it starts
+
+---
 
 ## Project Structure
 
@@ -665,55 +822,55 @@ src/
 +-- config.ts                    # YAML + env config loader with Zod validation
 |
 +-- interfaces/                  # Pluggable contracts
-|   +-- auth.ts                  # AuthProvider: getCredentials(), isExpired()
-|   +-- cloud-provider.ts        # CloudProvider: searchSpec(), call(), listServices()
-|   +-- audit.ts                 # AuditLogger: log(), query()
+|   +-- auth.ts                  #   AuthProvider: getCredentials(), isExpired()
+|   +-- cloud-provider.ts        #   CloudProvider: searchSpec(), call(), listServices()
+|   +-- audit.ts                 #   AuditLogger: log(), query()
 |
 +-- tools/
 |   +-- search.ts                # search tool: spec discovery, formatted results
 |   +-- execute.ts               # execute tool: sandbox orchestration, dry-run
 |
 +-- specs/                       # Dynamic API discovery system
-|   +-- types.ts                 # CatalogEntry, OperationIndexEntry, SpecsConfig
-|   +-- dynamic-spec-index.ts    # Three-tier lazy-loading spec index (all providers)
-|   +-- spec-fetcher.ts          # GitHub Trees API + CDN + Google Discovery + Alibaba API
-|   +-- spec-cache.ts            # Disk cache with TTL-based expiration
-|   +-- operation-index.ts       # Cross-service keyword search (AWS/Azure/GCP/Alibaba extractors)
-|   +-- lru-cache.ts             # In-memory LRU eviction for full specs
+|   +-- types.ts                 #   CatalogEntry, OperationIndexEntry, SpecsConfig
+|   +-- dynamic-spec-index.ts    #   Three-tier lazy-loading spec index (all providers)
+|   +-- spec-fetcher.ts          #   GitHub Trees API + CDN + Google Discovery + Alibaba API
+|   +-- spec-cache.ts            #   Disk cache with TTL-based expiration
+|   +-- operation-index.ts       #   Cross-service keyword search (all provider extractors)
+|   +-- lru-cache.ts             #   In-memory LRU eviction for full specs
 |
 +-- providers/
 |   +-- aws/
-|   |   +-- provider.ts          # SigV4 calls, mutating-prefix safety
-|   |   +-- specs.ts             # Botocore JSON parser
-|   |   +-- signer.ts            # AWS Signature Version 4
+|   |   +-- provider.ts          #   SigV4 calls, mutating-prefix safety
+|   |   +-- specs.ts             #   Botocore JSON parser
+|   |   +-- signer.ts            #   AWS Signature Version 4
 |   +-- azure/
-|   |   +-- provider.ts          # ARM REST calls, HTTP-method safety
-|   |   +-- specs.ts             # Swagger/OpenAPI parser
+|   |   +-- provider.ts          #   ARM REST calls, HTTP-method safety
+|   |   +-- specs.ts             #   Swagger/OpenAPI parser
 |   +-- gcp/
-|   |   +-- provider.ts          # Google REST calls, HTTP-method safety
-|   |   +-- specs.ts             # Google Discovery Document parser
+|   |   +-- provider.ts          #   Google REST calls, HTTP-method safety
+|   |   +-- specs.ts             #   Google Discovery Document parser
 |   +-- alibaba/
-|       +-- provider.ts          # Alibaba RPC calls, mutating-prefix safety
-|       +-- signer.ts            # ACS3-HMAC-SHA256
+|       +-- provider.ts          #   Alibaba RPC calls, mutating-prefix safety
+|       +-- signer.ts            #   ACS3-HMAC-SHA256
 |
 +-- persona/                     # Cloud engineering persona system
-|   +-- index.ts                 # Barrel export
-|   +-- instructions.ts          # Dynamic MCP instructions builder (provider-aware)
-|   +-- provider-profiles.ts     # Deep expertise docs: AWS, Azure, GCP, Alibaba
-|   +-- resources.ts             # MCP resources: cloud-pilot://persona/*, cloud-pilot://safety/*
-|   +-- prompts.ts               # 6 workflow prompts: landing-zone, incident-response, etc.
+|   +-- index.ts                 #   Barrel export
+|   +-- instructions.ts          #   Dynamic MCP instructions builder (provider-aware)
+|   +-- provider-profiles.ts     #   Deep expertise docs: AWS, Azure, GCP, Alibaba
+|   +-- resources.ts             #   MCP resources: cloud-pilot://persona/*, cloud-pilot://safety/*
+|   +-- prompts.ts               #   6 workflow prompts: landing-zone, incident-response, etc.
 |
 +-- auth/
-|   +-- env.ts                   # Auto-discovery credential chain (AWS CLI/SDK, az CLI, gcloud, aliyun CLI)
-|   +-- vault.ts                 # HashiCorp Vault AppRole (all 4 providers)
-|   +-- azure-ad.ts              # Azure AD OAuth2 client credentials
+|   +-- env.ts                   #   Auto-discovery credential chain (all CLIs/SDKs)
+|   +-- vault.ts                 #   HashiCorp Vault AppRole (all 4 providers)
+|   +-- azure-ad.ts              #   Azure AD OAuth2 client credentials
 |
 +-- audit/
-|   +-- file.ts                  # Append-only JSON audit log
+|   +-- file.ts                  #   Append-only JSON audit log
 |
 +-- sandbox/
-    +-- runtime.ts               # QuickJS WASM sandbox with timeout + memory limits
-    +-- api-bridge.ts            # sdk.request() bridge: connects sandbox to providers
+    +-- runtime.ts               #   QuickJS WASM sandbox with timeout + memory limits
+    +-- api-bridge.ts            #   sdk.request() bridge: connects sandbox to providers
 
 scripts/
 +-- download-specs.sh            # Pre-download common specs for faster cold start
@@ -733,6 +890,8 @@ test/
 +-- docker.yml                   # Tests gate -> Docker build -> GHCR push -> verify
 +-- update-catalogs.yml          # Monthly catalog refresh
 ```
+
+---
 
 ## Extending
 
@@ -760,6 +919,8 @@ test/
 | Azure Foundry | Streamable HTTP | Azure AD / Managed Identity | Native Azure auth |
 | AWS ECS/Lambda | Streamable HTTP | IAM Role | Native AWS auth |
 | Kubernetes | Streamable HTTP | Vault / Workload Identity | Sidecar or standalone pod |
+
+---
 
 ## Troubleshooting
 
@@ -820,7 +981,7 @@ The `vault kv` CLI adds the `/data/` prefix automatically. The server's Vault cl
 
 The server expects specific key names in each Vault secret. If your existing secrets use different names (e.g., `access_key` instead of `access_key_id`), the credentials will be `undefined` and the provider will fail.
 
-See the [expected key names table](#step-1-create-vault-secrets) and verify your secrets match:
+See the [expected key names table](#vault-integration) and verify your secrets match:
 
 ```bash
 vault kv get -format=json secret/cloud-pilot/aws | jq '.data.data | keys'
@@ -865,6 +1026,8 @@ aws sts get-caller-identity   # AWS
 az account show               # Azure
 gcloud auth print-access-token # GCP
 ```
+
+---
 
 ## Author
 
