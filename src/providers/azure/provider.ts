@@ -8,6 +8,14 @@ import type {
 } from "../../interfaces/cloud-provider.js";
 import type { AuthProvider } from "../../interfaces/auth.js";
 import type { ProviderConfig } from "../../config.js";
+import {
+  createPipelineFromOptions,
+  createPipelineRequest,
+  createDefaultHttpClient,
+  bearerTokenAuthenticationPolicy,
+} from "@azure/core-rest-pipeline";
+import type { Pipeline, HttpClient } from "@azure/core-rest-pipeline";
+import { DefaultAzureCredential } from "@azure/identity";
 
 export interface SpecIndex {
   search(query: string, service?: string): Promise<OperationSpec[]> | OperationSpec[];
@@ -16,6 +24,8 @@ export interface SpecIndex {
 
 const MUTATING_METHODS = ["PUT", "POST", "DELETE", "PATCH"];
 
+// Default API versions per service. Used when the action URL doesn't include
+// an explicit api-version query param.
 const AZURE_API_VERSIONS: Record<string, string> = {
   compute: "2024-07-01",
   storage: "2023-05-01",
@@ -34,6 +44,8 @@ export class AzureProvider implements CloudProvider {
   private auth: AuthProvider;
   private specIndex: SpecIndex;
   private subscriptionId: string;
+  private pipeline: Pipeline;
+  private httpClient: HttpClient;
 
   constructor(
     config: ProviderConfig,
@@ -46,6 +58,19 @@ export class AzureProvider implements CloudProvider {
     this.specIndex = specIndex;
     this.subscriptionId =
       subscriptionId ?? process.env.AZURE_SUBSCRIPTION_ID ?? "";
+
+    // Build Azure REST pipeline with automatic auth, retry, and throttling.
+    // bearerTokenAuthenticationPolicy handles token acquisition, caching,
+    // refresh, and Continuous Access Evaluation (CAE) challenges.
+    this.pipeline = createPipelineFromOptions({});
+    this.pipeline.addPolicy(
+      bearerTokenAuthenticationPolicy({
+        credential: new DefaultAzureCredential(),
+        scopes: ["https://management.azure.com/.default"],
+      }),
+      { phase: "Sign" },
+    );
+    this.httpClient = createDefaultHttpClient();
   }
 
   async searchSpec(query: string, service?: string): Promise<OperationSpec[]> {
@@ -67,17 +92,12 @@ export class AzureProvider implements CloudProvider {
 
     this.enforceSafetyMode(method);
 
-    const creds = await this.auth.getCredentials("azure");
-    if (!creds.azure?.accessToken) {
-      return {
-        success: false,
-        error: "Azure access token not available. Run: az login",
-      };
-    }
-
-    const token = creds.azure.accessToken;
-    if (!this.subscriptionId && creds.azure.subscriptionId) {
-      this.subscriptionId = creds.azure.subscriptionId;
+    // Resolve subscription ID from auth if not set
+    if (!this.subscriptionId) {
+      const creds = await this.auth.getCredentials("azure");
+      if (creds.azure?.subscriptionId) {
+        this.subscriptionId = creds.azure.subscriptionId;
+      }
     }
 
     const apiVersion =
@@ -98,30 +118,31 @@ export class AzureProvider implements CloudProvider {
 
     const start = Date.now();
     try {
-      const fetchOpts: RequestInit = {
-        method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      };
+      const request = createPipelineRequest({ url, method: method as "GET" | "PUT" | "POST" | "DELETE" | "PATCH" | "HEAD" });
+      request.headers.set("Content-Type", "application/json");
 
       if (body && ["PUT", "POST", "PATCH"].includes(method)) {
-        fetchOpts.body = JSON.stringify(body);
+        request.body = JSON.stringify(body);
       }
 
-      const res = await fetch(url, fetchOpts);
-      const data = res.headers.get("content-type")?.includes("json")
-        ? await res.json()
-        : await res.text();
+      // Pipeline handles auth, retry on 429/throttling, and transient errors
+      const response = await this.pipeline.sendRequest(this.httpClient, request);
       const duration = Date.now() - start;
 
-      if (!res.ok) {
+      const data = response.headers.get("content-type")?.includes("json") && response.bodyAsText
+        ? JSON.parse(response.bodyAsText)
+        : response.bodyAsText ?? "";
+
+      if (response.status >= 400) {
         return {
           success: false,
-          error: `Azure ${service}:${action} returned ${res.status}`,
+          error: `Azure ${service}:${action} returned ${response.status}`,
           data,
-          metadata: { httpStatus: res.status, duration },
+          metadata: {
+            requestId: response.headers.get("x-ms-request-id") ?? undefined,
+            httpStatus: response.status,
+            duration,
+          },
         };
       }
 
@@ -129,8 +150,8 @@ export class AzureProvider implements CloudProvider {
         success: true,
         data,
         metadata: {
-          requestId: res.headers.get("x-ms-request-id") ?? undefined,
-          httpStatus: res.status,
+          requestId: response.headers.get("x-ms-request-id") ?? undefined,
+          httpStatus: response.status,
           duration,
         },
       };
