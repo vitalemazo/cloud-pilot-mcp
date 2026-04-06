@@ -84,7 +84,7 @@ const ConfigSchema = z.object({
       enabled: z.boolean().default(false),
       workspacesDir: z.string().default("~/.cloud-pilot/tofu-workspaces"),
       binary: z.string().default("tofu"),
-      stateBackend: z.enum(["local", "s3", "http", "consul", "pg"]).default("local"),
+      stateBackend: z.enum(["local", "s3", "http", "vault", "consul", "pg"]).default("local"),
       stateConfig: z
         .object({
           // S3 backend

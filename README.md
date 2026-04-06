@@ -454,7 +454,7 @@ tofu:
   enabled: true
   workspacesDir: ~/.cloud-pilot/tofu-workspaces  # Where workspaces and local state live
   binary: tofu                                    # Path to OpenTofu binary
-  stateBackend: local                             # local | s3 | http | consul | pg
+  stateBackend: local                             # local | s3 | vault | http | consul | pg
   timeoutMs: 300000                               # 5 min timeout for long operations
 ```
 
@@ -482,15 +482,36 @@ tofu:
     encrypt: true                 # Optional: encrypt state at rest
 ```
 
-**HTTP** — state via HTTP API. Compatible with HashiCorp Vault, Consul, or any custom backend.
+**Vault** — state stored directly in HashiCorp Vault KV v2. cloud-pilot runs an internal proxy that translates between OpenTofu's HTTP backend protocol and Vault's API. No external proxy service needed. State locking is implemented via Vault secrets.
+
+```yaml
+tofu:
+  stateBackend: vault
+  stateConfig:
+    address: https://vault.internal:8200          # Vault server address
+    path: secret/data/tofu-state                  # KV v2 path for state storage
+```
+
+Authentication uses cloud-pilot's existing Vault credentials — if you have `auth.type: vault` configured with AppRole, the same token is reused for state storage. Or set `VAULT_TOKEN` and `VAULT_ADDR` environment variables.
+
+How it works internally:
+```
+OpenTofu ──HTTP──> cloud-pilot vault proxy (127.0.0.1) ──Vault API──> Vault KV v2
+  GET /state/ws    →  GET  /v1/secret/data/tofu-state/ws     (unwrap response)
+  POST /state/ws   →  POST /v1/secret/data/tofu-state/ws     (wrap in {data:{}})
+  POST /lock/ws    →  POST /v1/secret/data/tofu-state-locks/ws
+  DELETE /lock/ws   →  DELETE /v1/secret/data/tofu-state-locks/ws
+```
+
+**HTTP** — state via any HTTP API. For custom backends that speak the OpenTofu HTTP state protocol.
 
 ```yaml
 tofu:
   stateBackend: http
   stateConfig:
-    address: https://vault.internal/v1/secret/data/tofu-state
-    username: tofu-agent          # Optional: basic auth
-    password: ${VAULT_TOKEN}
+    address: https://state-api.internal/v1/state
+    username: agent                # Optional: basic auth
+    password: secret
 ```
 
 **Consul** — state in Consul KV store with built-in locking.
@@ -993,7 +1014,7 @@ tofu:
   enabled: false             # Enable OpenTofu infrastructure lifecycle tool
   workspacesDir: /data/tofu-workspaces  # Persistent workspace storage
   binary: tofu               # Path to OpenTofu binary
-  stateBackend: local        # local | s3 | http
+  stateBackend: local        # local | s3 | vault | http | consul | pg
   # stateConfig:             # Backend-specific config
   #   bucket: my-state-bucket  # For s3 backend
   #   region: us-east-1

@@ -7,13 +7,14 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import type { Config } from "../config.js";
 import type { AuthProvider } from "../interfaces/auth.js";
+import { VaultStateProxy } from "./vault-state-proxy.js";
 
 const execFileAsync = promisify(execFile);
 
 export interface TofuConfig {
   workspacesDir: string;
   binary: string;
-  stateBackend: "local" | "s3" | "http" | "consul" | "pg";
+  stateBackend: "local" | "s3" | "http" | "consul" | "pg" | "vault";
   stateConfig?: {
     bucket?: string;
     region?: string;
@@ -54,6 +55,8 @@ export class TofuWorkspaceManager {
   private config: TofuConfig;
   private providerConfigs: Map<string, Config["providers"][number]>;
   private auth: AuthProvider;
+  private vaultProxy: VaultStateProxy | null = null;
+  private vaultProxyPort = 0;
 
   constructor(
     tofuConfig: Partial<TofuConfig> | undefined,
@@ -76,6 +79,52 @@ export class TofuWorkspaceManager {
     if (!existsSync(this.config.workspacesDir)) {
       mkdirSync(this.config.workspacesDir, { recursive: true });
     }
+  }
+
+  /** Start the Vault state proxy if vault backend is configured. */
+  async ensureVaultProxy(): Promise<void> {
+    if (this.config.stateBackend !== "vault" || this.vaultProxy) return;
+
+    // Resolve Vault credentials from auth provider
+    let vaultAddr = this.config.stateConfig?.address ?? "";
+    let vaultToken = "";
+
+    // Try to get Vault token from auth config or environment
+    if (process.env.VAULT_TOKEN) {
+      vaultToken = process.env.VAULT_TOKEN;
+    } else if (process.env.VAULT_ADDR) {
+      vaultAddr = vaultAddr || process.env.VAULT_ADDR;
+    }
+
+    // If no token from env, try to get from auth provider (Vault AppRole)
+    if (!vaultToken) {
+      try {
+        // The auth provider may have a Vault token from AppRole login
+        const creds = await this.auth.getCredentials("aws");
+        // Check if there's a vault token in the process env (set by VaultAuthProvider)
+        vaultToken = process.env.VAULT_TOKEN ?? "";
+      } catch { /* not available */ }
+    }
+
+    if (!vaultAddr || !vaultToken) {
+      throw new Error(
+        "Vault state backend requires vault address and token. " +
+        "Set stateConfig.address in config.yaml and VAULT_TOKEN env var, " +
+        "or configure auth.type: vault with AppRole credentials.",
+      );
+    }
+
+    const secretPath = this.config.stateConfig?.path
+      ?? this.config.stateConfig?.address?.replace(/^https?:\/\/[^/]+\/v1\//, "")
+      ?? "secret/data/tofu-state";
+
+    this.vaultProxy = new VaultStateProxy({
+      vaultAddr,
+      vaultToken,
+      secretPath,
+    });
+
+    this.vaultProxyPort = await this.vaultProxy.start();
   }
 
   /** Check if OpenTofu binary is available. */
@@ -152,6 +201,8 @@ export class TofuWorkspaceManager {
 
   /** Run tofu init on a workspace. */
   async init(workspace: string, providers: string[] = ["aws"]): Promise<TofuResult> {
+    // Start Vault proxy if vault backend is configured
+    await this.ensureVaultProxy();
     const dir = this.ensureWorkspace(workspace, providers);
     return this.runTofu(dir, ["init", "-input=false", "-no-color"]);
   }
@@ -406,6 +457,21 @@ export class TofuWorkspaceManager {
         if (sc?.schemaName) lines.push(`    schema_name = "${sc.schemaName}"`);
         lines.push(`  }`, `}`);
         return lines.join("\n");
+      }
+      case "vault": {
+        // Point to the internal Vault state proxy
+        const proxyBase = `http://127.0.0.1:${this.vaultProxyPort}`;
+        return [
+          `terraform {`,
+          `  backend "http" {`,
+          `    address        = "${proxyBase}/state/${workspace}"`,
+          `    lock_address   = "${proxyBase}/lock/${workspace}"`,
+          `    unlock_address = "${proxyBase}/lock/${workspace}"`,
+          `    lock_method    = "POST"`,
+          `    unlock_method  = "DELETE"`,
+          `  }`,
+          `}`,
+        ].join("\n");
       }
       case "local":
       default:
