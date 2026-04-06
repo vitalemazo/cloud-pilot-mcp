@@ -6,11 +6,25 @@ import type { AuditLogger } from "../interfaces/audit.js";
 import type { Config } from "../config.js";
 import { createApiBridge } from "../sandbox/api-bridge.js";
 import { executeInSandbox } from "../sandbox/runtime.js";
+import { SessionChangeset } from "../session/changeset.js";
 
 interface ExecuteArgs {
   provider: string;
   code: string;
   dryRun?: boolean;
+}
+
+// Per-session changeset tracker. Keyed by a sessionId-like identifier.
+// In practice, each MCP session gets its own server instance, so we use
+// the provider name as the key (one changeset per provider per session).
+const sessionChangesets = new Map<string, SessionChangeset>();
+
+function getChangeset(provider: string, sessionId?: string): SessionChangeset {
+  const key = sessionId ? `${sessionId}:${provider}` : provider;
+  if (!sessionChangesets.has(key)) {
+    sessionChangesets.set(key, new SessionChangeset());
+  }
+  return sessionChangesets.get(key)!;
 }
 
 export async function handleExecute(
@@ -19,6 +33,7 @@ export async function handleExecute(
   providerConfigs: Map<string, Config["providers"][number]>,
   audit: AuditLogger,
   config: Config,
+  sessionId?: string,
 ) {
   const start = Date.now();
   const cloudProvider = providers.get(args.provider);
@@ -62,12 +77,15 @@ export async function handleExecute(
   }
 
   const dryRun = args.dryRun ?? false;
+  const changeset = getChangeset(args.provider, sessionId);
 
   const bridge = createApiBridge({
     provider: cloudProvider,
     config: providerConfig,
     audit,
     dryRun,
+    sessionId,
+    changeset,
   });
 
   try {
@@ -91,7 +109,16 @@ export async function handleExecute(
     }
 
     if (dryRun) {
-      output.unshift("[DRY RUN] No actual API calls were made.\n");
+      output.unshift("[DRY RUN] Validated without executing.\n");
+
+      // Level 4: Append session summary after dry-run
+      const summary = changeset.formatSessionSummary();
+      if (summary !== "No resources created or modified in this session.") {
+        output.push(`\n${summary}`);
+      }
+    } else if (changeset.getResources().length > 0) {
+      // After real execution, show updated session state
+      output.push(`\n${changeset.formatSessionSummary()}`);
     }
 
     return {

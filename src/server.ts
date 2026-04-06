@@ -59,8 +59,11 @@ export function createServer(deps: ServerDeps): McpServer {
     "execute",
     "Execute JavaScript code in a sandboxed environment with access to cloud APIs via sdk.request({ service, action, params }). " +
       "Use console.log() for output. Follow engineering best practices: verify current state before modifying, " +
-      "use dryRun=true first for mutating operations, handle errors gracefully, and log what you intend to do. " +
-      "When making infrastructure changes, always confirm the result after execution.",
+      "IMPORTANT: You MUST use dryRun=true first for ALL mutating operations (create, update, delete). " +
+      "The server enforces this — mutating calls without a prior dry-run will be rejected. " +
+      "Dry-run validates against the cloud provider (AWS EC2 uses native DryRun), shows impact summaries, " +
+      "and tracks session resources for rollback planning. " +
+      "Handle errors gracefully and log what you intend to do.",
     {
       provider: z.enum(providerEnum as [string, ...string[]]).describe("Cloud provider to use"),
       code: z

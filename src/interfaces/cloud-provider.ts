@@ -46,5 +46,14 @@ export interface CloudProvider {
     action: string,
     params: Record<string, unknown>,
   ): Promise<CloudProviderCallResult>;
+  /** Validate a call against the cloud provider without executing it.
+   *  Returns success=true if the provider confirms the call would succeed.
+   *  Not all providers/operations support native dry-run — falls back to
+   *  client-side validation. */
+  dryRun?(
+    service: string,
+    action: string,
+    params: Record<string, unknown>,
+  ): Promise<CloudProviderCallResult & { validationSource: string }>;
   listServices(): string[];
 }

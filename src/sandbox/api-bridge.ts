@@ -4,6 +4,7 @@
 import type { CloudProvider, CloudProviderCallResult } from "../interfaces/cloud-provider.js";
 import type { AuditLogger, AuditEntry } from "../interfaces/audit.js";
 import type { ProviderConfig } from "../config.js";
+import type { SessionChangeset } from "../session/changeset.js";
 
 export interface ApiBridgeOptions {
   provider: CloudProvider;
@@ -11,6 +12,7 @@ export interface ApiBridgeOptions {
   audit: AuditLogger;
   dryRun: boolean;
   sessionId?: string;
+  changeset?: SessionChangeset;
 }
 
 export function createApiBridge(opts: ApiBridgeOptions) {
@@ -22,10 +24,45 @@ export function createApiBridge(opts: ApiBridgeOptions) {
     const params = JSON.parse(paramsJson) as Record<string, unknown>;
     const start = Date.now();
 
+    // ── Dry-run mode ────────────────────────────────────────────────
     if (opts.dryRun) {
+      // Level 3: Build impact summary
+      const impact = opts.changeset?.buildImpactSummary(service, action, params);
+
+      // Level 1: Try native provider dry-run if available
+      let validation: { success: boolean; error?: string; validationSource: string } | undefined;
+      if (opts.provider.dryRun) {
+        try {
+          validation = await opts.provider.dryRun(service, action, params);
+        } catch (err) {
+          validation = {
+            success: false,
+            error: err instanceof Error ? err.message : String(err),
+            validationSource: "provider-error",
+          };
+        }
+      }
+
+      // Level 2: Record this dry-run for the session gate
+      if (opts.changeset) {
+        opts.changeset.recordDryRun(service, action, params);
+      }
+
+      // Level 4: Include current session state
+      const sessionSummary = opts.changeset?.formatSessionSummary();
+
       const result = {
         dryRun: true,
         wouldCall: { provider: opts.provider.name, service, action, params },
+        validation: validation
+          ? {
+              validated: validation.success,
+              validationSource: validation.validationSource,
+              error: validation.error,
+            }
+          : { validated: false, validationSource: "skipped" },
+        impact: impact ?? undefined,
+        session: sessionSummary ?? undefined,
       };
 
       await opts.audit.log({
@@ -44,6 +81,27 @@ export function createApiBridge(opts: ApiBridgeOptions) {
       return JSON.stringify(result);
     }
 
+    // ── Real execution ──────────────────────────────────────────────
+
+    // Level 2: Enforce dry-run gate for mutating operations
+    if (opts.changeset?.isMutating(action) && !opts.changeset.wasDryRunPerformed(service, action, params)) {
+      const result = {
+        success: false,
+        error: `Mutating action "${action}" requires a dry-run first. ` +
+          `Call execute with dryRun: true before executing this operation.`,
+        requiresDryRun: true,
+      };
+
+      await logAudit(opts, {
+        service, action, params, start,
+        success: false,
+        error: result.error,
+      });
+
+      return JSON.stringify(result);
+    }
+
+    // Execute the real call
     let callResult: CloudProviderCallResult;
     try {
       callResult = await opts.provider.call(service, action, params);
@@ -51,6 +109,17 @@ export function createApiBridge(opts: ApiBridgeOptions) {
       const error = err instanceof Error ? err.message : String(err);
       await logAudit(opts, { service, action, params, start, success: false, error });
       return JSON.stringify({ success: false, error });
+    }
+
+    // Level 4: Track created/modified resources
+    if (callResult.success && opts.changeset?.isMutating(action)) {
+      opts.changeset.trackResource(
+        opts.provider.name,
+        service,
+        action,
+        params,
+        callResult.data,
+      );
     }
 
     await logAudit(opts, {

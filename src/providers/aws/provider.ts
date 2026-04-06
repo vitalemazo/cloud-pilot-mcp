@@ -254,6 +254,76 @@ export class AwsProvider implements CloudProvider {
     return null;
   }
 
+  // Services that support the native AWS DryRun parameter.
+  // EC2 supports it on most mutating operations.
+  private static readonly NATIVE_DRYRUN_SERVICES = new Set(["ec2"]);
+
+  async dryRun(
+    service: string,
+    action: string,
+    params: Record<string, unknown>,
+  ): Promise<CloudProviderCallResult & { validationSource: string }> {
+    // EC2 supports native DryRun — sends the request to AWS for validation
+    // without creating resources. AWS returns DryRunOperation on success.
+    if (AwsProvider.NATIVE_DRYRUN_SERVICES.has(service)) {
+      const dryRunParams = { ...params, DryRun: true };
+      const result = await this.call(service, action, dryRunParams);
+
+      // AWS returns an error with code "DryRunOperation" when the call WOULD succeed
+      if (!result.success && result.error?.includes("DryRunOperation")) {
+        return {
+          success: true,
+          data: { message: "AWS confirmed this operation would succeed" },
+          validationSource: "aws-native",
+          metadata: result.metadata,
+        };
+      }
+
+      // Any other error means the call would fail (permissions, quotas, etc.)
+      return {
+        ...result,
+        validationSource: "aws-native",
+      };
+    }
+
+    // Non-EC2 services: client-side validation only (check allowlist, mode, command exists)
+    this.enforceAllowlist(service, action);
+
+    const info = await this.resolveServiceInfo(service, action);
+    if (!info) {
+      return {
+        success: false,
+        error: `No AWS SDK client available for service "${service}"`,
+        validationSource: "client-side",
+      };
+    }
+
+    const pkgName = `@aws-sdk/client-${info.pkg}`;
+    try {
+      const mod = await import(pkgName) as Record<string, unknown>;
+      const commandName = `${action}Command`;
+      if (!mod[commandName]) {
+        return {
+          success: false,
+          error: `Command "${commandName}" not found in ${pkgName}`,
+          validationSource: "client-side",
+        };
+      }
+    } catch {
+      return {
+        success: false,
+        error: `AWS SDK package "${pkgName}" is not installed`,
+        validationSource: "client-side",
+      };
+    }
+
+    return {
+      success: true,
+      data: { message: "Client-side validation passed (command exists, service allowed)" },
+      validationSource: "client-side",
+    };
+  }
+
   private enforceAllowlist(service: string, action: string): void {
     if (
       this.config.allowedServices.length > 0 &&
