@@ -22,6 +22,8 @@
 
 When an agent connects, the server delivers a **Senior Cloud Platform Engineer persona** — complete with engineering principles, provider-specific expertise, safety awareness, and structured workflow prompts — so the agent automatically operates with production-grade cloud architecture and security standards.
 
+**[Watch the demo](https://github.com/vitalemazo/cloud-pilot-mcp/releases/tag/v0.2.0)** — deploying and destroying a three-tier AWS architecture (VPC, ALB, ASG, RDS) using the `tofu` tool.
+
 **What changed in v0.2:**
 - **Native SDK execution** — AWS calls use `@aws-sdk/client-*` packages (not custom HTTP). Azure uses `@azure/core-rest-pipeline` with automatic retry/throttling. Zero serialization bugs.
 - **OpenTofu integration** — new `tofu` tool for stateful infrastructure lifecycle: write HCL, plan, apply, destroy, import existing resources, drift detection, and rollback.
