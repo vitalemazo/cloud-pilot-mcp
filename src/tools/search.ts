@@ -36,7 +36,18 @@ export async function handleSearch(
     if (available.length > 0) {
       lines.push(``, `Available providers: ${available.join(", ")}`);
     } else {
-      lines.push(``, `No providers are currently configured. Add providers to config.yaml and ensure credentials are available.`);
+      lines.push(
+        ``,
+        `No providers are currently configured. This usually means provider initialization failed silently during startup.`,
+        ``,
+        `Common causes:`,
+        `- Config file not found (check CLOUD_PILOT_CONFIG env var or ensure config.yaml is in the working directory)`,
+        `- Credentials not available (expired Vault token, missing CLI auth, wrong secret key names)`,
+        `- Vault secretPath missing "data/" prefix for KV v2 (use "secret/data/..." not "secret/...")`,
+        ``,
+        `Check server stderr logs for "[cloud-pilot] WARNING: Failed to initialize provider" messages.`,
+        `See: https://github.com/vitalemazo/cloud-pilot-mcp#troubleshooting`,
+      );
     }
     return {
       content: [{ type: "text" as const, text: lines.join("\n") }],
