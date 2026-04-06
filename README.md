@@ -380,7 +380,7 @@ OpenTofu solves this:
 ```
 1. search   → "What APIs exist for VPC, subnets, ALB?"
 2. execute  → Read current state: "What VPCs exist? What's running?"
-3. tofu     → Write HCL → plan → review → apply → state tracked
+3. tofu     → registry (discover providers) → write HCL → init → plan → apply
              → Later: plan (drift check) → destroy (clean rollback)
 ```
 
@@ -444,6 +444,46 @@ Agent: "Has anything changed in prod-web since last apply?"
 ```
 
 The agent detects unauthorized changes and can either fix them (`tofu apply` to revert) or update the HCL to match.
+
+### Provider Registry Integration
+
+The `tofu` tool integrates with the [OpenTofu Registry](https://search.opentofu.org/providers) to automatically discover providers and their latest versions. No hardcoded version constraints — the agent queries the registry at runtime.
+
+**Search for a provider:**
+
+```
+→ tofu registry (resource: "aws")
+    [REGISTRY] Provider: hashicorp/aws
+    Latest version: 6.39.0
+    Source: registry.opentofu.org/hashicorp/aws
+    Recent versions: 6.39.0, 6.38.0, 6.37.0, ...
+
+    Usage in HCL:
+      terraform {
+        required_providers {
+          aws = {
+            source  = "hashicorp/aws"
+            version = "~> 6.0"
+          }
+        }
+      }
+
+→ tofu registry (resource: "cloudflare")
+    [REGISTRY] Provider: cloudflare/cloudflare
+    Latest version: 5.18.0
+
+→ tofu registry (resource: "kubernetes")
+    [REGISTRY] Provider: hashicorp/kubernetes
+    Latest version: 3.0.1
+```
+
+**Automatic version resolution:** When the agent writes HCL and runs `init`, cloud-pilot fetches the latest stable version from the registry for each provider instead of using hardcoded version constraints. This means:
+
+- New provider releases are picked up automatically
+- The agent can work with any provider in the registry, not just a preconfigured set
+- Common aliases are understood: `aws` → `hashicorp/aws`, `azure` → `hashicorp/azurerm`, `gcp` → `hashicorp/google`, `cloudflare` → `cloudflare/cloudflare`, `kubernetes` → `hashicorp/kubernetes`
+
+The full workflow becomes: `registry` (discover provider) → `write` (HCL) → `init` (downloads provider) → `plan` → `apply`.
 
 ### Configuration
 
@@ -564,6 +604,7 @@ Credentials are automatically injected from cloud-pilot's auth provider (Vault, 
 |---|---|---|
 | "What instances are running?" | `execute` | Fast read, no state needed |
 | "What APIs does EKS have?" | `search` | API discovery |
+| "What's the latest Cloudflare provider?" | `tofu registry` | Provider discovery from OpenTofu registry |
 | "Create a VPC with 6 subnets" | `tofu` | Stateful, rollbackable |
 | "Check CloudWatch metrics" | `execute` | Read-only, ad-hoc |
 | "Deploy a full environment" | `tofu` | Complex, needs dependency ordering |
