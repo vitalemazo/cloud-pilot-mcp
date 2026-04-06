@@ -1155,31 +1155,43 @@ When cloud providers launch new services, specs appear in their repositories wit
 
 ## Safety Model
 
-The agent never gets raw credentials. Code executes in a sandboxed environment with only `console.log` and `sdk.request()` available — no filesystem, network, process, or Node.js API access. Credentials live in the host process and are never exposed to the sandbox.
+Safety in cloud-pilot operates at multiple layers — from credential isolation and execution sandboxing, through dry-run validation and state management, to audit trails and policy enforcement. Every layer is configurable per provider and per deployment.
 
 ```
-  +--------------------------------------------------+
-  |              Credential Isolation                  |
-  |                                                    |
-  |   Host Process            Sandbox                  |
-  |  +---------------+    +--------------------+       |
-  |  | AWS keys      |    |  sdk.request()     |       |
-  |  | Azure tokens  |<-->|  bridge only       |       |
-  |  | GCP tokens    |    |                    |       |
-  |  | Alibaba keys  |    |  No fs / no net    |       |
-  |  +---------------+    |  No process access |       |
-  |                        +--------------------+       |
-  +--------------------------------------------------+
+  +----------------------------------------------------------------------+
+  |                        Safety Layers                                  |
+  |                                                                       |
+  |   Credentials         Execute Sandbox        OpenTofu                 |
+  |  +---------------+   +------------------+   +-------------------+     |
+  |  | Vault AppRole |   | sdk.request()    |   | tofu plan         |     |
+  |  | Env vars      |   | bridge only      |   |   (preview first) |     |
+  |  | Azure AD      |   |                  |   | tofu apply        |     |
+  |  | IAM roles     |   | No fs / no net   |   |   (state tracked) |     |
+  |  |               |   | No process access|   | tofu destroy      |     |
+  |  | Never exposed |   | Dry-run gate     |   |   (dependency     |     |
+  |  | to agent      |   | Impact warnings  |   |    order)         |     |
+  |  +---------------+   +------------------+   +-------------------+     |
+  |                                                                       |
+  |   Policy                 Audit                  State                  |
+  |  +---------------+   +------------------+   +-------------------+     |
+  |  | read-only     |   | Every API call   |   | Vault backend     |     |
+  |  | allowlists    |   | logged with      |   | S3 + DynamoDB     |     |
+  |  | blocklists    |   | timestamp, params|   | Consul / PG       |     |
+  |  | dryRunPolicy  |   | success/failure  |   | Drift detection   |     |
+  |  +---------------+   +------------------+   +-------------------+     |
+  +----------------------------------------------------------------------+
 ```
 
 | Control | How It Works |
 |---------|-------------|
-| **Read-only mode** | Blocks mutating operations. Default for all providers. |
+| **Credential isolation** | Credentials live in the host process (Vault, env, Azure AD). The sandbox and agent never see them. OpenTofu gets credentials injected per-execution. |
+| **Read-only mode** | Blocks mutating operations at the provider level. Default for all providers. |
 | **Service allowlist** | Only configured services can be called. Empty = all allowed. |
 | **Action blocklist** | Specific dangerous operations permanently blocked. |
-| **Dry-run system** | 4-level validation: native cloud provider dry-run, session-enforced gate, impact summaries, rollback planning. Configurable per provider. |
-| **Audit trail** | Every search and execution logged with timestamp, service, action, params, success/failure, duration. |
-| **Credential isolation** | Credentials live in the host process. The sandbox never sees them. |
+| **4-level dry-run** | Native cloud validation (AWS DryRun), session-enforced gate, impact summaries with cost warnings, rollback plans. Configurable per provider via `dryRunPolicy`. |
+| **OpenTofu state** | All infrastructure changes tracked in state files. Enables rollback, drift detection, and dependency-ordered teardown. State stored in Vault, S3, or other persistent backends. |
+| **Audit trail** | Every search, execute, and tofu operation logged with timestamp, service, action, params, success/failure, duration. Persisted to file or external systems. |
+| **Sandbox isolation** | Execute tool runs in a VM sandbox with no filesystem, network, or process access. Upgradable to container or MicroVM isolation for untrusted agents. |
 
 ### Safety Modes
 
