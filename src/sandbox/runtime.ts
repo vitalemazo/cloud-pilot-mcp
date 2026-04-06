@@ -296,7 +296,8 @@ export async function executeInSandbox(
         // Clear logs for clean re-run
         logs.length = 0;
 
-        return executeWithRetries();
+        // Must await so the try/finally doesn't dispose the VM mid-retry
+        return await executeWithRetries();
       }
 
       // No pending requests and first pass threw — return the original error

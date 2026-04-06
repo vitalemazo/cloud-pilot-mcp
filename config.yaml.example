@@ -43,7 +43,7 @@ specs:
 
 sandbox:
   memoryLimitMB: 128
-  timeoutMs: 30000
+  timeoutMs: 120000
 
 audit:
   type: file
