@@ -234,6 +234,12 @@ export class AwsProvider implements CloudProvider {
     }
     const body = queryParts.join("&");
 
+    // Debug: log request details for query protocol calls
+    if (process.env.CLOUD_PILOT_DEBUG === "true") {
+      console.error(`[cloud-pilot:debug] ${service}:${action} protocol=${meta?.protocol} endpoint=${endpointPrefix}`);
+      console.error(`[cloud-pilot:debug] body=${body}`);
+    }
+
     const start = Date.now();
     try {
       // Use endpointPrefix for signing — it matches AWS's expected signing
