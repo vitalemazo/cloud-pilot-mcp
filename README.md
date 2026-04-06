@@ -5,8 +5,9 @@
 <h1 align="center">cloud-pilot-mcp</h1>
 
 <p align="center">
-  Give AI agents the ability to control cloud infrastructure across<br/>
-  <b>AWS, Azure, GCP, and Alibaba Cloud</b> through natural language.
+  The multi-cloud infrastructure lifecycle platform for AI agents.<br/>
+  Discover, deploy, manage, and roll back infrastructure across<br/>
+  <b>AWS, Azure, GCP, and Alibaba Cloud</b> — with state tracking, safety controls, and full audit trail.
 </p>
 
 <p align="center">
@@ -14,23 +15,37 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT License"></a>
   <a href="https://github.com/vitalemazo/cloud-pilot-mcp/pkgs/container/cloud-pilot-mcp"><img src="https://img.shields.io/badge/docker-ghcr.io-blue?logo=docker&logoColor=white" alt="Docker"></a>
   <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/protocol-MCP-purple" alt="MCP"></a>
+  <a href="https://opentofu.org"><img src="https://img.shields.io/badge/IaC-OpenTofu-7B42BC" alt="OpenTofu"></a>
 </p>
 
 <br/>
 
-> cloud-pilot exposes three tools — **search**, **execute**, and **tofu** — that together cover **1,289+ services** and **51,900+ API operations** with full infrastructure lifecycle management. Discover APIs at runtime, execute scripts against live cloud state, and manage stateful deployments with plan/apply/destroy through OpenTofu.
+> cloud-pilot started as a two-tool API wrapper — search and execute. It evolved into a **full infrastructure lifecycle platform** with three tools covering **1,289+ services**, **51,900+ API operations**, and **stateful infrastructure management** through OpenTofu. Agents don't just call APIs — they deploy, observe, validate, roll back, and detect drift.
 
-When an agent connects, the server delivers a **Senior Cloud Platform Engineer persona** — complete with engineering principles, provider-specific expertise, safety awareness, and structured workflow prompts — so the agent automatically operates with production-grade cloud architecture and security standards.
+**Three tools, complete lifecycle:**
 
-**Demo: Three-tier AWS deployment with OpenTofu** — VPC, ALB, ASG, RDS deployed and destroyed via the `tofu` tool.
+| Tool | Purpose | Backed by |
+|------|---------|-----------|
+| **search** | Discover any cloud API across all providers at runtime | Dynamic spec index (botocore, Swagger, Discovery API) |
+| **execute** | Fast reads, ad-hoc scripts, multi-step queries against live state | Native SDKs (`@aws-sdk/client-*`, `@azure/core-rest-pipeline`, `google-auth-library`) |
+| **tofu** | Stateful infrastructure: plan, apply, destroy, import, drift detection, rollback | [OpenTofu](https://opentofu.org) with provider registry integration and Vault state backend |
+
+**Demo: Three-tier AWS deployment** — 29 resources (VPC, ALB, ASG, RDS) deployed and destroyed via the `tofu` tool.
 
 [![Watch the full demo](assets/demo-preview.gif)](https://github.com/vitalemazo/cloud-pilot-mcp/releases/tag/v0.2.0)
 
-**What changed in v0.2:**
-- **Native SDK execution** — AWS calls use `@aws-sdk/client-*` packages (not custom HTTP). Azure uses `@azure/core-rest-pipeline` with automatic retry/throttling. Zero serialization bugs.
-- **OpenTofu integration** — new `tofu` tool for stateful infrastructure lifecycle: write HCL, plan, apply, destroy, import existing resources, drift detection, and rollback.
-- **4-level dry-run system** — native cloud provider validation (AWS DryRun), session-enforced gate, impact summaries with cost warnings, and session changeset with rollback plans.
-- **Configurable safety** — `dryRunPolicy` per provider: `enforced` (interactive sessions), `optional` (approved automation), `disabled` (read-only bots).
+**How it evolved:**
+
+| v0.1 | v0.2 |
+|------|------|
+| Custom HTTP calls with homegrown SigV4 + XML parser | Native AWS SDK clients, Azure REST pipeline |
+| Two tools (search + execute) | Three tools (+ OpenTofu lifecycle) |
+| Stateless — no record of what was created | State-tracked with plan/apply/destroy/rollback |
+| "Here's what I would call" dry-run | 4-level dry-run: native cloud validation, session gate, impact summaries, rollback plans |
+| Hardcoded provider versions | Dynamic registry lookup from registry.opentofu.org |
+| No state persistence | Configurable backends: local, S3, Vault, Consul, PostgreSQL |
+
+When an agent connects, the server delivers a **Senior Cloud Platform Engineer persona** — complete with engineering principles, provider-specific expertise, safety awareness, and structured workflow prompts — so the agent automatically operates with production-grade cloud architecture and security standards.
 
 ---
 
@@ -38,12 +53,12 @@ When an agent connects, the server delivers a **Senior Cloud Platform Engineer p
 
 | Section | Description |
 |---------|-------------|
-| [The Problem](#the-problem) | Why existing approaches fall short |
-| [How It Works](#how-it-works) | The three-tool pattern: search, execute, tofu |
+| [The Problem](#the-problem) | Discovery, execution, and lifecycle — the three gaps in AI cloud management |
+| [How It Works](#how-it-works) | End-to-end example: three-tier AWS deployment in one conversation |
 | [Cloud Provider Coverage](#cloud-provider-coverage) | 4 providers, 1,289 services, 51,900+ operations |
 | [Architecture](#architecture) | System design and component overview |
 | [Built-In Cloud Engineering Persona](#built-in-cloud-engineering-persona) | Instructions, resources, prompts, configuration |
-| [Why cloud-pilot?](#why-cloud-pilot) | When you need a control plane between AI agents and your cloud |
+| [Why cloud-pilot?](#why-cloud-pilot) | What makes it different — comparison table and use cases |
 | [Agents That Act, Not Advise](#agents-that-act-not-advise) | How cloud-pilot turns AI from advisor to actor — real deployment example |
 | [Enterprise Integration](#enterprise-integration) | ServiceNow, Teams/Slack, and how MCP enables one integration for all clouds |
 | [Infrastructure Lifecycle with OpenTofu](#infrastructure-lifecycle-with-opentofu) | Stateful deployments: plan, apply, destroy, import, drift detection, rollback |
@@ -69,55 +84,56 @@ When an agent connects, the server delivers a **Senior Cloud Platform Engineer p
 
 ## The Problem
 
-Cloud providers expose thousands of API operations across hundreds of services. Traditional approaches to AI-driven cloud management either:
+AI agents managing cloud infrastructure face three compounding problems:
 
-- **Hard-code a handful of tools** (e.g., "list EC2 instances", "create S3 bucket") — limiting what the agent can do to what the developer anticipated
-- **Generate hundreds of MCP tools** from API specs — overwhelming the agent's context window and making tool selection unreliable
-- **Require manual updates** every time a cloud provider launches a new service
+1. **Discovery** — Cloud providers expose 51,900+ API operations. Hard-coding tools for each one doesn't scale. Generating hundreds of MCP tools overwhelms the agent's context window.
 
-cloud-pilot-mcp solves this with a **search-and-execute pattern**: the agent discovers what it needs at runtime, then calls it through a sandboxed execution environment. No pre-built tools, no fixed service list, no manual updates.
+2. **Execution** — Most AI tools generate Terraform files or CLI commands for a human to run. The AI advises but can't act. When something fails at step 12 of 20, the human debugs.
+
+3. **Lifecycle** — Creating resources is easy. Tracking what was created, detecting drift, rolling back failures, and tearing down in dependency order — that requires state management the AI doesn't have.
+
+cloud-pilot solves all three with three tools: **search** (discover APIs at runtime), **execute** (act on live infrastructure via native SDKs), and **tofu** (manage stateful lifecycle through OpenTofu with plan/apply/destroy).
 
 ---
 
 ## How It Works
 
+**Quick read: deploy a three-tier architecture in one conversation.**
+
 ```
-                  User                        Agent                      cloud-pilot-mcp
-                   |                            |                              |
-                   |  "Set up a Transit Gateway |                              |
-                   |   connecting three VPCs"    |                              |
-                   |--------------------------->|                              |
-                   |                            |                              |
-                   |                            |  search("transit gateway")   |
-                   |                            |----------------------------->|
-                   |                            |                              |
-                   |                            |  CreateTransitGateway,       |
-                   |                            |  CreateTGWVpcAttachment,     |
-                   |                            |  CreateTGWRouteTable + schemas|
-                   |                            |<-----------------------------|
-                   |                            |                              |
-                   |                            |  execute(provider: "aws",    |
-                   |                            |    code: sdk.request({       |
-                   |                            |      service: "ec2",         |
-                   |                            |      action: "CreateTGW",    |
-                   |                            |      params: {...}           |
-                   |                            |    })                        |
-                   |                            |----------------------------->|
-                   |                            |                              |  QuickJS
-                   |                            |                              |  Sandbox
-                   |                            |                              |----+
-                   |                            |                              |    | SigV4
-                   |                            |                              |    | signed
-                   |                            |                              |<---+
-                   |                            |  Transit Gateway ID, state   |
-                   |                            |<-----------------------------|
-                   |                            |                              |
-                   |  "Done! TGW tgw-0abc123    |                              |
-                   |   created in us-east-1"    |                              |
-                   |<---------------------------|                              |
+User: "Build a three-tier web app in AWS"
+
+Agent:
+  → search("VPC subnets ALB RDS")           # Discover the APIs
+  → execute(DescribeVpcs)                    # Check current state
+  → tofu registry("aws")                    # Resolve latest provider (v6.39.0)
+  → tofu write(hcl: VPC + subnets + ALB     # Write the infrastructure code
+      + ASG + RDS — 29 resources)
+  → tofu plan                               # Preview: "29 to add, 0 to change"
+  → tofu apply                              # Deploy — state tracked
+      ✓ VPC created
+      ✓ 6 subnets, IGW, NAT GW
+      ✓ ALB + target group + listener
+      ✓ ASG with 2 instances
+      ✓ RDS MySQL — all in dependency order
+
+  → "Done. ALB DNS: three-tier-alb-xxx.elb.amazonaws.com"
+
+--- Later ---
+
+User: "Tear it all down"
+
+  → tofu destroy                             # 29 resources destroyed
+      NAT GW → subnets → IGW → VPC          # Correct dependency order
+      RDS → DB subnet group → SGs            # State clean
 ```
 
-The agent reasons about what APIs exist, plans the sequence, and executes — all within the conversation.
+**What happened under the hood:**
+- `search` found the APIs without hardcoded tool definitions
+- `execute` queried live state via native AWS SDK (not custom HTTP)
+- `tofu` managed the full lifecycle — the agent wrote HCL, OpenTofu handled dependency ordering, state tracking, and teardown
+- The 4-level dry-run system validated permissions before any mutation
+- Credentials flowed from Vault → cloud-pilot → OpenTofu, never exposed to the agent
 
 ---
 
