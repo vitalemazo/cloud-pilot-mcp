@@ -1,15 +1,19 @@
 <p align="center">
-  <h1 align="center">cloud-pilot-mcp</h1>
-  <p align="center">
-    Give AI agents the ability to control cloud infrastructure across<br/>
-    <b>AWS, Azure, GCP, and Alibaba Cloud</b> through natural language.
-  </p>
-  <p align="center">
-    <a href="#quick-start"><img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen?logo=node.js&logoColor=white" alt="Node 20+"></a>
-    <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT License"></a>
-    <a href="https://github.com/vitalemazo/cloud-pilot-mcp/pkgs/container/cloud-pilot-mcp"><img src="https://img.shields.io/badge/docker-ghcr.io-blue?logo=docker&logoColor=white" alt="Docker"></a>
-    <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/protocol-MCP-purple" alt="MCP"></a>
-  </p>
+  <img src="assets/banner.png" alt="cloud-pilot-mcp — Multi-cloud MCP infrastructure control" width="100%"/>
+</p>
+
+<h1 align="center">cloud-pilot-mcp</h1>
+
+<p align="center">
+  Give AI agents the ability to control cloud infrastructure across<br/>
+  <b>AWS, Azure, GCP, and Alibaba Cloud</b> through natural language.
+</p>
+
+<p align="center">
+  <a href="#quick-start"><img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen?logo=node.js&logoColor=white" alt="Node 20+"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT License"></a>
+  <a href="https://github.com/vitalemazo/cloud-pilot-mcp/pkgs/container/cloud-pilot-mcp"><img src="https://img.shields.io/badge/docker-ghcr.io-blue?logo=docker&logoColor=white" alt="Docker"></a>
+  <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/protocol-MCP-purple" alt="MCP"></a>
 </p>
 
 <br/>
