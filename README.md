@@ -24,7 +24,7 @@ When an agent connects, the server delivers a **Senior Cloud Platform Engineer p
 
 **Demo: Three-tier AWS deployment with OpenTofu** — VPC, ALB, ASG, RDS deployed and destroyed via the `tofu` tool.
 
-https://github.com/vitalemazo/cloud-pilot-mcp/raw/main/assets/demo-three-tier-aws.mp4
+[![Watch the full demo](assets/demo-preview.gif)](https://github.com/vitalemazo/cloud-pilot-mcp/releases/tag/v0.2.0)
 
 **What changed in v0.2:**
 - **Native SDK execution** — AWS calls use `@aws-sdk/client-*` packages (not custom HTTP). Azure uses `@azure/core-rest-pipeline` with automatic retry/throttling. Zero serialization bugs.
