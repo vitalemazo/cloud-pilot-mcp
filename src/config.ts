@@ -69,6 +69,15 @@ const ConfigSchema = z.object({
       path: z.string().default("./audit.json"),
     })
     .default({}),
+  persona: z
+    .object({
+      enabled: z.boolean().default(true),
+      instructionsOverride: z.string().optional(),
+      additionalGuidance: z.string().optional(),
+      enablePrompts: z.boolean().default(true),
+      enableResources: z.boolean().default(true),
+    })
+    .default({}),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;
@@ -124,6 +133,12 @@ function applyEnvOverrides(raw: Record<string, unknown>): Record<string, unknown
     raw.specs = {
       ...(raw.specs as object),
       offline: process.env.CLOUD_PILOT_SPECS_OFFLINE === "true",
+    };
+  }
+  if (process.env.CLOUD_PILOT_PERSONA_ENABLED !== undefined) {
+    raw.persona = {
+      ...(raw.persona as object),
+      enabled: process.env.CLOUD_PILOT_PERSONA_ENABLED === "true",
     };
   }
   return raw;

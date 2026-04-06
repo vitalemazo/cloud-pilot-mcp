@@ -8,6 +8,7 @@ import type { AuditLogger } from "./interfaces/audit.js";
 import type { Config } from "./config.js";
 import { handleSearch } from "./tools/search.js";
 import { handleExecute } from "./tools/execute.js";
+import { buildInstructions, registerPersonaResources, registerPersonaPrompts } from "./persona/index.js";
 
 interface ServerDeps {
   providers: Map<string, CloudProvider>;
@@ -20,14 +21,27 @@ export function createServer(deps: ServerDeps): McpServer {
   const providerNames = Array.from(deps.providers.keys());
   const providerEnum = providerNames.length > 0 ? providerNames : ["aws"];
 
-  const server = new McpServer({
-    name: "cloud-pilot",
-    version: "0.1.0",
-  });
+  // Build persona instructions
+  let instructions: string | undefined;
+  if (deps.config.persona.enabled) {
+    instructions = deps.config.persona.instructionsOverride
+      ?? buildInstructions(providerNames, deps.providerConfigs);
+    if (deps.config.persona.additionalGuidance) {
+      instructions += `\n\n## Additional Guidance\n\n${deps.config.persona.additionalGuidance}`;
+    }
+  }
+
+  const server = new McpServer(
+    { name: "cloud-pilot", version: "0.1.0" },
+    instructions ? { instructions } : undefined,
+  );
 
   server.tool(
     "search",
-    "Search cloud provider API specifications to discover available operations, their parameters, and response schemas",
+    "Search cloud provider API specifications to discover available operations, their parameters, and response schemas. " +
+      "As a Senior Cloud Platform Engineer, always search before executing to understand the full API surface. " +
+      "Use specific service scopes when possible to get more relevant results. " +
+      "Consider searching for related operations (security, monitoring, IAM) alongside your primary operation.",
     {
       provider: z.enum(providerEnum as [string, ...string[]]).describe("Cloud provider to search"),
       query: z
@@ -43,7 +57,10 @@ export function createServer(deps: ServerDeps): McpServer {
 
   server.tool(
     "execute",
-    "Execute JavaScript code in a sandboxed environment with access to cloud APIs via sdk.request({ service, action, params })",
+    "Execute JavaScript code in a sandboxed environment with access to cloud APIs via sdk.request({ service, action, params }). " +
+      "Use console.log() for output. Follow engineering best practices: verify current state before modifying, " +
+      "use dryRun=true first for mutating operations, handle errors gracefully, and log what you intend to do. " +
+      "When making infrastructure changes, always confirm the result after execution.",
     {
       provider: z.enum(providerEnum as [string, ...string[]]).describe("Cloud provider to use"),
       code: z
@@ -59,6 +76,15 @@ export function createServer(deps: ServerDeps): McpServer {
     async (args) =>
       handleExecute(args, deps.providers, deps.providerConfigs, deps.audit, deps.config),
   );
+
+  // Register persona resources and prompts
+  if (deps.config.persona.enabled && deps.config.persona.enableResources) {
+    registerPersonaResources(server, deps.providers, deps.providerConfigs);
+  }
+
+  if (deps.config.persona.enabled && deps.config.persona.enablePrompts) {
+    registerPersonaPrompts(server, providerNames);
+  }
 
   return server;
 }
