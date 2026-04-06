@@ -267,29 +267,43 @@ Or via environment variable: `CLOUD_PILOT_PERSONA_ENABLED=false`
 
 ## Why cloud-pilot?
 
-If you're a developer with Claude Code or Cursor and your own AWS credentials, you don't need this — just run `aws` CLI commands directly. The AI already knows the CLI syntax, and you trust yourself with admin access.
+cloud-pilot is a **multi-cloud infrastructure lifecycle platform for AI agents**. It gives any MCP-compatible AI — Claude, ChatGPT, Cursor, custom bots — the ability to discover, deploy, manage, and roll back cloud infrastructure across AWS, Azure, and GCP with production-grade safety controls.
 
-**cloud-pilot exists for when the thing talking to your cloud isn't you in a terminal.** It's the control plane between untrusted or semi-trusted AI agents and your cloud accounts.
+### What makes it different
 
-### SaaS product — Cloud Copilot for your customers
+| Capability | Without cloud-pilot | With cloud-pilot |
+|---|---|---|
+| **Deploy infrastructure** | AI generates Terraform files for you to run | AI deploys directly via OpenTofu with plan/apply/destroy |
+| **Rollback a failed deploy** | Manual cleanup, hope you remember what was created | `tofu destroy` — state-tracked, dependency-ordered |
+| **Query live state** | Copy-paste CLI commands | `execute` — scripted multi-step reads in one call |
+| **Discover APIs** | Read documentation | `search` — 51,900+ operations, discoverable at runtime |
+| **Find the right provider** | Browse registry.opentofu.org manually | `tofu registry` — latest versions, HCL snippets |
+| **Safety controls** | IAM policies only | Read-only mode + allowlists + 4-level dry-run + audit trail |
+| **Drift detection** | Manual `terraform plan` | Agent runs `tofu plan`, flags unauthorized changes |
+| **Multi-cloud** | Different tools per cloud | One server, one conversation, all clouds |
+| **Credentials** | In the AI's config or environment | Isolated — Vault, IAM roles, managed identity. Agent never sees them. |
 
-You build a platform where customers connect their AWS/Azure/GCP accounts and their teams manage infrastructure through a chat interface. You can't give the AI raw credentials — you need read-only mode for junior engineers, read-write for seniors, a full audit trail for compliance, and service allowlists so nobody accidentally touches production databases. Cloud-pilot is the middleware that makes this safe.
+### Who it's for
 
-### Internal DevOps portal
+**Platform teams building AI-powered infrastructure management:**
 
-Your company has 50 engineers. Instead of giving everyone AWS console access with broad IAM policies, you deploy cloud-pilot behind an internal chat interface. Engineers ask "what's running in staging?" or "scale up the ECS service." The MCP enforces who can read vs write, logs every action, and the infra team reviews the audit trail. One set of credentials, controlled access, full visibility.
+You're building a product or internal tool where AI agents manage cloud infrastructure on behalf of users. You need controlled access (not raw admin), an audit trail, and the ability to roll back. cloud-pilot is the control plane between the AI and your cloud accounts.
 
-### Incident response bot
+**DevOps teams replacing manual workflows:**
 
-A PagerDuty alert fires at 3am. An automated agent connects via cloud-pilot, pulls CloudWatch metrics, checks EC2 instance status, grabs CloudTrail events, and posts a summary to Slack — all in read-only mode with a full audit log. No human needed for initial triage. No risk of the bot making things worse because it can't mutate anything.
+Your team manages AWS, Azure, and GCP. Instead of everyone having console access with broad IAM policies, you deploy cloud-pilot behind a chat interface (Teams, Slack, ServiceNow). Engineers ask questions and request changes in natural language. cloud-pilot enforces who can read vs write, validates every mutation with dry-run, and logs every action.
 
-### Multi-cloud management for consulting firms
+**Consulting firms managing client infrastructure:**
 
-A consulting firm manages AWS, Azure, and GCP for different clients. One MCP server per client, each with Vault-sourced credentials, allowlists scoped to their environment, and separate audit logs. Consultants use whatever AI tool they prefer — Claude, ChatGPT, Cursor — all go through cloud-pilot. Client switches providers? Reconfigure the MCP, the agent workflow doesn't change.
+One MCP server per client, each with Vault-sourced credentials, allowlists scoped to their environment, and separate audit logs. Consultants use whatever AI tool they prefer — all go through cloud-pilot. Client switches providers? Reconfigure, the workflow doesn't change.
 
-### CI/CD pipeline intelligence
+**Incident response automation:**
 
-An agent in your deployment pipeline uses cloud-pilot to verify infrastructure state before and after deployments — checks security groups, validates IAM policies, confirms RDS snapshots exist. Read-only, fully audited, no credentials in the pipeline config. If something looks wrong, it blocks the deploy and explains why.
+A PagerDuty alert fires at 3am. An agent connects via cloud-pilot in read-only mode, pulls CloudWatch metrics, checks instance status, grabs CloudTrail events, and posts a triage summary to Slack — with a full audit log. No human needed for initial triage. No risk of the bot making things worse.
+
+**CI/CD pipeline intelligence:**
+
+An agent in your deployment pipeline uses cloud-pilot to deploy infrastructure via OpenTofu, verify state after deployment, and roll back if something looks wrong. State is tracked in Vault, audit trail feeds into your compliance system.
 
 ---
 
