@@ -41,16 +41,14 @@ async function main() {
   const server = createServer({ providers, providerConfigs, audit, config });
 
   if (config.transport === "http") {
-    const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: () => randomUUID(),
-    });
-    await server.connect(transport);
+    // Session management: each client gets its own transport, all sharing the same server deps
+    const sessions = new Map<string, StreamableHTTPServerTransport>();
 
     // Rate limiter: simple sliding window per IP
     const rateMap = new Map<string, { count: number; resetAt: number }>();
     const rateLimit = config.http.rateLimitPerMinute;
 
-    const httpServer = createHttpServer((req, res) => {
+    const httpServer = createHttpServer(async (req, res) => {
       const start = Date.now();
       const clientIp =
         (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ??
@@ -85,6 +83,7 @@ async function main() {
           JSON.stringify({
             status: "ok",
             providers: Array.from(providers.keys()),
+            sessions: sessions.size,
             uptime: process.uptime(),
           }),
         );
@@ -134,9 +133,45 @@ async function main() {
         );
       });
 
-      // MCP endpoint
+      // MCP endpoint — route to existing session or create new one
       if (req.url === "/mcp" || req.url === "/") {
-        transport.handleRequest(req, res);
+        const sessionId = req.headers["mcp-session-id"] as string | undefined;
+
+        if (sessionId && sessions.has(sessionId)) {
+          // Existing session
+          const transport = sessions.get(sessionId)!;
+          await transport.handleRequest(req, res);
+        } else if (!sessionId || req.method === "POST") {
+          // New session — create transport, connect a fresh server instance, handle request
+          const transport = new StreamableHTTPServerTransport({
+            sessionIdGenerator: () => randomUUID(),
+          });
+          const sessionServer = createServer({ providers, providerConfigs, audit, config });
+          await sessionServer.connect(transport);
+
+          // Track session cleanup
+          transport.onclose = () => {
+            const sid = [...sessions.entries()].find(([, t]) => t === transport)?.[0];
+            if (sid) {
+              sessions.delete(sid);
+              console.error(`[cloud-pilot] Session ${sid.slice(0, 8)}... closed (${sessions.size} active)`);
+            }
+          };
+
+          await transport.handleRequest(req, res);
+
+          // After handling, the transport should have a session ID in the response
+          // Find the session ID from the response headers
+          const newSessionId = res.getHeader("mcp-session-id") as string | undefined;
+          if (newSessionId) {
+            sessions.set(newSessionId, transport);
+            console.error(`[cloud-pilot] New session ${newSessionId.slice(0, 8)}... from ${clientIp} (${sessions.size} active)`);
+          }
+        } else {
+          // Invalid session ID
+          res.writeHead(404, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Session not found" }));
+        }
         return;
       }
 
