@@ -64,9 +64,11 @@ function parseXml(xml: string): Record<string, unknown> {
 
 // Flatten params into query string key=value pairs for AWS query protocol.
 // Handles nested objects and arrays using the dot-notation AWS expects.
+// EC2 protocol uses Key.N, standard query protocol uses Key.member.N.
 function flattenParams(
   params: Record<string, unknown>,
   prefix = "",
+  useMemberTag = false,
 ): Record<string, string> {
   const result: Record<string, string> = {};
 
@@ -77,15 +79,17 @@ function flattenParams(
 
     if (Array.isArray(value)) {
       for (let i = 0; i < value.length; i++) {
-        const itemPrefix = `${fullKey}.${i + 1}`;
+        const itemPrefix = useMemberTag
+          ? `${fullKey}.member.${i + 1}`
+          : `${fullKey}.${i + 1}`;
         if (typeof value[i] === "object" && value[i] !== null) {
-          Object.assign(result, flattenParams(value[i] as Record<string, unknown>, itemPrefix));
+          Object.assign(result, flattenParams(value[i] as Record<string, unknown>, itemPrefix, useMemberTag));
         } else {
           result[itemPrefix] = String(value[i]);
         }
       }
     } else if (typeof value === "object") {
-      Object.assign(result, flattenParams(value as Record<string, unknown>, fullKey));
+      Object.assign(result, flattenParams(value as Record<string, unknown>, fullKey, useMemberTag));
     } else {
       result[fullKey] = String(value);
     }
@@ -218,8 +222,9 @@ export class AwsProvider implements CloudProvider {
   ): Promise<CloudProviderCallResult> {
     const apiVersion = meta?.apiVersion ?? "";
 
-    // Build query-string body
-    const flatParams = flattenParams(params);
+    // EC2 protocol uses Key.N, standard query uses Key.member.N
+    const useMemberTag = (meta?.protocol ?? "query") !== "ec2";
+    const flatParams = flattenParams(params, "", useMemberTag);
     const queryParts: string[] = [
       `Action=${encodeURIComponent(action)}`,
       `Version=${encodeURIComponent(apiVersion)}`,
