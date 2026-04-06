@@ -231,6 +231,10 @@ export class AwsProvider implements CloudProvider {
 
     const start = Date.now();
     try {
+      // Use endpointPrefix for signing — it matches AWS's expected signing
+      // service name (e.g. "elasticloadbalancing" not "elbv2")
+      const signingService = endpointPrefix;
+
       const res = await this.fetchWithFallback(endpointPrefix, region, async (endpoint) => {
         const headers = await signRequest({
           method: "POST",
@@ -243,7 +247,7 @@ export class AwsProvider implements CloudProvider {
           secretAccessKey: creds.secretAccessKey,
           sessionToken: creds.sessionToken,
           region,
-          service,
+          service: signingService,
         });
         return fetch(endpoint, { method: "POST", headers, body });
       });
@@ -319,6 +323,7 @@ export class AwsProvider implements CloudProvider {
     }
     const queryString = queryParts.length > 0 ? `?${queryParts.join("&")}` : "";
 
+    const signingService = endpointPrefix;
     const start = Date.now();
     try {
       const res = await this.fetchWithFallback(endpointPrefix, region, async (endpoint) => {
@@ -332,7 +337,7 @@ export class AwsProvider implements CloudProvider {
           secretAccessKey: creds.secretAccessKey,
           sessionToken: creds.sessionToken,
           region,
-          service,
+          service: signingService,
         });
         return fetch(fullUrl, { method, headers });
       });
@@ -383,6 +388,7 @@ export class AwsProvider implements CloudProvider {
     const targetPrefix = meta?.targetPrefix ?? "";
     const target = targetPrefix ? `${targetPrefix}.${action}` : action;
 
+    const signingService = endpointPrefix;
     const start = Date.now();
     try {
       const res = await this.fetchWithFallback(endpointPrefix, region, async (endpoint) => {
@@ -398,7 +404,7 @@ export class AwsProvider implements CloudProvider {
           secretAccessKey: creds.secretAccessKey,
           sessionToken: creds.sessionToken,
           region,
-          service,
+          service: signingService,
         });
         return fetch(endpoint, { method: "POST", headers, body });
       });
