@@ -8,6 +8,14 @@ export interface ParamSpec {
   description?: string;
 }
 
+export interface ServiceMetadata {
+  protocol?: string;       // "ec2" | "query" | "json" | "rest-json" | "rest-xml"
+  targetPrefix?: string;   // For JSON protocol (e.g., "AmazonEC2ContainerServiceV20141113")
+  apiVersion?: string;     // e.g., "2016-11-15"
+  endpointPrefix?: string; // e.g., "ec2", may differ from service name
+  jsonVersion?: string;    // e.g., "1.1"
+}
+
 export interface OperationSpec {
   service: string;
   operation: string;
@@ -15,6 +23,7 @@ export interface OperationSpec {
   description: string;
   inputParams: ParamSpec[];
   outputFields: ParamSpec[];
+  serviceMetadata?: ServiceMetadata;
 }
 
 export interface CloudProviderCallResult {

@@ -2,7 +2,7 @@
 // Licensed under the MIT License. See LICENSE file in the project root.
 
 import { readFileSync, existsSync, readdirSync } from "node:fs";
-import type { OperationSpec, ParamSpec } from "../../interfaces/cloud-provider.js";
+import type { OperationSpec, ParamSpec, ServiceMetadata } from "../../interfaces/cloud-provider.js";
 
 interface BotocoreShape {
   type: string;
@@ -24,6 +24,9 @@ interface BotocoreServiceModel {
     serviceFullName: string;
     endpointPrefix: string;
     protocol: string;
+    targetPrefix?: string;
+    apiVersion?: string;
+    jsonVersion?: string;
   };
   operations: Record<string, BotocoreOperation>;
   shapes: Record<string, BotocoreShape>;
@@ -112,6 +115,13 @@ export class AwsSpecIndex {
       description: stripHtml(op.documentation ?? ""),
       inputParams,
       outputFields,
+      serviceMetadata: {
+        protocol: model.metadata.protocol,
+        targetPrefix: model.metadata.targetPrefix,
+        apiVersion: model.metadata.apiVersion,
+        endpointPrefix: model.metadata.endpointPrefix,
+        jsonVersion: model.metadata.jsonVersion,
+      },
     };
   }
 

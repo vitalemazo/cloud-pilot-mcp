@@ -545,11 +545,18 @@ function extractAwsOperationSpec(
   rawSpec: unknown,
 ): OperationSpec | null {
   const spec = rawSpec as {
+    metadata?: {
+      protocol?: string;
+      targetPrefix?: string;
+      apiVersion?: string;
+      endpointPrefix?: string;
+      jsonVersion?: string;
+    };
     operations?: Record<
       string,
       {
         name: string;
-        http?: { method: string };
+        http?: { method: string; requestUri?: string };
         input?: { shape: string };
         output?: { shape: string };
         documentation?: string;
@@ -585,6 +592,15 @@ function extractAwsOperationSpec(
     description: stripHtml(op.documentation ?? ""),
     inputParams,
     outputFields,
+    serviceMetadata: spec.metadata
+      ? {
+          protocol: spec.metadata.protocol,
+          targetPrefix: spec.metadata.targetPrefix,
+          apiVersion: spec.metadata.apiVersion,
+          endpointPrefix: spec.metadata.endpointPrefix,
+          jsonVersion: spec.metadata.jsonVersion,
+        }
+      : undefined,
   };
 }
 
