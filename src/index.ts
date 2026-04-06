@@ -29,9 +29,15 @@ import type { AuthProvider } from "./interfaces/auth.js";
 import type { AuditLogger } from "./interfaces/audit.js";
 import type { CloudProvider } from "./interfaces/cloud-provider.js";
 import type { Config } from "./config.js";
-import { resolve } from "node:path";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const PROJECT_ROOT = resolve(__dirname, "..");
 
 async function main() {
+  process.chdir(PROJECT_ROOT);
   const config = loadConfig();
 
   const auth = buildAuth(config);
@@ -326,9 +332,14 @@ async function buildProviders(
       }
       console.error(`[cloud-pilot] Provider "${pc.type}" initialized (${pc.mode}, region: ${pc.region})`);
     } catch (err) {
-      console.error(
-        `[cloud-pilot] WARNING: Failed to initialize provider "${pc.type}": ${err instanceof Error ? err.message : String(err)}`,
-      );
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`[cloud-pilot] WARNING: Failed to initialize provider "${pc.type}": ${msg}`);
+      if (msg.includes("Vault") || msg.includes("403") || msg.includes("401")) {
+        console.error(`[cloud-pilot]   Hint: Check Vault address, AppRole credentials, and secretPath. For KV v2, secretPath must include "data/" (e.g., "secret/data/cloud-pilot").`);
+      }
+      if (msg.includes("ENOENT") || msg.includes("not found")) {
+        console.error(`[cloud-pilot]   Hint: Ensure the server is running from the project root, or set CLOUD_PILOT_CONFIG to the absolute path of config.yaml.`);
+      }
     }
   }
 

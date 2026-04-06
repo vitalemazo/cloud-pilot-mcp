@@ -331,19 +331,92 @@ ALIBABA_CLOUD_REGION=cn-hangzhou
 
 #### Vault Integration
 
-For production deployments, credentials can be sourced from **HashiCorp Vault** via AppRole auth. Set `auth.type: vault` in `config.yaml` and configure the Vault connection:
+For production deployments, credentials can be sourced from **HashiCorp Vault** via AppRole auth. This keeps secrets out of config files and environment variables.
+
+##### Step 1: Create Vault Secrets
+
+Create a secret for each cloud provider at `secret/cloud-pilot/{provider}`. The server reads from `{secretPath}/{provider}` and maps fields automatically.
+
+**AWS example:**
+```bash
+vault kv put secret/cloud-pilot/aws \
+  access_key_id="AKIA..." \
+  secret_access_key="..." \
+  region="us-east-1"
+```
+
+**Expected key names per provider:**
+
+| Provider | Required Keys | Optional Keys |
+|----------|--------------|---------------|
+| **AWS** | `access_key_id`, `secret_access_key` | `session_token`, `region` (default: us-east-1) |
+| **Azure** | `tenant_id`, `client_id`, `client_secret` | `subscription_id` |
+| **GCP** | `access_token`, `project_id` | |
+| **Alibaba** | `access_key_id`, `access_key_secret` | `security_token`, `region` (default: cn-hangzhou) |
+
+##### Step 2: Create an AppRole
+
+Create a Vault AppRole with read access to the secret path:
+
+```bash
+# Enable AppRole auth (if not already)
+vault auth enable approle
+
+# Create a policy
+vault policy write cloud-pilot - <<EOF
+path "secret/data/cloud-pilot/*" {
+  capabilities = ["read"]
+}
+EOF
+
+# Create the AppRole
+vault write auth/approle/role/cloud-pilot \
+  token_policies="cloud-pilot" \
+  token_ttl=1h \
+  token_max_ttl=4h
+
+# Get the role ID and secret ID
+vault read auth/approle/role/cloud-pilot/role-id
+vault write -f auth/approle/role/cloud-pilot/secret-id
+```
+
+##### Step 3: Configure cloud-pilot
+
+Set `auth.type: vault` in `config.yaml`:
 
 ```yaml
 auth:
   type: vault
   vault:
     address: https://vault.example.com
-    roleId: "..."       # or VAULT_ROLE_ID env var
-    secretId: "..."     # or VAULT_SECRET_ID env var
-    secretPath: secret/cloud-pilot   # reads secret/cloud-pilot/{aws,azure,gcp,alibaba}
+    roleId: "905670cc-..."       # or VAULT_ROLE_ID env var
+    secretId: "6e84df5b-..."     # or VAULT_SECRET_ID env var
+    secretPath: secret/data/cloud-pilot   # KV v2 API path (includes data/)
 ```
 
-Vault secrets are read from `{secretPath}/{provider}` and mapped to credentials automatically. All four providers are supported.
+> **Important:** For KV v2 secret engines (the default), `secretPath` must include `data/` in the path. The server reads via the HTTP API directly, which requires the full KV v2 path: `secret/data/cloud-pilot`, not `secret/cloud-pilot`. The `vault kv` CLI handles this prefix automatically, but the HTTP API does not.
+
+Or configure via environment variables:
+
+```bash
+export VAULT_ADDR="https://vault.example.com"
+export VAULT_ROLE_ID="905670cc-..."
+export VAULT_SECRET_ID="6e84df5b-..."
+```
+
+##### Step 4: Verify
+
+Test the connection before starting the server:
+
+```bash
+# Verify AppRole login works
+vault write auth/approle/login \
+  role_id="$VAULT_ROLE_ID" \
+  secret_id="$VAULT_SECRET_ID"
+
+# Verify secret is readable
+vault kv get secret/cloud-pilot/aws
+```
 
 #### Resilient Provider Initialization
 
@@ -687,6 +760,111 @@ test/
 | Azure Foundry | Streamable HTTP | Azure AD / Managed Identity | Native Azure auth |
 | AWS ECS/Lambda | Streamable HTTP | IAM Role | Native AWS auth |
 | Kubernetes | Streamable HTTP | Vault / Workload Identity | Sidecar or standalone pod |
+
+## Troubleshooting
+
+### "No providers are currently configured"
+
+This is the most common issue. The server started but no cloud providers initialized successfully. Provider failures are non-fatal — the server logs a warning to stderr and continues without the failed provider.
+
+**Check the logs.** The server logs to stderr. Look for lines like:
+```
+[cloud-pilot] WARNING: Failed to initialize provider "aws": <reason>
+```
+
+Common causes:
+
+#### 1. Credentials not found or invalid
+
+- **env auth**: Verify your CLI is authenticated (`aws sts get-caller-identity`, `az account show`, etc.)
+- **vault auth**: Verify AppRole login works and the secret path is correct (see [Vault Integration](#vault-integration))
+- **Expired tokens**: Vault tokens and cloud provider sessions expire. Re-authenticate and restart the server.
+
+#### 2. Config file not found
+
+The server looks for config in this order: `$CLOUD_PILOT_CONFIG` env var, `config.local.yaml`, `config.yaml` — all relative to the **working directory**. When an MCP client spawns the server as a subprocess, the working directory may not be the project root.
+
+**Fix:** The server automatically resolves its project root from the script location, but if you've moved `dist/index.js` or are running from a symlink, set the config path explicitly:
+
+```bash
+export CLOUD_PILOT_CONFIG=/absolute/path/to/config.yaml
+```
+
+Or in your MCP client config:
+```json
+{
+  "mcpServers": {
+    "cloud-pilot": {
+      "command": "node",
+      "args": ["/path/to/cloud-pilot-mcp/dist/index.js"],
+      "env": {
+        "CLOUD_PILOT_CONFIG": "/path/to/cloud-pilot-mcp/config.yaml"
+      }
+    }
+  }
+}
+```
+
+#### 3. Vault `secretPath` missing `data/` prefix
+
+If using Vault KV v2 (the default since Vault 1.1), the HTTP API path must include `/data/`:
+
+| Vault CLI command | HTTP API path (for `secretPath`) |
+|---|---|
+| `vault kv get secret/cloud-pilot/aws` | `secret/data/cloud-pilot` |
+| `vault kv get kv/myapp/aws` | `kv/data/myapp` |
+
+The `vault kv` CLI adds the `/data/` prefix automatically. The server's Vault client uses the HTTP API directly, so you must include it.
+
+#### 4. Vault secret key naming mismatch
+
+The server expects specific key names in each Vault secret. If your existing secrets use different names (e.g., `access_key` instead of `access_key_id`), the credentials will be `undefined` and the provider will fail.
+
+See the [expected key names table](#step-1-create-vault-secrets) and verify your secrets match:
+
+```bash
+vault kv get -format=json secret/cloud-pilot/aws | jq '.data.data | keys'
+# Should output: ["access_key_id", "region", "secret_access_key"]
+```
+
+### Provider initialized but search returns no results
+
+The operation index builds progressively in the background after first startup. If you search immediately after a cold start, results may be limited. Watch stderr for:
+
+```
+[cloud-pilot] Starting background operation index build for aws...
+[cloud-pilot] Background index build complete for aws
+```
+
+Pre-download specs for faster cold starts:
+```bash
+npm run download-specs
+```
+
+### Testing provider connectivity
+
+Verify credentials work end-to-end before debugging the MCP layer:
+
+```bash
+# Direct test (from the project directory)
+node -e "
+  const { loadConfig } = await import('./dist/config.js');
+  const { VaultAuthProvider } = await import('./dist/auth/vault.js');
+  const config = loadConfig();
+  const auth = new VaultAuthProvider(config.auth.vault);
+  const creds = await auth.getCredentials('aws');
+  console.log('Keys:', Object.keys(creds.aws));
+  console.log('Has accessKeyId:', !!creds.aws.accessKeyId);
+  console.log('Region:', creds.aws.region);
+"
+```
+
+For env auth, verify the CLI works:
+```bash
+aws sts get-caller-identity   # AWS
+az account show               # Azure
+gcloud auth print-access-token # GCP
+```
 
 ## Author
 
