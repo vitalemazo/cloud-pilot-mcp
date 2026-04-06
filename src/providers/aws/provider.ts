@@ -178,8 +178,7 @@ export class AwsProvider implements CloudProvider {
           endpointPrefix, service, action, params, meta, creds.aws, region,
         );
       case "rest-xml":
-        // For S3 and similar — use query protocol with XML parsing
-        return this.callQueryProtocol(
+        return this.callRestXmlProtocol(
           endpointPrefix, service, action, params, meta, creds.aws, region,
         );
       default:
@@ -303,6 +302,82 @@ export class AwsProvider implements CloudProvider {
       return {
         success: true,
         data: unwrapped,
+        metadata: {
+          requestId: res.headers.get("x-amz-request-id") ?? undefined,
+          httpStatus: res.status,
+          duration,
+        },
+      };
+    } catch (err) {
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : String(err),
+        metadata: { duration: Date.now() - start },
+      };
+    }
+  }
+
+  private async callRestXmlProtocol(
+    endpointPrefix: string,
+    service: string,
+    action: string,
+    params: Record<string, unknown>,
+    meta: ServiceMetadata | undefined,
+    creds: { accessKeyId: string; secretAccessKey: string; sessionToken?: string; region: string },
+    region: string,
+  ): Promise<CloudProviderCallResult> {
+    // REST-XML services (S3, CloudFront, Route53) use HTTP method + path
+    // to identify the operation. For listing operations, use GET with
+    // params as query string. For operations on specific resources,
+    // the resource identifier goes in the path.
+    const method = "GET";
+    const path = "/";
+    const body = "";
+
+    // Build query string from params (if any)
+    const queryParts: string[] = [];
+    for (const [k, v] of Object.entries(params)) {
+      if (v !== undefined && v !== null) {
+        queryParts.push(`${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`);
+      }
+    }
+    const queryString = queryParts.length > 0 ? `?${queryParts.join("&")}` : "";
+
+    const start = Date.now();
+    try {
+      const res = await this.fetchWithFallback(endpointPrefix, region, (endpoint) => {
+        const fullUrl = `${endpoint}${path}${queryString}`;
+        const headers = signRequest({
+          method,
+          url: fullUrl,
+          headers: {},
+          body,
+          accessKeyId: creds.accessKeyId,
+          secretAccessKey: creds.secretAccessKey,
+          sessionToken: creds.sessionToken,
+          region,
+          service,
+        });
+        return fetch(fullUrl, { method, headers });
+      });
+
+      const text = await res.text();
+      const duration = Date.now() - start;
+      const data = parseXml(text);
+
+      if (!res.ok) {
+        const errorInfo = (data as Record<string, unknown>).Error ?? data;
+        return {
+          success: false,
+          error: `AWS ${service}:${action} returned ${res.status}`,
+          data: errorInfo,
+          metadata: { httpStatus: res.status, duration },
+        };
+      }
+
+      return {
+        success: true,
+        data,
         metadata: {
           requestId: res.headers.get("x-amz-request-id") ?? undefined,
           httpStatus: res.status,
