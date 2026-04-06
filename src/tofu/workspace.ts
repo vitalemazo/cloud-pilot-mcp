@@ -6,6 +6,7 @@ import { resolve, join } from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import type { Config } from "../config.js";
+import type { AuthProvider } from "../interfaces/auth.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -38,13 +39,16 @@ const DEFAULT_TOFU_CONFIG: TofuConfig = {
 export class TofuWorkspaceManager {
   private config: TofuConfig;
   private providerConfigs: Map<string, Config["providers"][number]>;
+  private auth: AuthProvider;
 
   constructor(
     tofuConfig: Partial<TofuConfig> | undefined,
     providerConfigs: Map<string, Config["providers"][number]>,
+    auth: AuthProvider,
   ) {
     this.config = { ...DEFAULT_TOFU_CONFIG, ...tofuConfig };
     this.providerConfigs = providerConfigs;
+    this.auth = auth;
 
     // Ensure workspaces directory exists
     if (!existsSync(this.config.workspacesDir)) {
@@ -188,12 +192,52 @@ export class TofuWorkspaceManager {
     return this.runTofu(dir, ["show", "-no-color"]);
   }
 
+  /** Resolve cloud credentials and inject them as environment variables. */
+  private async resolveCredentialEnv(): Promise<Record<string, string>> {
+    const env: Record<string, string> = {};
+
+    // AWS credentials
+    try {
+      const creds = await this.auth.getCredentials("aws");
+      if (creds.aws) {
+        env.AWS_ACCESS_KEY_ID = creds.aws.accessKeyId;
+        env.AWS_SECRET_ACCESS_KEY = creds.aws.secretAccessKey;
+        if (creds.aws.sessionToken) env.AWS_SESSION_TOKEN = creds.aws.sessionToken;
+        env.AWS_REGION = creds.aws.region;
+      }
+    } catch { /* AWS not configured */ }
+
+    // Azure credentials (tofu uses ARM_* env vars)
+    try {
+      const creds = await this.auth.getCredentials("azure");
+      if (creds.azure) {
+        env.ARM_TENANT_ID = creds.azure.tenantId ?? "";
+        env.ARM_CLIENT_ID = creds.azure.clientId ?? "";
+        if (creds.azure.accessToken) env.ARM_ACCESS_TOKEN = creds.azure.accessToken;
+        if (creds.azure.subscriptionId) env.ARM_SUBSCRIPTION_ID = creds.azure.subscriptionId;
+      }
+    } catch { /* Azure not configured */ }
+
+    // GCP credentials (tofu uses GOOGLE_* env vars)
+    try {
+      const creds = await this.auth.getCredentials("gcp");
+      if (creds.gcp) {
+        env.GOOGLE_OAUTH_ACCESS_TOKEN = creds.gcp.accessToken;
+        if (creds.gcp.projectId) env.GOOGLE_PROJECT = creds.gcp.projectId;
+      }
+    } catch { /* GCP not configured */ }
+
+    return env;
+  }
+
   /** Execute a tofu command in a workspace directory. */
   private async runTofu(cwd: string, args: string[]): Promise<TofuResult> {
     try {
-      // Pass through cloud credential env vars
+      // Inject cloud credentials from auth provider into child process
+      const credEnv = await this.resolveCredentialEnv();
       const env = {
         ...process.env,
+        ...credEnv,
         TF_IN_AUTOMATION: "true",
         TF_INPUT: "false",
       };

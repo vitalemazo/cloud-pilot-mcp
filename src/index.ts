@@ -44,7 +44,7 @@ async function main() {
   const audit = buildAudit(config);
   const { providers, providerConfigs } = await buildProviders(config, auth);
 
-  const server = createServer({ providers, providerConfigs, audit, config });
+  const server = createServer({ providers, providerConfigs, audit, config, auth });
 
   if (config.transport === "http") {
     // Session management: each client gets its own transport, all sharing the same server deps
@@ -152,7 +152,7 @@ async function main() {
           const transport = new StreamableHTTPServerTransport({
             sessionIdGenerator: () => randomUUID(),
           });
-          const sessionServer = createServer({ providers, providerConfigs, audit, config });
+          const sessionServer = createServer({ providers, providerConfigs, audit, config, auth });
           await sessionServer.connect(transport);
 
           // Track session cleanup

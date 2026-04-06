@@ -11,12 +11,14 @@ import { handleExecute } from "./tools/execute.js";
 import { handleTofu } from "./tools/tofu.js";
 import { TofuWorkspaceManager } from "./tofu/workspace.js";
 import { buildInstructions, registerPersonaResources, registerPersonaPrompts } from "./persona/index.js";
+import type { AuthProvider } from "./interfaces/auth.js";
 
 interface ServerDeps {
   providers: Map<string, CloudProvider>;
   providerConfigs: Map<string, Config["providers"][number]>;
   audit: AuditLogger;
   config: Config;
+  auth?: AuthProvider;
 }
 
 export function createServer(deps: ServerDeps): McpServer {
@@ -83,7 +85,7 @@ export function createServer(deps: ServerDeps): McpServer {
   );
 
   // Register tofu tool if enabled
-  if (deps.config.tofu.enabled) {
+  if (deps.config.tofu.enabled && deps.auth) {
     const tofuManager = new TofuWorkspaceManager(
       {
         workspacesDir: deps.config.tofu.workspacesDir,
@@ -93,6 +95,7 @@ export function createServer(deps: ServerDeps): McpServer {
         timeoutMs: deps.config.tofu.timeoutMs,
       },
       deps.providerConfigs,
+      deps.auth,
     );
 
     server.tool(
