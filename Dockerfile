@@ -13,7 +13,7 @@ WORKDIR /app
 COPY --from=builder /app/dist dist/
 COPY --from=builder /app/node_modules node_modules/
 COPY package.json ./
-COPY config.yaml ./
+COPY config.yaml.example config.yaml
 COPY data/ data/
 
 ENV NODE_ENV=production
