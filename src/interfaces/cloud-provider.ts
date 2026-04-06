@@ -14,6 +14,7 @@ export interface ServiceMetadata {
   apiVersion?: string;     // e.g., "2016-11-15"
   endpointPrefix?: string; // e.g., "ec2", may differ from service name
   jsonVersion?: string;    // e.g., "1.1"
+  serviceId?: string;      // e.g., "Elastic Load Balancing v2" — maps to @aws-sdk/client-* package
 }
 
 export interface OperationSpec {

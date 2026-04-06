@@ -551,6 +551,7 @@ function extractAwsOperationSpec(
       apiVersion?: string;
       endpointPrefix?: string;
       jsonVersion?: string;
+      serviceId?: string;
     };
     operations?: Record<
       string,
@@ -599,6 +600,7 @@ function extractAwsOperationSpec(
           apiVersion: spec.metadata.apiVersion,
           endpointPrefix: spec.metadata.endpointPrefix,
           jsonVersion: spec.metadata.jsonVersion,
+          serviceId: spec.metadata.serviceId,
         }
       : undefined,
   };

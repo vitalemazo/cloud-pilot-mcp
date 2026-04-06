@@ -9,8 +9,7 @@ import type {
 } from "../../interfaces/cloud-provider.js";
 import type { AuthProvider } from "../../interfaces/auth.js";
 import type { ProviderConfig } from "../../config.js";
-import { signRequest } from "./signer.js";
-import { XMLParser } from "fast-xml-parser";
+import type { AwsCredentialIdentity, Provider as CredentialProvider } from "@aws-sdk/types";
 
 export interface SpecIndex {
   search(query: string, service?: string): Promise<OperationSpec[]> | OperationSpec[];
@@ -26,88 +25,53 @@ const MUTATING_PREFIXES = [
   "Authorize", "Grant",
 ];
 
-// AWS XML uses <item> and <member> as list wrappers. Forcing them to always
-// be arrays means a parent like <reservationSet><item>...</item></reservationSet>
-// parses as { reservationSet: { item: [...] } }. The unwrapListTags post-pass
-// then collapses { item: [...] } into just [...] on the parent key.
-const xmlParser = new XMLParser({
-  ignoreAttributes: true,
-  removeNSPrefix: true,
-  isArray: (name: string) => name === "item" || name === "member",
-});
+// Static mapping from botocore service name → { serviceId, npm package suffix }.
+// serviceId comes from botocore metadata.serviceId.
+// Package name = @aws-sdk/client-{suffix}
+// Client class = serviceId.replaceAll(' ', '').replace(/v(\d)/g, 'V$1') + 'Client'
+const SERVICE_ID_MAP: Record<string, { serviceId: string; pkg: string }> = {
+  ec2:              { serviceId: "EC2",                          pkg: "ec2" },
+  s3:              { serviceId: "S3",                            pkg: "s3" },
+  sts:             { serviceId: "STS",                           pkg: "sts" },
+  iam:             { serviceId: "IAM",                           pkg: "iam" },
+  rds:             { serviceId: "RDS",                           pkg: "rds" },
+  lambda:          { serviceId: "Lambda",                        pkg: "lambda" },
+  ecs:             { serviceId: "ECS",                           pkg: "ecs" },
+  elbv2:           { serviceId: "Elastic Load Balancing v2",     pkg: "elastic-load-balancing-v2" },
+  autoscaling:     { serviceId: "Auto Scaling",                  pkg: "auto-scaling" },
+  cloudwatch:      { serviceId: "CloudWatch",                    pkg: "cloudwatch" },
+  logs:            { serviceId: "CloudWatch Logs",               pkg: "cloudwatch-logs" },
+  cloudformation:  { serviceId: "CloudFormation",                pkg: "cloudformation" },
+  route53:         { serviceId: "Route 53",                      pkg: "route-53" },
+  sns:             { serviceId: "SNS",                           pkg: "sns" },
+  sqs:             { serviceId: "SQS",                           pkg: "sqs" },
+  dynamodb:        { serviceId: "DynamoDB",                      pkg: "dynamodb" },
+  secretsmanager:  { serviceId: "Secrets Manager",               pkg: "secrets-manager" },
+  kms:             { serviceId: "KMS",                           pkg: "kms" },
+  elasticache:     { serviceId: "ElastiCache",                   pkg: "elasticache" },
+  eks:             { serviceId: "EKS",                           pkg: "eks" },
+};
 
-// Recursively unwrap objects whose only key is "item" or "member" into
-// their parent, converting { someSet: { item: [...] } } → { someSet: [...] }.
-function unwrapListTags(obj: unknown): unknown {
-  if (typeof obj !== "object" || obj === null) return obj;
-  if (Array.isArray(obj)) return obj.map(unwrapListTags);
-
-  const result: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
-    const processed = unwrapListTags(value);
-    if (typeof processed === "object" && processed !== null && !Array.isArray(processed)) {
-      const keys = Object.keys(processed);
-      if (keys.length === 1 && (keys[0] === "item" || keys[0] === "member")) {
-        result[key] = (processed as Record<string, unknown>)[keys[0]];
-        continue;
-      }
-    }
-    result[key] = processed;
-  }
-  return result;
+// Derive the Client class name from a serviceId.
+// "Elastic Load Balancing v2" → "ElasticLoadBalancingV2Client"
+function serviceIdToClientClass(serviceId: string): string {
+  return serviceId
+    .replaceAll(" ", "")
+    .replace(/v(\d)/g, "V$1")
+    + "Client";
 }
 
-function parseXml(xml: string): Record<string, unknown> {
-  const raw = xmlParser.parse(xml) as Record<string, unknown>;
-  return unwrapListTags(raw) as Record<string, unknown>;
-}
-
-// Flatten params into query string key=value pairs for AWS query protocol.
-// Handles nested objects and arrays using the dot-notation AWS expects.
-// EC2 protocol uses Key.N, standard query protocol uses Key.member.N.
-function flattenParams(
-  params: Record<string, unknown>,
-  prefix = "",
-  useMemberTag = false,
-): Record<string, string> {
-  const result: Record<string, string> = {};
-
-  for (const [key, value] of Object.entries(params)) {
-    const fullKey = prefix ? `${prefix}.${key}` : key;
-
-    if (value === null || value === undefined) continue;
-
-    if (Array.isArray(value)) {
-      for (let i = 0; i < value.length; i++) {
-        const itemPrefix = useMemberTag
-          ? `${fullKey}.member.${i + 1}`
-          : `${fullKey}.${i + 1}`;
-        if (typeof value[i] === "object" && value[i] !== null) {
-          Object.assign(result, flattenParams(value[i] as Record<string, unknown>, itemPrefix, useMemberTag));
-        } else {
-          result[itemPrefix] = String(value[i]);
-        }
-      }
-    } else if (typeof value === "object") {
-      Object.assign(result, flattenParams(value as Record<string, unknown>, fullKey, useMemberTag));
-    } else {
-      result[fullKey] = String(value);
-    }
-  }
-
-  return result;
-}
+// Cache for instantiated SDK clients (keyed by "service:region")
+const clientCache = new Map<string, unknown>();
 
 export class AwsProvider implements CloudProvider {
   name = "aws" as const;
   private config: ProviderConfig;
   private auth: AuthProvider;
   private specIndex: SpecIndex;
-  // Cache service metadata to avoid repeated spec lookups
-  private metadataCache = new Map<string, ServiceMetadata>();
 
-  // Track which services need global endpoints (learned from failures)
-  private globalEndpointServices = new Set<string>();
+  // Cache for resolved serviceId from dynamic specs
+  private serviceIdCache = new Map<string, { serviceId: string; pkg: string }>();
 
   constructor(config: ProviderConfig, auth: AuthProvider, specIndex: SpecIndex) {
     this.config = config;
@@ -130,350 +94,164 @@ export class AwsProvider implements CloudProvider {
   ): Promise<CloudProviderCallResult> {
     this.enforceAllowlist(service, action);
 
-    const creds = await this.auth.getCredentials("aws");
-    if (!creds.aws) {
-      return { success: false, error: "No AWS credentials available" };
-    }
-
-    // Resolve service metadata (protocol, targetPrefix, etc.)
-    const meta = await this.resolveMetadata(service, action);
-    const protocol = meta?.protocol ?? "json";
-    const region = creds.aws.region;
-    const endpointPrefix = meta?.endpointPrefix ?? service;
-
-    console.error(`[cloud-pilot:aws] ${service}:${action} protocol=${protocol} endpoint=${endpointPrefix} version=${meta?.apiVersion ?? "?"}`);
-    if (Object.keys(params).length > 0) {
-      console.error(`[cloud-pilot:aws] params=${JSON.stringify(params).slice(0, 500)}`);
-    }
-
-    switch (protocol) {
-      case "ec2":
-      case "query":
-        return this.callQueryProtocol(
-          endpointPrefix, service, action, params, meta, creds.aws, region,
-        );
-      case "json":
-        return this.callJsonProtocol(
-          endpointPrefix, service, action, params, meta, creds.aws, region,
-        );
-      case "rest-json":
-        // rest-json uses path-based routing, but for simple calls we can
-        // fall back to JSON protocol with POST. Full path template support
-        // would require parsing the spec's http.requestUri.
-        return this.callJsonProtocol(
-          endpointPrefix, service, action, params, meta, creds.aws, region,
-        );
-      case "rest-xml":
-        return this.callRestXmlProtocol(
-          endpointPrefix, service, action, params, meta, creds.aws, region,
-        );
-      default:
-        return this.callJsonProtocol(
-          endpointPrefix, service, action, params, meta, creds.aws, region,
-        );
-    }
-  }
-
-  private resolveEndpoint(endpointPrefix: string, region: string): string {
-    if (this.globalEndpointServices.has(endpointPrefix)) {
-      return `https://${endpointPrefix}.amazonaws.com`;
-    }
-    return `https://${endpointPrefix}.${region}.amazonaws.com`;
-  }
-
-  // Wraps a fetch call with automatic global endpoint fallback.
-  // If the regional endpoint fails with a DNS/connection error,
-  // retries with the global endpoint and remembers for future calls.
-  private async fetchWithFallback(
-    endpointPrefix: string,
-    region: string,
-    doFetch: (endpoint: string) => Promise<Response>,
-  ): Promise<Response> {
-    const endpoint = this.globalEndpointServices.has(endpointPrefix)
-      ? `https://${endpointPrefix}.amazonaws.com`
-      : `https://${endpointPrefix}.${region}.amazonaws.com`;
-
-    try {
-      return await doFetch(endpoint);
-    } catch (err) {
-      // If regional endpoint failed with a connection error, try global
-      const msg = err instanceof Error ? err.message : "";
-      if (
-        !this.globalEndpointServices.has(endpointPrefix) &&
-        (msg.includes("fetch failed") || msg.includes("ENOTFOUND") || msg.includes("getaddrinfo"))
-      ) {
-        const globalEndpoint = `https://${endpointPrefix}.amazonaws.com`;
-        try {
-          const res = await doFetch(globalEndpoint);
-          // Remember this service uses global endpoint
-          this.globalEndpointServices.add(endpointPrefix);
-          return res;
-        } catch {
-          // Global also failed, throw original error
-        }
-      }
-      throw err;
-    }
-  }
-
-  private async callQueryProtocol(
-    endpointPrefix: string,
-    service: string,
-    action: string,
-    params: Record<string, unknown>,
-    meta: ServiceMetadata | undefined,
-    creds: { accessKeyId: string; secretAccessKey: string; sessionToken?: string; region: string },
-    region: string,
-  ): Promise<CloudProviderCallResult> {
-    const apiVersion = meta?.apiVersion ?? "";
-
-    // EC2 protocol uses Key.N, standard query uses Key.member.N
-    const useMemberTag = (meta?.protocol ?? "query") !== "ec2";
-    const flatParams = flattenParams(params, "", useMemberTag);
-    const queryParts: string[] = [
-      `Action=${encodeURIComponent(action)}`,
-      `Version=${encodeURIComponent(apiVersion)}`,
-    ];
-    for (const [k, v] of Object.entries(flatParams)) {
-      queryParts.push(`${encodeURIComponent(k)}=${encodeURIComponent(v)}`);
-    }
-    const body = queryParts.join("&");
-
-    // Debug: log request details for query protocol calls
-    if (process.env.CLOUD_PILOT_DEBUG === "true") {
-      console.error(`[cloud-pilot:debug] ${service}:${action} protocol=${meta?.protocol} endpoint=${endpointPrefix}`);
-      console.error(`[cloud-pilot:debug] body=${body}`);
-    }
-
     const start = Date.now();
+
     try {
-      // Use endpointPrefix for signing — it matches AWS's expected signing
-      // service name (e.g. "elasticloadbalancing" not "elbv2")
-      const signingService = endpointPrefix;
-
-      const res = await this.fetchWithFallback(endpointPrefix, region, async (endpoint) => {
-        const headers = await signRequest({
-          method: "POST",
-          url: endpoint,
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-          },
-          body,
-          accessKeyId: creds.accessKeyId,
-          secretAccessKey: creds.secretAccessKey,
-          sessionToken: creds.sessionToken,
-          region,
-          service: signingService,
-        });
-        return fetch(endpoint, { method: "POST", headers, body });
-      });
-
-      const text = await res.text();
-      const duration = Date.now() - start;
-
-      // Parse XML response
-      const data = parseXml(text);
-
-      // Extract the result from the response wrapper
-      // AWS wraps responses in <ActionResponse><ActionResult>...</ActionResult></ActionResponse>
-      const responseKey = `${action}Response`;
-      const resultKey = `${action}Result`;
-      const unwrapped =
-        (data[responseKey] as Record<string, unknown>)?.[resultKey] ??
-        data[responseKey] ??
-        data;
-
-      if (!res.ok) {
-        // Try to extract error info
-        const errorInfo = (data as Record<string, unknown>).Error ??
-          ((data as Record<string, unknown>).Response as Record<string, unknown>)?.Errors;
+      // Resolve the SDK package info for this service
+      const info = await this.resolveServiceInfo(service, action);
+      if (!info) {
         return {
           success: false,
-          error: `AWS ${service}:${action} returned ${res.status}`,
-          data: errorInfo ?? data,
-          metadata: { httpStatus: res.status, duration },
+          error: `No AWS SDK client available for service "${service}". ` +
+            `Install @aws-sdk/client-${service} and add it to SERVICE_ID_MAP, ` +
+            `or check that the service name is correct.`,
+          metadata: { duration: Date.now() - start },
         };
       }
 
-      return {
-        success: true,
-        data: unwrapped,
-        metadata: {
-          requestId: res.headers.get("x-amz-request-id") ?? undefined,
-          httpStatus: res.status,
-          duration,
-        },
-      };
-    } catch (err) {
-      return {
-        success: false,
-        error: err instanceof Error ? err.message : String(err),
-        metadata: { duration: Date.now() - start },
-      };
-    }
-  }
-
-  private async callRestXmlProtocol(
-    endpointPrefix: string,
-    service: string,
-    action: string,
-    params: Record<string, unknown>,
-    meta: ServiceMetadata | undefined,
-    creds: { accessKeyId: string; secretAccessKey: string; sessionToken?: string; region: string },
-    region: string,
-  ): Promise<CloudProviderCallResult> {
-    // REST-XML services (S3, CloudFront, Route53) use HTTP method + path
-    // to identify the operation. For listing operations, use GET with
-    // params as query string. For operations on specific resources,
-    // the resource identifier goes in the path.
-    const method = "GET";
-    const path = "/";
-    const body = "";
-
-    // Build query string from params (if any)
-    const queryParts: string[] = [];
-    for (const [k, v] of Object.entries(params)) {
-      if (v !== undefined && v !== null) {
-        queryParts.push(`${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`);
-      }
-    }
-    const queryString = queryParts.length > 0 ? `?${queryParts.join("&")}` : "";
-
-    const signingService = endpointPrefix;
-    const start = Date.now();
-    try {
-      const res = await this.fetchWithFallback(endpointPrefix, region, async (endpoint) => {
-        const fullUrl = `${endpoint}${path}${queryString}`;
-        const headers = await signRequest({
-          method,
-          url: fullUrl,
-          headers: {},
-          body,
-          accessKeyId: creds.accessKeyId,
-          secretAccessKey: creds.secretAccessKey,
-          sessionToken: creds.sessionToken,
-          region,
-          service: signingService,
-        });
-        return fetch(fullUrl, { method, headers });
-      });
-
-      const text = await res.text();
-      const duration = Date.now() - start;
-      const data = parseXml(text);
-
-      if (!res.ok) {
-        const errorInfo = (data as Record<string, unknown>).Error ?? data;
+      // Dynamic import of the SDK client package
+      const pkgName = `@aws-sdk/client-${info.pkg}`;
+      let mod: Record<string, unknown>;
+      try {
+        mod = await import(pkgName) as Record<string, unknown>;
+      } catch {
         return {
           success: false,
-          error: `AWS ${service}:${action} returned ${res.status}`,
-          data: errorInfo,
-          metadata: { httpStatus: res.status, duration },
+          error: `AWS SDK package "${pkgName}" is not installed. ` +
+            `Run: npm install ${pkgName}`,
+          metadata: { duration: Date.now() - start },
         };
       }
+
+      // Get or create client
+      const creds = await this.auth.getCredentials("aws");
+      if (!creds.aws) {
+        return { success: false, error: "No AWS credentials available" };
+      }
+      const region = creds.aws.region;
+      const client = await this.getClient(mod, info.serviceId, region);
+
+      // Construct the Command
+      const commandName = `${action}Command`;
+      const CommandClass = mod[commandName] as (new (params: unknown) => unknown) | undefined;
+      if (!CommandClass) {
+        return {
+          success: false,
+          error: `Command "${commandName}" not found in ${pkgName}. ` +
+            `Available commands can be found in the AWS SDK documentation.`,
+          metadata: { duration: Date.now() - start },
+        };
+      }
+
+      const command = new CommandClass(params);
+
+      // Execute
+      const sendFn = (client as { send: (cmd: unknown) => Promise<unknown> }).send.bind(client);
+      const result = await sendFn(command) as Record<string, unknown>;
+
+      // Extract metadata and clean response
+      const metadata = result.$metadata as { requestId?: string; httpStatusCode?: number } | undefined;
+      const duration = Date.now() - start;
+
+      // Remove SDK internal fields from response data
+      const data = { ...result };
+      delete data.$metadata;
 
       return {
         success: true,
         data,
         metadata: {
-          requestId: res.headers.get("x-amz-request-id") ?? undefined,
-          httpStatus: res.status,
+          requestId: metadata?.requestId,
+          httpStatus: metadata?.httpStatusCode,
           duration,
         },
       };
     } catch (err) {
-      return {
-        success: false,
-        error: err instanceof Error ? err.message : String(err),
-        metadata: { duration: Date.now() - start },
-      };
-    }
-  }
-
-  private async callJsonProtocol(
-    endpointPrefix: string,
-    service: string,
-    action: string,
-    params: Record<string, unknown>,
-    meta: ServiceMetadata | undefined,
-    creds: { accessKeyId: string; secretAccessKey: string; sessionToken?: string; region: string },
-    region: string,
-  ): Promise<CloudProviderCallResult> {
-    const body = JSON.stringify(params);
-    const jsonVersion = meta?.jsonVersion ?? "1.1";
-    const targetPrefix = meta?.targetPrefix ?? "";
-    const target = targetPrefix ? `${targetPrefix}.${action}` : action;
-
-    const signingService = endpointPrefix;
-    const start = Date.now();
-    try {
-      const res = await this.fetchWithFallback(endpointPrefix, region, async (endpoint) => {
-        const headers = await signRequest({
-          method: "POST",
-          url: endpoint,
-          headers: {
-            "Content-Type": `application/x-amz-json-${jsonVersion}`,
-            "X-Amz-Target": target,
-          },
-          body,
-          accessKeyId: creds.accessKeyId,
-          secretAccessKey: creds.secretAccessKey,
-          sessionToken: creds.sessionToken,
-          region,
-          service: signingService,
-        });
-        return fetch(endpoint, { method: "POST", headers, body });
-      });
-
-      const data = await res.json();
       const duration = Date.now() - start;
+      const error = err instanceof Error ? err.message : String(err);
 
-      if (!res.ok) {
-        return {
-          success: false,
-          error: `AWS ${service}:${action} returned ${res.status}`,
-          data,
-          metadata: { httpStatus: res.status, duration },
-        };
-      }
-
-      return {
-        success: true,
-        data,
-        metadata: {
-          requestId: res.headers.get("x-amz-request-id") ?? undefined,
-          httpStatus: res.status,
-          duration,
-        },
-      };
-    } catch (err) {
+      // Extract AWS error metadata if available
+      const awsErr = err as { $metadata?: { requestId?: string; httpStatusCode?: number }; name?: string; Code?: string };
       return {
         success: false,
-        error: err instanceof Error ? err.message : String(err),
-        metadata: { duration: Date.now() - start },
+        error: awsErr.name ? `${awsErr.name}: ${error}` : error,
+        data: awsErr.Code ? { Code: awsErr.Code } : undefined,
+        metadata: {
+          requestId: awsErr.$metadata?.requestId,
+          httpStatus: awsErr.$metadata?.httpStatusCode,
+          duration,
+        },
       };
     }
   }
 
-  private async resolveMetadata(
-    service: string,
-    action: string,
-  ): Promise<ServiceMetadata | undefined> {
-    // Check cache first
-    if (this.metadataCache.has(service)) {
-      return this.metadataCache.get(service);
+  // Get or create a cached SDK client for a service
+  private async getClient(
+    mod: Record<string, unknown>,
+    serviceId: string,
+    region: string,
+  ): Promise<unknown> {
+    const cacheKey = `${serviceId}:${region}`;
+    if (clientCache.has(cacheKey)) {
+      return clientCache.get(cacheKey)!;
     }
 
-    // Try to get metadata from the spec index
+    const clientClassName = serviceIdToClientClass(serviceId);
+    const ClientClass = mod[clientClassName] as (new (config: unknown) => unknown) | undefined;
+    if (!ClientClass) {
+      throw new Error(`Client class "${clientClassName}" not found in SDK package`);
+    }
+
+    // Bridge AuthProvider credentials to AWS SDK credential provider
+    const credentialProvider: CredentialProvider<AwsCredentialIdentity> = async () => {
+      const creds = await this.auth.getCredentials("aws");
+      if (!creds.aws) throw new Error("No AWS credentials available");
+      return {
+        accessKeyId: creds.aws.accessKeyId,
+        secretAccessKey: creds.aws.secretAccessKey,
+        sessionToken: creds.aws.sessionToken,
+        expiration: creds.expiresAt,
+      };
+    };
+
+    const client = new ClientClass({
+      region,
+      credentials: credentialProvider,
+    });
+
+    clientCache.set(cacheKey, client);
+    return client;
+  }
+
+  // Resolve service name to SDK package info, using static map first,
+  // then falling back to dynamic spec resolution.
+  private async resolveServiceInfo(
+    service: string,
+    action: string,
+  ): Promise<{ serviceId: string; pkg: string } | null> {
+    // Check static map first
+    if (SERVICE_ID_MAP[service]) {
+      return SERVICE_ID_MAP[service];
+    }
+
+    // Check dynamic cache
+    if (this.serviceIdCache.has(service)) {
+      return this.serviceIdCache.get(service)!;
+    }
+
+    // Try to resolve from spec index (botocore metadata has serviceId)
     if (this.specIndex.getOperation) {
       const spec = await this.specIndex.getOperation(service, action);
-      if (spec?.serviceMetadata) {
-        this.metadataCache.set(service, spec.serviceMetadata);
-        return spec.serviceMetadata;
+      if (spec?.serviceMetadata?.serviceId) {
+        const serviceId = spec.serviceMetadata.serviceId;
+        const pkg = serviceId.toLowerCase().replaceAll(" ", "-");
+        const info = { serviceId, pkg };
+        this.serviceIdCache.set(service, info);
+        return info;
       }
     }
 
-    return undefined;
+    return null;
   }
 
   private enforceAllowlist(service: string, action: string): void {
