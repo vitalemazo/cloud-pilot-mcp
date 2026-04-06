@@ -44,7 +44,7 @@ When an agent connects, the server delivers a **Senior Cloud Platform Engineer p
 | **Reference** | |
 | &nbsp;&nbsp;&nbsp;&nbsp;[Configuration Reference](#configuration-reference) | Full `config.yaml` schema and env var overrides |
 | &nbsp;&nbsp;&nbsp;&nbsp;[Dynamic API Discovery](#dynamic-api-discovery) | Three-tier spec system: catalog, index, full specs |
-| &nbsp;&nbsp;&nbsp;&nbsp;[Safety Model](#safety-model) | Sandbox, modes, allowlists, audit trail |
+| &nbsp;&nbsp;&nbsp;&nbsp;[Safety Model](#safety-model) | Sandbox isolation levels, modes, allowlists, audit trail |
 | &nbsp;&nbsp;&nbsp;&nbsp;[HTTP Transport Security](#http-transport-security) | Auth, CORS, rate limiting |
 | **Operations** | |
 | &nbsp;&nbsp;&nbsp;&nbsp;[CI/CD Pipeline](#cicd-pipeline) | Build, test, Docker, catalog refresh |
@@ -770,13 +770,13 @@ When cloud providers launch new services, specs appear in their repositories wit
 
 ## Safety Model
 
-The agent never gets raw credentials. The sandboxed execution environment (QuickJS WASM) has no access to the filesystem, network, or host process. It can only interact with cloud APIs through a constrained `sdk.request()` bridge that enforces:
+The agent never gets raw credentials. Code executes in a sandboxed environment with only `console.log` and `sdk.request()` available — no filesystem, network, process, or Node.js API access. Credentials live in the host process and are never exposed to the sandbox.
 
 ```
   +--------------------------------------------------+
   |              Credential Isolation                  |
   |                                                    |
-  |   Host Process          QuickJS Sandbox            |
+  |   Host Process            Sandbox                  |
   |  +---------------+    +--------------------+       |
   |  | AWS keys      |    |  sdk.request()     |       |
   |  | Azure tokens  |<-->|  bridge only       |       |
@@ -804,6 +804,25 @@ providers:
     mode: read-only      # Default. Only Describe/Get/List operations allowed.
     # mode: read-write   # Allows Create/Update/Put. Still respects blocklist.
     # mode: full         # No restrictions. Use with caution.
+```
+
+### Sandbox Isolation Levels
+
+cloud-pilot ships with a **Node.js `vm` sandbox** — a V8 context with no access to Node.js APIs. This provides credential isolation and is suitable for development, internal tools, and trusted AI agent workloads.
+
+For **production deployments** where untrusted users or third-party agents submit code, the sandbox should be upgraded to a hardened isolation layer. The `executeInSandbox` interface is designed for this — swap the implementation, everything else stays the same.
+
+| Isolation Level | Technology | Platform | Use Case |
+|----------------|------------|----------|----------|
+| **Soft sandbox** (default) | Node.js `vm.createContext()` | Any (macOS, Linux, Windows) | Development, internal tools, trusted AI agents |
+| **Container isolation** | [Docker](https://www.docker.com/) / [Podman](https://podman.io/) | Any | Multi-tenant SaaS, customer-submitted code |
+| **MicroVM isolation** | [Firecracker](https://github.com/firecracker-microvm/firecracker) | Linux (KVM) | High-security, per-execution throwaway VMs (what AWS Lambda uses) |
+| **Permission-based** | [Deno](https://deno.com/) | Any (macOS, Linux, Windows) | Fine-grained permission control (--allow-net, --allow-read) |
+
+To upgrade, replace `src/sandbox/runtime.ts` with an implementation that spins up a container or microVM, injects the code and bridge, and returns the result. The interface is a single function:
+
+```typescript
+executeInSandbox(code: string, bridge: RequestBridge, options: SandboxOptions): Promise<SandboxResult>
 ```
 
 ---
