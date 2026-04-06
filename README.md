@@ -2,6 +2,8 @@
 
 An MCP server that gives AI agents the ability to control cloud infrastructure across **AWS, Azure, GCP, and Alibaba Cloud** through natural language. Instead of building hundreds of individual tools, it exposes just two — **search** and **execute** — that together cover **1,289+ services and 51,900+ API operations**, discovered and fetched dynamically at runtime.
 
+When an agent connects, the server delivers a **Senior Cloud Platform Engineer persona** — complete with engineering principles, provider-specific expertise, safety awareness, and structured workflow prompts — so the agent automatically operates with production-grade cloud architecture and security standards.
+
 ## The Problem
 
 Cloud providers expose thousands of API operations across hundreds of services. Traditional approaches to AI-driven cloud management either:
@@ -55,6 +57,13 @@ All services are discovered dynamically — no pre-configuration needed. When a 
                     |  cloud-pilot-mcp   |
                     |                    |
                     |  +--------------+  |
+                    |  |  Persona     |  |  Sr. Cloud Platform Engineer identity
+                    |  |              |  |  instructions + resources + prompts
+                    |  |  8 engineering principles, provider expertise,
+                    |  |  6 workflow prompts, safety awareness
+                    |  +--------------+  |
+                    |                    |
+                    |  +--------------+  |
                     |  |   search     |  |  "What APIs exist for X?"
                     |  |              |  |  Searches 51,900+ operations
                     |  |  Tier 1: Service catalog (1,289 services)
@@ -87,6 +96,65 @@ All services are discovered dynamically — no pre-configuration needed. When a 
           |421 svcs| |240+pvdr| |305svc| | 323 svcs |
           +--------+ +--------+ +------+ +----------+
 ```
+
+## Built-In Cloud Engineering Persona
+
+When any AI agent connects to cloud-pilot-mcp, the server automatically shapes the agent's behavior through four layers:
+
+### Server Instructions (always delivered)
+
+On every connection, the server sends MCP `instructions` that establish the agent as a **Senior Cloud Platform Engineer, Security Architect, and DevOps Specialist** with:
+
+- **8 core principles**: security-first, Infrastructure as Code, blast radius minimization, defense in depth, cost awareness, operational excellence, Well-Architected Framework, high availability by default
+- **Behavioral standards**: search before executing, verify state before modifying, dry-run first for mutating operations, explain reasoning, warn about cost/risk, include monitoring alongside changes
+- **Safety awareness**: understand and communicate the current mode (read-only/read-write/full), respect audit trail, use dry-run
+
+The instructions are dynamically tailored to include only the configured providers, their modes, regions, and allowed services.
+
+### Provider Expertise (on demand via MCP Resources)
+
+Deep, provider-specific engineering guides (~1,500 words each) are available as MCP resources:
+
+| Resource URI | Content |
+|---|---|
+| `cloud-pilot://persona/overview` | Full persona document with all principles and provider summary |
+| `cloud-pilot://persona/aws` | VPC/TGW design, IAM roles, GuardDuty/SecurityHub, S3 lifecycle, Graviton, anti-patterns |
+| `cloud-pilot://persona/azure` | Landing Zones, Entra ID/Managed Identity, Virtual WAN, Defender, Policy, PIM |
+| `cloud-pilot://persona/gcp` | Shared VPC, Workload Identity Federation, GKE Autopilot, VPC Service Controls |
+| `cloud-pilot://persona/alibaba` | CEN, RAM/STS, ACK, Security Center, China-specific (ICP, data residency) |
+| `cloud-pilot://safety/{provider}` | Current safety mode, allowed services, blocked actions, audit config |
+
+Agents pull these on demand — they add zero overhead to connections where they aren't needed.
+
+### Workflow Prompts (structured multi-step procedures)
+
+Six MCP prompts provide opinionated, multi-step workflows that agents can invoke:
+
+| Prompt | What It Does |
+|--------|-------------|
+| `landing-zone` | Deploy a complete cloud landing zone: org structure, identity, networking, security baseline, monitoring |
+| `incident-response` | Security incident lifecycle: contain, investigate, eradicate, recover, post-mortem |
+| `cost-optimization` | Full cost audit: idle resources, rightsizing, reserved capacity, storage tiering, network costs |
+| `security-audit` | Comprehensive security review: IAM, network, encryption, logging, compliance, vulnerability management |
+| `migration-assessment` | Workload migration planning: discovery, 6R strategy, target architecture, migration waves, cutover |
+| `well-architected-review` | Well-Architected Framework review across all 6 pillars with provider-native recommendations |
+
+Each prompt accepts a `provider` argument (dynamically scoped to configured providers) and returns structured guidance that the agent follows step by step using `search` and `execute`.
+
+### Persona Configuration
+
+The persona is enabled by default. Customize or disable it in `config.yaml`:
+
+```yaml
+persona:
+  enabled: true                 # Set false to disable all persona features
+  # instructionsOverride: "..." # Replace default instructions with your own
+  # additionalGuidance: "..."   # Append custom policies (e.g., "All resources must be tagged with CostCenter")
+  enablePrompts: true           # Set false to disable workflow prompts
+  enableResources: true         # Set false to disable persona resources
+```
+
+Or via environment variable: `CLOUD_PILOT_PERSONA_ENABLED=false`
 
 ## Real-World Use Cases
 
@@ -471,6 +539,13 @@ sandbox:
 audit:
   type: file                 # file | console
   path: ./audit.json
+
+persona:
+  enabled: true              # Enable Sr. Cloud Platform Engineer persona
+  # instructionsOverride: "" # Replace default instructions entirely
+  # additionalGuidance: ""   # Append custom policies to default instructions
+  enablePrompts: true        # Expose workflow prompts (landing-zone, security-audit, etc.)
+  enableResources: true      # Expose persona resources (cloud-pilot://persona/*)
 ```
 
 ### Environment Variable Overrides
@@ -485,6 +560,7 @@ audit:
 | `GOOGLE_APPLICATION_CREDENTIALS` / `GCP_PROJECT_ID` | GCP credentials (also auto-discovered from `gcloud auth`, metadata server) |
 | `ALIBABA_CLOUD_ACCESS_KEY_ID` / `ALIBABA_CLOUD_ACCESS_KEY_SECRET` / `ALIBABA_CLOUD_REGION` | Alibaba credentials (also auto-discovered from `~/.alibabacloud/credentials`, ECS RAM role) |
 | `CLOUD_PILOT_SPECS_DYNAMIC` / `CLOUD_PILOT_SPECS_OFFLINE` | `specs.*` |
+| `CLOUD_PILOT_PERSONA_ENABLED` | `persona.enabled` (set `false` to disable persona) |
 | `GITHUB_TOKEN` | Increases GitHub API rate limit (60/hr -> 5,000/hr) |
 
 ## CI/CD Pipeline
@@ -512,7 +588,7 @@ Push to main
 ```
 src/
 +-- index.ts                     # Entrypoint: config, wiring, HTTP server with auth/CORS/rate limiting
-+-- server.ts                    # MCP server: registers search + execute tools
++-- server.ts                    # MCP server: tools, persona, resources, prompts
 +-- config.ts                    # YAML + env config loader with Zod validation
 |
 +-- interfaces/                  # Pluggable contracts
@@ -546,6 +622,13 @@ src/
 |   +-- alibaba/
 |       +-- provider.ts          # Alibaba RPC calls, mutating-prefix safety
 |       +-- signer.ts            # ACS3-HMAC-SHA256
+|
++-- persona/                     # Cloud engineering persona system
+|   +-- index.ts                 # Barrel export
+|   +-- instructions.ts          # Dynamic MCP instructions builder (provider-aware)
+|   +-- provider-profiles.ts     # Deep expertise docs: AWS, Azure, GCP, Alibaba
+|   +-- resources.ts             # MCP resources: cloud-pilot://persona/*, cloud-pilot://safety/*
+|   +-- prompts.ts               # 6 workflow prompts: landing-zone, incident-response, etc.
 |
 +-- auth/
 |   +-- env.ts                   # Auto-discovery credential chain (AWS CLI/SDK, az CLI, gcloud, aliyun CLI)
