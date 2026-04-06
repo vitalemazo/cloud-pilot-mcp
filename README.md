@@ -34,6 +34,8 @@ When an agent connects, the server delivers a **Senior Cloud Platform Engineer p
 | [Architecture](#architecture) | System design and component overview |
 | [Built-In Cloud Engineering Persona](#built-in-cloud-engineering-persona) | Instructions, resources, prompts, configuration |
 | [Why cloud-pilot?](#why-cloud-pilot) | When you need a control plane between AI agents and your cloud |
+| [Agents That Act, Not Advise](#agents-that-act-not-advise) | How cloud-pilot turns AI from advisor to actor — real deployment example |
+| [Enterprise Integration](#enterprise-integration) | ServiceNow, Teams/Slack, and how MCP enables one integration for all clouds |
 | [Real-World Use Cases](#real-world-use-cases) | Landing zones, global WAN, K8s, incident response, cost analysis |
 | **Getting Started** | |
 | &nbsp;&nbsp;&nbsp;&nbsp;[Quick Start](#quick-start) | Prerequisites, install, and run |
@@ -132,8 +134,8 @@ The agent reasons about what APIs exist, plans the sequence, and executes — al
 
 | Provider | Services | Operations | Spec Source | Auth |
 |----------|----------|------------|-------------|------|
-| **AWS** | 421 | 18,109 | [boto/botocore](https://github.com/boto/botocore) via jsDelivr CDN | AWS CLI / SDK credential chain -> SigV4 signing |
-| **Azure** | 240+ | 3,157 | [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) via GitHub CDN | Azure CLI / DefaultAzureCredential -> Bearer token |
+| **AWS** | 421 | 18,109 | [boto/botocore](https://github.com/boto/botocore) via jsDelivr CDN | AWS CLI / SDK credential chain -> Native `@aws-sdk/client-*` |
+| **Azure** | 240+ | 3,157 | [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) via GitHub CDN | Azure CLI / DefaultAzureCredential -> `@azure/core-rest-pipeline` |
 | **GCP** | 305 | 12,599 | [Google Discovery API](https://www.googleapis.com/discovery/v1/apis) (live) | gcloud CLI / GoogleAuth -> Bearer token |
 | **Alibaba** | 323 | 18,058 | [Alibaba Cloud API](https://api.aliyun.com/meta/v1/products) + api-docs.json | aliyun CLI / credential chain -> ACS3-HMAC-SHA256 |
 | **Total** | **1,289+** | **51,923** | | |
@@ -181,7 +183,8 @@ All services are discovered dynamically — no pre-configuration needed. When a 
                 |                 |         |              |
            +----v-----+    +-----v---+  +--v-----+  +-----v------+
            |   AWS    |    |  Azure  |  |  GCP   |  |  Alibaba   |
-           | SigV4    |    | Bearer  |  | Bearer |  | ACS3-HMAC  |
+           | Native   |    | ARM     |  | REST   |  | ACS3-HMAC  |
+           | SDK v3   |    | Pipeline|  | + Auth |  | + fetch    |
            | 421 svcs |    | 240+    |  | 305    |  | 323 svcs   |
            +----------+    +---------+  +--------+  +------------+
 ```
@@ -274,6 +277,68 @@ A consulting firm manages AWS, Azure, and GCP for different clients. One MCP ser
 ### CI/CD pipeline intelligence
 
 An agent in your deployment pipeline uses cloud-pilot to verify infrastructure state before and after deployments — checks security groups, validates IAM policies, confirms RDS snapshots exist. Read-only, fully audited, no credentials in the pipeline config. If something looks wrong, it blocks the deploy and explains why.
+
+---
+
+## Agents That Act, Not Advise
+
+Most AI cloud tools generate plans for a human to run. cloud-pilot is the only path where the agent can actually **execute, observe results, and react** — detecting that a NAT Gateway is still pending, polling until available, then adding the route. Without it, that's a "run this, wait, then run this" conversation with you in the middle.
+
+### What this looks like in practice
+
+In a real deployment of a three-tier AWS architecture (VPC, ALB, ASG, RDS), cloud-pilot enabled the agent to:
+
+1. **Live state awareness** — discovered the account only had a default VPC, adjusted the entire plan before writing a line of infrastructure
+2. **Error recovery** — hit a `Buffer not defined` error in the sandbox, immediately rewrote with a manual base64 encoder, no interruption to the user
+3. **Sequential dependencies** — NAT Gateway ready &rarr; route added &rarr; ASG healthy &rarr; RDS status check, all chained autonomously in a single execute call
+4. **Guardrail enforcement** — cloud-pilot blocked bad API calls (wrong parameter casing, out-of-scope services) before they reached the cloud provider
+
+**The core value: the AI becomes an actor, not an advisor.** cloud-pilot turns "here's a Terraform file, go run it" into an agent that deploys, observes, fixes, and confirms — all in one session.
+
+---
+
+## Enterprise Integration
+
+cloud-pilot speaks MCP (Model Context Protocol), which means any AI platform that supports MCP can leverage it as a cloud control plane. Here's how this works in real enterprise environments:
+
+### ServiceNow + cloud-pilot
+
+A ServiceNow Virtual Agent receives an infrastructure request ("provision a staging environment for the payments team"). Instead of routing to a human, the workflow:
+
+1. ServiceNow creates a change request with approval gates
+2. Once approved, triggers an MCP-connected agent with cloud-pilot
+3. The agent executes the full provisioning — VPC, subnets, security groups, compute, database — using cloud-pilot's `execute` tool in `read-write` mode scoped to the staging account
+4. cloud-pilot's audit log feeds back into ServiceNow as the change implementation record
+5. If anything fails, the agent rolls back and updates the ticket with diagnostics
+
+The ServiceNow agent never needs cloud credentials in its config. cloud-pilot handles auth (via Vault, IAM roles, or managed identity), enforces allowlists so the agent can't touch production, and logs every API call for compliance.
+
+### Microsoft Teams / Slack + cloud-pilot
+
+An infrastructure bot in Teams receives: "what's the status of our EKS clusters?" The bot connects to cloud-pilot in `read-only` mode:
+
+```
+User (Teams):  "Why is the staging API slow?"
+Bot:           → search("describe EKS cluster")
+               → execute(eks:DescribeCluster, ec2:DescribeInstances, cloudwatch:GetMetricData)
+               "The staging EKS cluster has 2/3 nodes in NotReady state.
+                CPU across the healthy node is at 94%. Recommending a
+                node group scale-up. Want me to submit a change request?"
+User (Teams):  "Yes"
+Bot:           → Creates ServiceNow CR → on approval → execute(eks:UpdateNodegroupConfig)
+```
+
+The same bot works across AWS, Azure, and GCP — one cloud-pilot server, one conversation model. Engineering teams don't need console access, CLI tools, or cloud-specific training. They ask questions in natural language and get answers grounded in live infrastructure state.
+
+### Why MCP makes this possible
+
+Traditional integrations require per-cloud, per-service API wrappers. A ServiceNow integration for AWS EC2 is different from one for Azure VMs is different from one for GCP Compute Engine. Each needs custom code, custom auth, custom error handling.
+
+With cloud-pilot as the MCP layer:
+- **One integration point** — connect your AI platform to cloud-pilot once, get all clouds
+- **One security model** — read-only for chat bots, read-write for approved workflows, full audit trail
+- **One conversation** — the agent discovers APIs at runtime, so new cloud services are available without integration updates
+- **One audit log** — every action across every cloud, in one place, mapped to the user/ticket/workflow that triggered it
 
 ---
 
