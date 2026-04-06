@@ -31,6 +31,9 @@ export function signRequest(params: SigningParams): Record<string, string> {
     headers["x-amz-security-token"] = params.sessionToken;
   }
 
+  // Required by S3, harmless for other services
+  headers["x-amz-content-sha256"] = sha256(params.body);
+
   const signedHeaderKeys = Object.keys(headers)
     .map((k) => k.toLowerCase())
     .sort();

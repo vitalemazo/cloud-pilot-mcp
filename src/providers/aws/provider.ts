@@ -125,6 +125,9 @@ export class AwsProvider implements CloudProvider {
   // Cache service metadata to avoid repeated spec lookups
   private metadataCache = new Map<string, ServiceMetadata>();
 
+  // Track which services need global endpoints (learned from failures)
+  private globalEndpointServices = new Set<string>();
+
   constructor(config: ProviderConfig, auth: AuthProvider, specIndex: SpecIndex) {
     this.config = config;
     this.auth = auth;
@@ -186,6 +189,49 @@ export class AwsProvider implements CloudProvider {
     }
   }
 
+  private resolveEndpoint(endpointPrefix: string, region: string): string {
+    if (this.globalEndpointServices.has(endpointPrefix)) {
+      return `https://${endpointPrefix}.amazonaws.com`;
+    }
+    return `https://${endpointPrefix}.${region}.amazonaws.com`;
+  }
+
+  // Wraps a fetch call with automatic global endpoint fallback.
+  // If the regional endpoint fails with a DNS/connection error,
+  // retries with the global endpoint and remembers for future calls.
+  private async fetchWithFallback(
+    endpointPrefix: string,
+    region: string,
+    doFetch: (endpoint: string) => Promise<Response>,
+  ): Promise<Response> {
+    const regionalEndpoint = `https://${endpointPrefix}.${region}.amazonaws.com`;
+    const endpoint = this.globalEndpointServices.has(endpointPrefix)
+      ? `https://${endpointPrefix}.amazonaws.com`
+      : regionalEndpoint;
+
+    try {
+      return await doFetch(endpoint);
+    } catch (err) {
+      // If regional endpoint failed with a connection error, try global
+      const msg = err instanceof Error ? err.message : "";
+      if (
+        !this.globalEndpointServices.has(endpointPrefix) &&
+        (msg.includes("fetch failed") || msg.includes("ENOTFOUND") || msg.includes("getaddrinfo"))
+      ) {
+        const globalEndpoint = `https://${endpointPrefix}.amazonaws.com`;
+        try {
+          const res = await doFetch(globalEndpoint);
+          // Remember this service uses global endpoint
+          this.globalEndpointServices.add(endpointPrefix);
+          return res;
+        } catch {
+          // Global also failed, throw original error
+        }
+      }
+      throw err;
+    }
+  }
+
   private async callQueryProtocol(
     endpointPrefix: string,
     service: string,
@@ -195,7 +241,6 @@ export class AwsProvider implements CloudProvider {
     creds: { accessKeyId: string; secretAccessKey: string; sessionToken?: string; region: string },
     region: string,
   ): Promise<CloudProviderCallResult> {
-    const endpoint = `https://${endpointPrefix}.${region}.amazonaws.com`;
     const apiVersion = meta?.apiVersion ?? "";
 
     // Build query-string body
@@ -209,26 +254,23 @@ export class AwsProvider implements CloudProvider {
     }
     const body = queryParts.join("&");
 
-    const headers = signRequest({
-      method: "POST",
-      url: endpoint,
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-      },
-      body,
-      accessKeyId: creds.accessKeyId,
-      secretAccessKey: creds.secretAccessKey,
-      sessionToken: creds.sessionToken,
-      region,
-      service,
-    });
-
     const start = Date.now();
     try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers,
-        body,
+      const res = await this.fetchWithFallback(endpointPrefix, region, (endpoint) => {
+        const headers = signRequest({
+          method: "POST",
+          url: endpoint,
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+          },
+          body,
+          accessKeyId: creds.accessKeyId,
+          secretAccessKey: creds.secretAccessKey,
+          sessionToken: creds.sessionToken,
+          region,
+          service,
+        });
+        return fetch(endpoint, { method: "POST", headers, body });
       });
 
       const text = await res.text();
@@ -285,33 +327,29 @@ export class AwsProvider implements CloudProvider {
     creds: { accessKeyId: string; secretAccessKey: string; sessionToken?: string; region: string },
     region: string,
   ): Promise<CloudProviderCallResult> {
-    const endpoint = `https://${endpointPrefix}.${region}.amazonaws.com`;
     const body = JSON.stringify(params);
     const jsonVersion = meta?.jsonVersion ?? "1.1";
     const targetPrefix = meta?.targetPrefix ?? "";
     const target = targetPrefix ? `${targetPrefix}.${action}` : action;
 
-    const headers = signRequest({
-      method: "POST",
-      url: endpoint,
-      headers: {
-        "Content-Type": `application/x-amz-json-${jsonVersion}`,
-        "X-Amz-Target": target,
-      },
-      body,
-      accessKeyId: creds.accessKeyId,
-      secretAccessKey: creds.secretAccessKey,
-      sessionToken: creds.sessionToken,
-      region,
-      service,
-    });
-
     const start = Date.now();
     try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers,
-        body,
+      const res = await this.fetchWithFallback(endpointPrefix, region, (endpoint) => {
+        const headers = signRequest({
+          method: "POST",
+          url: endpoint,
+          headers: {
+            "Content-Type": `application/x-amz-json-${jsonVersion}`,
+            "X-Amz-Target": target,
+          },
+          body,
+          accessKeyId: creds.accessKeyId,
+          secretAccessKey: creds.secretAccessKey,
+          sessionToken: creds.sessionToken,
+          region,
+          service,
+        });
+        return fetch(endpoint, { method: "POST", headers, body });
       });
 
       const data = await res.json();
