@@ -141,6 +141,11 @@ export class AwsProvider implements CloudProvider {
     const region = creds.aws.region;
     const endpointPrefix = meta?.endpointPrefix ?? service;
 
+    console.error(`[cloud-pilot:aws] ${service}:${action} protocol=${protocol} endpoint=${endpointPrefix} version=${meta?.apiVersion ?? "?"}`);
+    if (Object.keys(params).length > 0) {
+      console.error(`[cloud-pilot:aws] params=${JSON.stringify(params).slice(0, 500)}`);
+    }
+
     switch (protocol) {
       case "ec2":
       case "query":
