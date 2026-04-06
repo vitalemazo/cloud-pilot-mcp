@@ -1,8 +1,7 @@
 // Copyright (c) 2026 Vitale Mazo. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root.
 
-import { getQuickJS } from "quickjs-emscripten";
-import type { QuickJSHandle } from "quickjs-emscripten";
+import { createContext, Script } from "node:vm";
 
 export interface SandboxOptions {
   memoryLimitMB: number;
@@ -21,300 +20,82 @@ export async function executeInSandbox(
   requestBridge: (service: string, action: string, params: string) => Promise<string>,
   options: SandboxOptions,
 ): Promise<SandboxResult> {
-  const QuickJS = await getQuickJS();
-  const runtime = QuickJS.newRuntime();
-  runtime.setMemoryLimit(options.memoryLimitMB * 1024 * 1024);
-  runtime.setMaxStackSize(1024 * 1024);
-
   const logs: string[] = [];
-  const vm = runtime.newContext();
+
+  // Build a minimal sandbox context — no require, process, fs, net, or
+  // any Node.js API. Only console.log and sdk.request are available.
+  const sandbox: Record<string, unknown> = Object.create(null);
+
+  sandbox.console = Object.freeze({
+    log: (...args: unknown[]) => {
+      logs.push(args.map((a) => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" "));
+    },
+    error: (...args: unknown[]) => {
+      logs.push(args.map((a) => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" "));
+    },
+  });
+
+  sandbox.JSON = JSON;
+  sandbox.Object = Object;
+  sandbox.Array = Array;
+  sandbox.String = String;
+  sandbox.Number = Number;
+  sandbox.Boolean = Boolean;
+  sandbox.Math = Math;
+  sandbox.Date = Date;
+  sandbox.RegExp = RegExp;
+  sandbox.Error = Error;
+  sandbox.TypeError = TypeError;
+  sandbox.parseInt = parseInt;
+  sandbox.parseFloat = parseFloat;
+  sandbox.isNaN = isNaN;
+  sandbox.isFinite = isFinite;
+  sandbox.encodeURIComponent = encodeURIComponent;
+  sandbox.decodeURIComponent = decodeURIComponent;
+
+  // The sdk.request bridge — async, delegates to the host which holds credentials.
+  // The sandbox code never sees raw credentials.
+  sandbox.sdk = Object.freeze({
+    request: async (opts: { service: string; action: string; params?: Record<string, unknown> }) => {
+      const resultStr = await requestBridge(
+        opts.service,
+        opts.action,
+        JSON.stringify(opts.params || {}),
+      );
+      return JSON.parse(resultStr);
+    },
+  });
+
+  const context = createContext(sandbox);
+
+  // Wrap user code in an async IIFE so await works naturally
+  const wrappedCode = `(async () => {\n${code}\n})()`;
 
   try {
-    // Inject console.log
-    const logHandle = vm.newFunction("log", (...args: QuickJSHandle[]) => {
-      const parts = args.map((a) => {
-        const val = vm.dump(a);
-        return typeof val === "object" ? JSON.stringify(val) : String(val);
-      });
-      logs.push(parts.join(" "));
-    });
-    const consoleHandle = vm.newObject();
-    vm.setProp(consoleHandle, "log", logHandle);
-    vm.setProp(consoleHandle, "error", logHandle);
-    vm.setProp(vm.global, "console", consoleHandle);
-    consoleHandle.dispose();
-    logHandle.dispose();
+    // Compile the script (syntax errors caught here)
+    const script = new Script(wrappedCode, { filename: "sandbox.js" });
 
-    // Inject _request bridge as a sync function that stores pending calls
-    // Since QuickJS doesn't support async host functions natively,
-    // we use a request queue pattern
-    const pendingRequests: Array<{
-      service: string;
-      action: string;
-      params: string;
-      resolve: (result: string) => void;
-    }> = [];
+    // Run the script — returns a Promise from the async IIFE
+    const promise = script.runInContext(context) as Promise<unknown>;
 
-    const requestHandle = vm.newFunction(
-      "_request",
-      (serviceH: QuickJSHandle, actionH: QuickJSHandle, paramsH: QuickJSHandle) => {
-        const service = vm.getString(serviceH);
-        const action = vm.getString(actionH);
-        const params = vm.getString(paramsH);
+    // Race against timeout
+    const result = await Promise.race([
+      promise.then((output) => ({ ok: true as const, output })),
+      new Promise<{ ok: false; error: string }>((resolve) =>
+        setTimeout(
+          () => resolve({ ok: false, error: "Execution timed out" }),
+          options.timeoutMs,
+        ),
+      ),
+    ]);
 
-        // We'll handle this synchronously by blocking — see executeWithBridge below
-        let result: string | undefined;
-        pendingRequests.push({
-          service,
-          action,
-          params,
-          resolve: (r) => {
-            result = r;
-          },
-        });
-
-        // Return a placeholder — the actual async handling happens in the wrapper
-        if (result !== undefined) {
-          return vm.newString(result);
-        }
-        return vm.newString(JSON.stringify({ __pending: true, service, action, params }));
-      },
-    );
-    vm.setProp(vm.global, "_request", requestHandle);
-    requestHandle.dispose();
-
-    // Bootstrap the sdk object with a synchronous request wrapper
-    const bootstrap = `
-      var sdk = {
-        request: function(opts) {
-          var service = opts.service;
-          var action = opts.action;
-          var params = JSON.stringify(opts.params || {});
-          var resultStr = _request(service, action, params);
-          return JSON.parse(resultStr);
-        }
-      };
-    `;
-
-    const bootstrapResult = vm.evalCode(bootstrap);
-    if (bootstrapResult.error) {
-      const err = vm.dump(bootstrapResult.error);
-      bootstrapResult.error.dispose();
-      return { success: false, output: null, error: `Bootstrap failed: ${JSON.stringify(err)}`, logs };
-    }
-    bootstrapResult.value.dispose();
-
-    // Execute with a timeout using interrupt handler
-    let timedOut = false;
-    const deadline = Date.now() + options.timeoutMs;
-    runtime.setInterruptHandler(() => {
-      if (Date.now() > deadline) {
-        timedOut = true;
-        return true;
-      }
-      return false;
-    });
-
-    // For synchronous execution, we resolve requests inline.
-    // For a production async version, we'd need a more sophisticated approach.
-    // This works because cloud API calls are awaited one at a time in the sandbox.
-    const wrappedCode = `
-      (function() {
-        ${code}
-      })();
-    `;
-
-    // Pre-resolve all requests synchronously by running the code,
-    // collecting requests, resolving them, and re-running if needed.
-    // For v0.1, we use a simpler approach: make the bridge sync.
-    const resolvedCache = new Map<string, string>();
-
-    const executeWithRetries = async (): Promise<SandboxResult> => {
-      // Override _request with one that can use the cache
-      const syncRequestHandle = vm.newFunction(
-        "_request",
-        (serviceH: QuickJSHandle, actionH: QuickJSHandle, paramsH: QuickJSHandle) => {
-          const service = vm.getString(serviceH);
-          const action = vm.getString(actionH);
-          const params = vm.getString(paramsH);
-          const cacheKey = `${service}:${action}:${params}`;
-
-          const cached = resolvedCache.get(cacheKey);
-          if (cached) {
-            return vm.newString(cached);
-          }
-
-          // Not cached — return a marker so we know to resolve and retry
-          return vm.newString(JSON.stringify({ __pending: true, service, action, params }));
-        },
-      );
-      vm.setProp(vm.global, "_request", syncRequestHandle);
-      syncRequestHandle.dispose();
-
-      // Clear logs so each retry produces clean output
-      logs.length = 0;
-
-      const result = vm.evalCode(wrappedCode);
-
-      let retryError: { err: unknown } | null = null;
-      if (result.error) {
-        retryError = { err: vm.dump(result.error) };
-        result.error.dispose();
-        if (timedOut) {
-          return { success: false, output: null, error: "Execution timed out", logs };
-        }
-      } else {
-        result.value.dispose();
-      }
-
-      // Check for new pending requests (code may have thrown partway through a loop)
-      const retryQueueResult = vm.evalCode("JSON.stringify(__requestQueue)");
-      if (!retryQueueResult.error) {
-        const queue = JSON.parse(vm.getString(retryQueueResult.value)) as string[];
-        retryQueueResult.value.dispose();
-
-        let newPending = false;
-        for (const key of queue) {
-          if (!resolvedCache.has(key)) {
-            const firstColon = key.indexOf(":");
-            const secondColon = key.indexOf(":", firstColon + 1);
-            const service = key.substring(0, firstColon);
-            const action = key.substring(firstColon + 1, secondColon);
-            const params = key.substring(secondColon + 1);
-            const bridgeResult = await requestBridge(service, action, params);
-            resolvedCache.set(key, bridgeResult);
-            newPending = true;
-          }
-        }
-
-        if (newPending) {
-          // Inject all resolved results and retry
-          for (const [key, value] of resolvedCache) {
-            const escaped = value.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-            const injectResult = vm.evalCode(`__requestResults['${key}'] = '${escaped}';`);
-            if (!injectResult.error) {
-              injectResult.value.dispose();
-            } else {
-              injectResult.error.dispose();
-            }
-          }
-          // Reset queue for next pass
-          const resetResult = vm.evalCode("__requestQueue = [];");
-          if (!resetResult.error) resetResult.value.dispose();
-          else resetResult.error.dispose();
-
-          return executeWithRetries();
-        }
-      } else {
-        retryQueueResult.error.dispose();
-      }
-
-      if (retryError) {
-        return { success: false, output: null, error: JSON.stringify(retryError.err), logs };
-      }
-
-      return { success: true, output: null, logs };
-    };
-
-    // Pre-flight: extract all API calls by doing a dry parse,
-    // then resolve them and inject into cache.
-    // For now, support the simple case: resolve on first call.
-    // We'll enhance this with proper async support in v0.2.
-
-    // Simple approach: wrap each sdk.request to be truly sync via the bridge
-    const overrideBootstrap = `
-      var __requestResults = {};
-      var __requestQueue = [];
-      sdk.request = function(opts) {
-        var key = opts.service + ":" + opts.action + ":" + JSON.stringify(opts.params || {});
-        if (__requestResults[key]) {
-          return JSON.parse(__requestResults[key]);
-        }
-        var resultStr = _request(opts.service, opts.action, JSON.stringify(opts.params || {}));
-        var parsed = JSON.parse(resultStr);
-        if (parsed.__pending) {
-          __requestQueue.push(key);
-          return parsed;
-        }
-        __requestResults[key] = resultStr;
-        return parsed;
-      };
-    `;
-
-    const overrideResult = vm.evalCode(overrideBootstrap);
-    if (overrideResult.error) {
-      overrideResult.error.dispose();
-    } else {
-      overrideResult.value.dispose();
+    if (!result.ok) {
+      return { success: false, output: null, error: result.error, logs };
     }
 
-    // First pass: collect all needed API calls.
-    // The code may throw if it accesses nested properties on the pending
-    // marker (e.g. r.data.subnet.subnetId on {__pending: true}). This is
-    // expected — we still need to check the queue and retry with resolved data.
-    let firstPassError: { err: unknown } | null = null;
-    let evalResult = vm.evalCode(wrappedCode);
-    if (evalResult.error) {
-      firstPassError = { err: vm.dump(evalResult.error) };
-      evalResult.error.dispose();
-    } else {
-      evalResult.value.dispose();
-    }
-
-    // Check for pending requests (even if first pass threw)
-    const queueResult = vm.evalCode("JSON.stringify(__requestQueue)");
-    if (!queueResult.error) {
-      const queue = JSON.parse(vm.getString(queueResult.value)) as string[];
-      queueResult.value.dispose();
-
-      // Resolve all pending requests
-      for (const key of queue) {
-        if (!resolvedCache.has(key)) {
-          const firstColon = key.indexOf(":");
-          const secondColon = key.indexOf(":", firstColon + 1);
-          const service = key.substring(0, firstColon);
-          const action = key.substring(firstColon + 1, secondColon);
-          const params = key.substring(secondColon + 1);
-          const result = await requestBridge(service, action, params);
-          resolvedCache.set(key, result);
-        }
-      }
-
-      // If there were pending requests, re-run with resolved cache
-      if (queue.length > 0) {
-        // Inject resolved results
-        for (const [key, value] of resolvedCache) {
-          const escaped = value.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-          const injectResult = vm.evalCode(`__requestResults['${key}'] = '${escaped}';`);
-          if (!injectResult.error) {
-            injectResult.value.dispose();
-          } else {
-            injectResult.error.dispose();
-          }
-        }
-
-        // Clear logs for clean re-run
-        logs.length = 0;
-
-        // Must await so the try/finally doesn't dispose the VM mid-retry
-        return await executeWithRetries();
-      }
-
-      // No pending requests and first pass threw — return the original error
-      if (firstPassError) {
-        return { success: false, output: null, error: JSON.stringify(firstPassError.err), logs };
-      }
-    } else {
-      queueResult.error.dispose();
-      // Can't read queue and first pass threw — return the original error
-      if (firstPassError) {
-        return { success: false, output: null, error: JSON.stringify(firstPassError.err), logs };
-      }
-    }
-
-    return { success: true, output: null, logs };
-  } finally {
-    vm.dispose();
-    runtime.dispose();
+    return { success: true, output: result.output ?? null, logs };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { success: false, output: null, error: message, logs };
   }
 }
