@@ -77,7 +77,7 @@ export async function executeInSandbox(
         if (result !== undefined) {
           return vm.newString(result);
         }
-        return vm.newString('{"error":"async bridge not resolved"}');
+        return vm.newString(JSON.stringify({ __pending: true, service, action, params }));
       },
     );
     vm.setProp(vm.global, "_request", requestHandle);
