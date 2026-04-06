@@ -202,16 +202,20 @@ export async function executeInSandbox(
       overrideResult.value.dispose();
     }
 
-    // First pass: collect all needed API calls
+    // First pass: collect all needed API calls.
+    // The code may throw if it accesses nested properties on the pending
+    // marker (e.g. r.data.subnet.subnetId on {__pending: true}). This is
+    // expected — we still need to check the queue and retry with resolved data.
+    let firstPassError: { err: unknown } | null = null;
     let evalResult = vm.evalCode(wrappedCode);
     if (evalResult.error) {
-      const err = vm.dump(evalResult.error);
+      firstPassError = { err: vm.dump(evalResult.error) };
       evalResult.error.dispose();
-      return { success: false, output: null, error: JSON.stringify(err), logs };
+    } else {
+      evalResult.value.dispose();
     }
-    evalResult.value.dispose();
 
-    // Check for pending requests
+    // Check for pending requests (even if first pass threw)
     const queueResult = vm.evalCode("JSON.stringify(__requestQueue)");
     if (!queueResult.error) {
       const queue = JSON.parse(vm.getString(queueResult.value)) as string[];
@@ -248,8 +252,17 @@ export async function executeInSandbox(
 
         return executeWithRetries();
       }
+
+      // No pending requests and first pass threw — return the original error
+      if (firstPassError) {
+        return { success: false, output: null, error: JSON.stringify(firstPassError.err), logs };
+      }
     } else {
       queueResult.error.dispose();
+      // Can't read queue and first pass threw — return the original error
+      if (firstPassError) {
+        return { success: false, output: null, error: JSON.stringify(firstPassError.err), logs };
+      }
     }
 
     return { success: true, output: null, logs };
