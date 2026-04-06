@@ -736,21 +736,25 @@ providers:
   - type: aws
     region: us-east-1
     mode: read-only          # read-only | read-write | full
+    dryRunPolicy: optional   # enforced | optional | disabled
     allowedServices: []      # Empty = all services
     blockedActions: []
 
   - type: azure
     region: eastus
     mode: read-only
+    dryRunPolicy: optional
     subscriptionId: "..."
 
   - type: gcp
     region: us-central1
     mode: read-only
+    dryRunPolicy: optional
 
   - type: alibaba
     region: cn-hangzhou
     mode: read-only
+    dryRunPolicy: optional
 
 specs:
   dynamic: true              # Enable runtime API discovery
@@ -857,7 +861,7 @@ The agent never gets raw credentials. Code executes in a sandboxed environment w
 | **Read-only mode** | Blocks mutating operations. Default for all providers. |
 | **Service allowlist** | Only configured services can be called. Empty = all allowed. |
 | **Action blocklist** | Specific dangerous operations permanently blocked. |
-| **Dry-run mode** | `dryRun: true` logs what would happen without executing. |
+| **Dry-run system** | 4-level validation: native cloud provider dry-run, session-enforced gate, impact summaries, rollback planning. Configurable per provider. |
 | **Audit trail** | Every search and execution logged with timestamp, service, action, params, success/failure, duration. |
 | **Credential isolation** | Credentials live in the host process. The sandbox never sees them. |
 
@@ -869,6 +873,111 @@ providers:
     mode: read-only      # Default. Only Describe/Get/List operations allowed.
     # mode: read-write   # Allows Create/Update/Put. Still respects blocklist.
     # mode: full         # No restrictions. Use with caution.
+```
+
+### Dry-Run System
+
+cloud-pilot includes a 4-level dry-run system that validates infrastructure changes before they happen. The behavior is configurable per provider via the `dryRunPolicy` setting.
+
+#### Configuration
+
+```yaml
+providers:
+  - type: aws
+    mode: read-write
+    dryRunPolicy: enforced    # enforced | optional | disabled
+```
+
+| Policy | Behavior | Use Case |
+|--------|----------|----------|
+| **`enforced`** | Mutating calls are **rejected** unless a matching `dryRun: true` call was made first in the same session. The server enforces this — the agent cannot skip it. | Interactive sessions (Claude Code, Cursor, Teams bots with human in the loop) |
+| **`optional`** (default) | Dry-run is available and produces full validation/impact output, but the agent can execute without it. | Approved automation (ServiceNow post-approval workflows, CI/CD pipelines where the approval gate IS the safety check) |
+| **`disabled`** | Dry-run returns basic call info with no cloud-side validation, no impact summary, and no session tracking. Zero overhead. | Read-only monitoring bots, fully trusted automation |
+
+#### The 4 Levels
+
+**Level 1 — Native cloud provider validation**
+
+For AWS EC2 operations, cloud-pilot sends the actual API call with `DryRun=true` to AWS. AWS validates IAM permissions, resource quotas, CIDR conflicts, and other constraints — returning success or a specific failure reason — without creating any resources. Non-EC2 services get client-side validation (command exists, service is allowed).
+
+```
+DRY RUN: CreateVpc
+  validation: { validated: true, validationSource: "aws-native" }
+```
+
+**Level 2 — Session-enforced gate** (requires `dryRunPolicy: enforced`)
+
+Every mutating operation (Create, Delete, Update, Attach, etc.) must be dry-run'd before the real call. The server tracks a hash of each `(service, action, params)` tuple that has been dry-run'd in the session. If a real call doesn't have a matching dry-run, it's rejected:
+
+```
+ERROR: Mutating action "CreateVpc" requires a dry-run first (dryRunPolicy: enforced).
+       Call execute with dryRun: true before executing this operation.
+```
+
+**Level 3 — Impact summary**
+
+Every dry-run response includes a human-readable impact analysis:
+
+```
+impact: {
+  description: "Create Vpc on ec2",
+  actionType: "create",
+  reversible: true,
+  reverseAction: "DeleteVpc",
+  warnings: []
+}
+```
+
+For cost-incurring resources, warnings are included:
+- `"NAT Gateway incurs charges (~$32/mo + data processing)"`
+- `"Application Load Balancer incurs charges (~$16/mo + LCU)"`
+- `"This action may not be reversible"` (for deletes)
+
+**Level 4 — Session changeset and rollback plan**
+
+cloud-pilot tracks every resource created or modified during the session, extracts resource IDs from responses, and maintains a reverse-order rollback plan:
+
+```
+Session resources:
+  + ec2:CreateVpc vpc-0abc123 (Vpc)
+  + ec2:CreateSubnet subnet-0def456 (Subnet)
+  + ec2:CreateInternetGateway igw-0ghi789 (InternetGateway)
+
+Rollback plan:
+  1. ec2:DeleteInternetGateway (igw-0ghi789)
+  2. ec2:DeleteSubnet (subnet-0def456)
+  3. ec2:DeleteVpc (vpc-0abc123)
+```
+
+If a deployment fails mid-way, the rollback plan shows exactly what to clean up, in the correct dependency order.
+
+#### Example: ServiceNow vs Claude Code
+
+A **ServiceNow workflow** that's already been through change management approval:
+```yaml
+# ServiceNow integration config
+providers:
+  - type: aws
+    mode: read-write
+    dryRunPolicy: optional    # Approval gate is the safety check
+```
+
+An **interactive Claude Code session** where a human reviews each step:
+```yaml
+# Developer config
+providers:
+  - type: aws
+    mode: read-write
+    dryRunPolicy: enforced    # Force dry-run before every mutation
+```
+
+A **read-only monitoring bot** in Slack:
+```yaml
+# Monitoring bot config
+providers:
+  - type: aws
+    mode: read-only
+    dryRunPolicy: disabled    # Read-only, no mutations possible
 ```
 
 ### Sandbox Isolation Levels

@@ -26,6 +26,18 @@ export function createApiBridge(opts: ApiBridgeOptions) {
 
     // ── Dry-run mode ────────────────────────────────────────────────
     if (opts.dryRun) {
+      const dryRunPolicy = opts.config.dryRunPolicy ?? "optional";
+
+      // When disabled, dry-run just returns the call info with no validation
+      if (dryRunPolicy === "disabled") {
+        const result = {
+          dryRun: true,
+          wouldCall: { provider: opts.provider.name, service, action, params },
+          validation: { validated: false, validationSource: "disabled" },
+        };
+        return JSON.stringify(result);
+      }
+
       // Level 3: Build impact summary
       const impact = opts.changeset?.buildImpactSummary(service, action, params);
 
@@ -83,11 +95,16 @@ export function createApiBridge(opts: ApiBridgeOptions) {
 
     // ── Real execution ──────────────────────────────────────────────
 
-    // Level 2: Enforce dry-run gate for mutating operations
-    if (opts.changeset?.isMutating(action) && !opts.changeset.wasDryRunPerformed(service, action, params)) {
+    // Level 2: Enforce dry-run gate for mutating operations (only in "enforced" mode)
+    const dryRunPolicy = opts.config.dryRunPolicy ?? "optional";
+    if (
+      dryRunPolicy === "enforced" &&
+      opts.changeset?.isMutating(action) &&
+      !opts.changeset.wasDryRunPerformed(service, action, params)
+    ) {
       const result = {
         success: false,
-        error: `Mutating action "${action}" requires a dry-run first. ` +
+        error: `Mutating action "${action}" requires a dry-run first (dryRunPolicy: enforced). ` +
           `Call execute with dryRun: true before executing this operation.`,
         requiresDryRun: true,
       };

@@ -9,6 +9,7 @@ const ProviderConfigSchema = z.object({
   type: z.enum(["aws", "azure", "gcp", "alibaba"]),
   region: z.string().default("us-east-1"),
   mode: z.enum(["read-only", "read-write", "full"]).default("read-only"),
+  dryRunPolicy: z.enum(["enforced", "optional", "disabled"]).default("optional"),
   allowedServices: z.array(z.string()).default([]),
   blockedActions: z.array(z.string()).default([]),
   requireConfirmation: z.array(z.string()).default([]),
