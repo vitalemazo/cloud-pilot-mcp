@@ -8,6 +8,7 @@ import { promisify } from "node:util";
 import type { Config } from "../config.js";
 import type { AuthProvider } from "../interfaces/auth.js";
 import { VaultStateProxy } from "./vault-state-proxy.js";
+import { generateRequiredProviders, lookupProvider, searchProviders, type ProviderInfo } from "./registry.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -159,14 +160,14 @@ export class TofuWorkspaceManager {
   }
 
   /** Ensure a workspace exists and has provider config. */
-  private ensureWorkspace(workspace: string, providers: string[]): string {
+  private async ensureWorkspace(workspace: string, providers: string[]): Promise<string> {
     const dir = this.workspacePath(workspace);
     if (!existsSync(dir)) {
       mkdirSync(dir, { recursive: true });
     }
 
-    // Generate provider.tf with required providers
-    const providerTf = this.generateProviderConfig(providers);
+    // Generate provider.tf from OpenTofu registry (fetches latest versions)
+    const providerTf = await this.generateProviderConfig(providers);
     writeFileSync(join(dir, "provider.tf"), providerTf);
 
     // Generate backend config
@@ -177,8 +178,8 @@ export class TofuWorkspaceManager {
   }
 
   /** Write HCL to a workspace. */
-  writeHCL(workspace: string, filename: string, hcl: string, providers: string[] = ["aws"]): string {
-    const dir = this.ensureWorkspace(workspace, providers);
+  async writeHCL(workspace: string, filename: string, hcl: string, providers: string[] = ["aws"]): Promise<string> {
+    const dir = await this.ensureWorkspace(workspace, providers);
     const safeName = filename.endsWith(".tf") ? filename : `${filename}.tf`;
     const filePath = join(dir, safeName);
     writeFileSync(filePath, hcl);
@@ -203,7 +204,7 @@ export class TofuWorkspaceManager {
   async init(workspace: string, providers: string[] = ["aws"]): Promise<TofuResult> {
     // Start Vault proxy if vault backend is configured
     await this.ensureVaultProxy();
-    const dir = this.ensureWorkspace(workspace, providers);
+    const dir = await this.ensureWorkspace(workspace, providers);
     return this.runTofu(dir, ["init", "-input=false", "-no-color"]);
   }
 
@@ -340,67 +341,55 @@ export class TofuWorkspaceManager {
     }
   }
 
-  /** Generate provider.tf content based on configured providers. */
-  private generateProviderConfig(providers: string[]): string {
+  /** Generate provider.tf by looking up latest versions from the OpenTofu registry. */
+  private async generateProviderConfig(providers: string[]): Promise<string> {
+    // Fetch provider info from registry
+    const requiredProviders = await generateRequiredProviders(providers);
+
     const blocks: string[] = [
       `terraform {`,
       `  required_providers {`,
     ];
 
-    for (const p of providers) {
-      const pc = this.providerConfigs.get(p);
-      switch (p) {
-        case "aws":
-          blocks.push(`    aws = {`);
-          blocks.push(`      source  = "hashicorp/aws"`);
-          blocks.push(`      version = "~> 5.0"`);
-          blocks.push(`    }`);
-          break;
-        case "azure":
-          blocks.push(`    azurerm = {`);
-          blocks.push(`      source  = "hashicorp/azurerm"`);
-          blocks.push(`      version = "~> 4.0"`);
-          blocks.push(`    }`);
-          break;
-        case "gcp":
-          blocks.push(`    google = {`);
-          blocks.push(`      source  = "hashicorp/google"`);
-          blocks.push(`      version = "~> 6.0"`);
-          blocks.push(`    }`);
-          break;
-      }
+    for (const [name, info] of Object.entries(requiredProviders)) {
+      blocks.push(`    ${name} = {`);
+      blocks.push(`      source  = "${info.source}"`);
+      blocks.push(`      version = "${info.version}"`);
+      blocks.push(`    }`);
     }
 
     blocks.push(`  }`);
     blocks.push(`}`);
     blocks.push(``);
 
-    // Provider blocks with region config
+    // Provider blocks with region config from cloud-pilot config
     for (const p of providers) {
       const pc = this.providerConfigs.get(p);
-      switch (p) {
-        case "aws":
-          blocks.push(`provider "aws" {`);
-          blocks.push(`  region = "${pc?.region ?? "us-east-1"}"`);
-          blocks.push(`}`);
-          break;
-        case "azure":
-          blocks.push(`provider "azurerm" {`);
+      const providerName = p === "azure" ? "azurerm"
+        : p === "gcp" ? "google"
+        : p === "alibaba" ? "alicloud"
+        : p;
+
+      // Only generate provider block if we have it in required_providers
+      if (!requiredProviders[providerName]) continue;
+
+      blocks.push(`provider "${providerName}" {`);
+
+      switch (providerName) {
+        case "azurerm":
           blocks.push(`  features {}`);
-          if (pc?.subscriptionId) {
-            blocks.push(`  subscription_id = "${pc.subscriptionId}"`);
-          }
-          blocks.push(`}`);
+          if (pc?.subscriptionId) blocks.push(`  subscription_id = "${pc.subscriptionId}"`);
           break;
-        case "gcp":
-          blocks.push(`provider "google" {`);
+        case "google":
           blocks.push(`  region = "${pc?.region ?? "us-central1"}"`);
-          if (pc?.subscriptionId) {
-            blocks.push(`  project = "${pc.subscriptionId}"`);
-          }
-          blocks.push(`}`);
+          if (pc?.subscriptionId) blocks.push(`  project = "${pc.subscriptionId}"`);
+          break;
+        default:
+          if (pc?.region) blocks.push(`  region = "${pc.region}"`);
           break;
       }
+
+      blocks.push(`}`);
       blocks.push(``);
     }
 

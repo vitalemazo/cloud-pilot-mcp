@@ -102,10 +102,11 @@ export function createServer(deps: ServerDeps): McpServer {
       "tofu",
       "Manage infrastructure as code with OpenTofu (Terraform-compatible). " +
         "Use this for stateful infrastructure operations that need rollback, drift detection, and dependency management. " +
-        "Subcommands: init (initialize workspace), write (save HCL config), plan (preview changes), " +
+        "Subcommands: registry (search OpenTofu provider registry for latest versions), " +
+        "init (initialize workspace), write (save HCL config), plan (preview changes), " +
         "apply (create/update resources), destroy (tear down), import (adopt existing resources), " +
         "state (list/show tracked resources), output (read outputs), show (current state), workspaces (list all). " +
-        "Workflow: write HCL → init → plan → apply. To rollback: destroy. To check drift: plan with no changes.",
+        "Workflow: registry (discover providers) → write HCL → init → plan → apply. To rollback: destroy.",
       {
         subcommand: z
           .string()

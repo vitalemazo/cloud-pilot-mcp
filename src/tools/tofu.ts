@@ -4,6 +4,7 @@
 import type { AuditLogger } from "../interfaces/audit.js";
 import type { Config } from "../config.js";
 import type { TofuWorkspaceManager } from "../tofu/workspace.js";
+import { lookupProvider, searchProviders } from "../tofu/registry.js";
 
 interface TofuArgs {
   subcommand: string;
@@ -77,12 +78,14 @@ export async function handleTofu(
         return await handleRead(args, tofu);
       case "workspaces":
         return await handleListWorkspaces(tofu);
+      case "registry":
+        return await handleRegistry(args);
       default:
         return {
           content: [{
             type: "text" as const,
             text: `Unknown subcommand "${args.subcommand}". ` +
-              `Available: init, plan, apply, destroy, import, state, output, show, write, read, workspaces`,
+              `Available: init, write, plan, apply, destroy, import, state, output, show, workspaces, registry`,
           }],
           isError: true,
         };
@@ -239,6 +242,71 @@ async function handleListWorkspaces(tofu: TofuWorkspaceManager) {
           : `No workspaces yet. Use subcommand "init" with a workspace name to create one.`,
       ].join("\n"),
     }],
+    isError: false,
+  };
+}
+
+async function handleRegistry(args: TofuArgs) {
+  const query = args.resource ?? args.workspace ?? "aws";
+
+  // If it looks like a specific provider lookup, do that
+  if (query.includes("/") || /^[a-z]+$/.test(query)) {
+    const info = await lookupProvider(query);
+    if (!info) {
+      return {
+        content: [{
+          type: "text" as const,
+          text: `Provider "${query}" not found in the OpenTofu registry.\n\n` +
+            `Try a full name like "hashicorp/aws" or search with a keyword.`,
+        }],
+        isError: false,
+      };
+    }
+
+    const lines = [
+      `[REGISTRY] Provider: ${info.source}`,
+      ``,
+      `Latest version: ${info.latestVersion}`,
+      `Source: registry.opentofu.org/${info.source}`,
+      ``,
+      `Recent versions: ${info.allVersions.slice(0, 10).join(", ")}`,
+      ``,
+      `Usage in HCL:`,
+      `  terraform {`,
+      `    required_providers {`,
+      `      ${info.name} = {`,
+      `        source  = "${info.source}"`,
+      `        version = "~> ${info.latestVersion.split(".")[0]}.0"`,
+      `      }`,
+      `    }`,
+      `  }`,
+    ];
+
+    return {
+      content: [{ type: "text" as const, text: lines.join("\n") }],
+      isError: false,
+    };
+  }
+
+  // Otherwise search
+  const results = await searchProviders(query);
+  if (results.length === 0) {
+    return {
+      content: [{
+        type: "text" as const,
+        text: `No providers found matching "${query}" in the OpenTofu registry.`,
+      }],
+      isError: false,
+    };
+  }
+
+  const lines = [`[REGISTRY] Search results for "${query}"`, ``];
+  for (const info of results) {
+    lines.push(`  ${info.source} (latest: ${info.latestVersion})`);
+  }
+
+  return {
+    content: [{ type: "text" as const, text: lines.join("\n") }],
     isError: false,
   };
 }
