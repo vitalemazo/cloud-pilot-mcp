@@ -5,7 +5,15 @@ http:
   host: "127.0.0.1"
 
 auth:
-  type: env
+  type: env                  # env | vault | azure-ad
+
+  # Uncomment for Vault auth:
+  # type: vault
+  # vault:
+  #   address: https://vault.example.com
+  #   roleId: "..."          # or VAULT_ROLE_ID env var
+  #   secretId: "..."        # or VAULT_SECRET_ID env var
+  #   secretPath: secret/data/cloud-pilot   # KV v2 path (includes data/)
 
 providers:
   - type: aws
@@ -18,20 +26,12 @@ providers:
       - rds
       - lambda
       - ecs
+      - sts
       - cloudwatch
 
-  - type: azure
-    region: eastus
-    mode: read-only
-    allowedServices:
-      - compute
-      - storage
-      - network
-      - sql
-      - web
-      - keyvault
-      - monitor
-      - containerservice
+  # - type: azure
+  #   region: eastus
+  #   mode: read-only
 
 specs:
   dynamic: true
