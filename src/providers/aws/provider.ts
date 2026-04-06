@@ -10,6 +10,7 @@ import type {
 import type { AuthProvider } from "../../interfaces/auth.js";
 import type { ProviderConfig } from "../../config.js";
 import { signRequest } from "./signer.js";
+import { XMLParser } from "fast-xml-parser";
 
 export interface SpecIndex {
   search(query: string, service?: string): Promise<OperationSpec[]> | OperationSpec[];
@@ -25,64 +26,40 @@ const MUTATING_PREFIXES = [
   "Authorize", "Grant",
 ];
 
-// Lightweight XML-to-object parser for AWS query/ec2 protocol responses.
-// Handles flat and nested elements. Not a full XML parser — covers the
-// subset returned by AWS query-style APIs.
-function parseXml(xml: string): Record<string, unknown> {
-  function parseNode(s: string): unknown {
-    const result: Record<string, unknown> = {};
-    const tagRe = /<(\w+)>([\s\S]*?)<\/\1>/g;
-    let match: RegExpExecArray | null;
-    let found = false;
+// AWS XML uses <item> and <member> as list wrappers. Forcing them to always
+// be arrays means a parent like <reservationSet><item>...</item></reservationSet>
+// parses as { reservationSet: { item: [...] } }. The unwrapListTags post-pass
+// then collapses { item: [...] } into just [...] on the parent key.
+const xmlParser = new XMLParser({
+  ignoreAttributes: true,
+  removeNSPrefix: true,
+  isArray: (name: string) => name === "item" || name === "member",
+});
 
-    // eslint-disable-next-line no-cond-assign
-    while ((match = tagRe.exec(s)) !== null) {
-      found = true;
-      const [, tag, inner] = match;
-      const parsed = parseNode(inner);
+// Recursively unwrap objects whose only key is "item" or "member" into
+// their parent, converting { someSet: { item: [...] } } → { someSet: [...] }.
+function unwrapListTags(obj: unknown): unknown {
+  if (typeof obj !== "object" || obj === null) return obj;
+  if (Array.isArray(obj)) return obj.map(unwrapListTags);
 
-      // If the tag already exists, convert to array
-      if (result[tag] !== undefined) {
-        if (!Array.isArray(result[tag])) {
-          result[tag] = [result[tag]];
-        }
-        (result[tag] as unknown[]).push(parsed);
-      } else {
-        result[tag] = parsed;
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+    const processed = unwrapListTags(value);
+    if (typeof processed === "object" && processed !== null && !Array.isArray(processed)) {
+      const keys = Object.keys(processed);
+      if (keys.length === 1 && (keys[0] === "item" || keys[0] === "member")) {
+        result[key] = (processed as Record<string, unknown>)[keys[0]];
+        continue;
       }
     }
-
-    // If no child tags found, return as string value
-    if (!found) {
-      return s.trim();
-    }
-
-    // Unwrap <item> or <member> arrays (common AWS pattern)
-    for (const key of Object.keys(result)) {
-      const val = result[key];
-      if (
-        typeof val === "object" &&
-        val !== null &&
-        !Array.isArray(val) &&
-        ("item" in (val as Record<string, unknown>) || "member" in (val as Record<string, unknown>))
-      ) {
-        const items = (val as Record<string, unknown>).item ?? (val as Record<string, unknown>).member;
-        result[key] = Array.isArray(items) ? items : [items];
-      }
-    }
-
-    return result;
+    result[key] = processed;
   }
+  return result;
+}
 
-  // Strip XML declaration and find the root element
-  const stripped = xml.replace(/<\?xml[^?]*\?>\s*/, "");
-  const rootMatch = stripped.match(/<(\w+)[\s>]/);
-  if (!rootMatch) return {};
-
-  const parsed = parseNode(stripped);
-  return typeof parsed === "object" && parsed !== null
-    ? (parsed as Record<string, unknown>)
-    : {};
+function parseXml(xml: string): Record<string, unknown> {
+  const raw = xmlParser.parse(xml) as Record<string, unknown>;
+  return unwrapListTags(raw) as Record<string, unknown>;
 }
 
 // Flatten params into query string key=value pairs for AWS query protocol.
@@ -203,10 +180,9 @@ export class AwsProvider implements CloudProvider {
     region: string,
     doFetch: (endpoint: string) => Promise<Response>,
   ): Promise<Response> {
-    const regionalEndpoint = `https://${endpointPrefix}.${region}.amazonaws.com`;
     const endpoint = this.globalEndpointServices.has(endpointPrefix)
       ? `https://${endpointPrefix}.amazonaws.com`
-      : regionalEndpoint;
+      : `https://${endpointPrefix}.${region}.amazonaws.com`;
 
     try {
       return await doFetch(endpoint);
@@ -255,8 +231,8 @@ export class AwsProvider implements CloudProvider {
 
     const start = Date.now();
     try {
-      const res = await this.fetchWithFallback(endpointPrefix, region, (endpoint) => {
-        const headers = signRequest({
+      const res = await this.fetchWithFallback(endpointPrefix, region, async (endpoint) => {
+        const headers = await signRequest({
           method: "POST",
           url: endpoint,
           headers: {
@@ -345,9 +321,9 @@ export class AwsProvider implements CloudProvider {
 
     const start = Date.now();
     try {
-      const res = await this.fetchWithFallback(endpointPrefix, region, (endpoint) => {
+      const res = await this.fetchWithFallback(endpointPrefix, region, async (endpoint) => {
         const fullUrl = `${endpoint}${path}${queryString}`;
-        const headers = signRequest({
+        const headers = await signRequest({
           method,
           url: fullUrl,
           headers: {},
@@ -409,8 +385,8 @@ export class AwsProvider implements CloudProvider {
 
     const start = Date.now();
     try {
-      const res = await this.fetchWithFallback(endpointPrefix, region, (endpoint) => {
-        const headers = signRequest({
+      const res = await this.fetchWithFallback(endpointPrefix, region, async (endpoint) => {
+        const headers = await signRequest({
           method: "POST",
           url: endpoint,
           headers: {
